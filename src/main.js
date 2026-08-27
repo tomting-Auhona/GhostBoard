@@ -5,13 +5,9 @@ import {
   HandLandmarker
 } from "@mediapipe/tasks-vision";
 
-import {
-  Chess
-} from "chess.js";
+import { Chess } from "chess.js";
 
-import {
-  initializeApp
-} from "firebase/app";
+import { initializeApp } from "firebase/app";
 
 import {
   getAuth,
@@ -29,9 +25,7 @@ import {
   onDisconnect
 } from "firebase/database";
 
-import {
-  firebaseConfig
-} from "./firebase-config.js";
+import { firebaseConfig } from "./firebase-config.js";
 
 
 /* =========================================================
@@ -39,15 +33,11 @@ import {
 ========================================================= */
 
 const BUILD_VERSION =
-  "GHOSTBOARD-AUTO-SWITCH-7";
+  "GHOSTBOARD-AI-FAIR-CLOCK-8";
 
-console.log(
-  `Ghost Board ${BUILD_VERSION}`
-);
+console.log(`Ghost Board ${BUILD_VERSION}`);
 
-document.title =
-  "Ghost Board";
-
+document.title = "Ghost Board";
 
 const $ = (selector) =>
   document.querySelector(selector);
@@ -57,153 +47,79 @@ const $ = (selector) =>
    DOM
 ========================================================= */
 
-const app =
-  $("#app");
+const app = $("#app");
 
-const setupScreen =
-  $("#setupScreen");
+const setupScreen = $("#setupScreen");
+const gameScreen = $("#gameScreen");
 
-const gameScreen =
-  $("#gameScreen");
+const startGameBtn = $("#startGameBtn");
+const gameModeInput = $("#gameMode");
 
-const startGameBtn =
-  $("#startGameBtn");
+const player1NameInput = $("#player1Name");
+const player2NameInput = $("#player2Name");
 
-const gameModeInput =
-  $("#gameMode");
+const player2Field = $("#player2Field");
 
-const player1NameInput =
-  $("#player1Name");
+const difficultyField = $("#difficultyField");
+const difficultyInput = $("#difficulty");
 
-const player2NameInput =
-  $("#player2Name");
+const timeControlInput = $("#timeControl");
 
-const player2Field =
-  $("#player2Field");
+const customTime = $("#customTime");
+const customMinutes = $("#customMinutes");
+const customIncrement = $("#customIncrement");
 
-const difficultyField =
-  $("#difficultyField");
+const boardThemeInput = $("#boardTheme");
+const liveTheme = $("#liveTheme");
 
-const difficultyInput =
-  $("#difficulty");
+const soundToggle = $("#soundToggle");
+const setupMessage = $("#setupMessage");
 
-const timeControlInput =
-  $("#timeControl");
+const onlineFields = $("#onlineFields");
+const onlineAction = $("#onlineAction");
 
-const customTime =
-  $("#customTime");
+const roomCodeField = $("#roomCodeField");
+const roomCodeInput = $("#roomCodeInput");
 
-const customMinutes =
-  $("#customMinutes");
-
-const customIncrement =
-  $("#customIncrement");
-
-const boardThemeInput =
-  $("#boardTheme");
-
-const liveTheme =
-  $("#liveTheme");
-
-const soundToggle =
-  $("#soundToggle");
-
-const setupMessage =
-  $("#setupMessage");
+const onlineNote = $("#onlineNote");
 
 
-const onlineFields =
-  $("#onlineFields");
+const webcam = $("#webcam");
+const cameraStage = $("#cameraStage");
 
-const onlineAction =
-  $("#onlineAction");
+const boardEl = $("#board");
+const handCursor = $("#handCursor");
 
-const roomCodeField =
-  $("#roomCodeField");
+const gameStatus = $("#gameStatus");
+const moveHistoryEl = $("#moveHistory");
 
-const roomCodeInput =
-  $("#roomCodeInput");
+const whiteNameEl = $("#whiteName");
+const blackNameEl = $("#blackName");
 
-const onlineNote =
-  $("#onlineNote");
+const whiteClockEl = $("#whiteClock");
+const blackClockEl = $("#blackClock");
 
+const whitePlayer = $("#whitePlayer");
+const blackPlayer = $("#blackPlayer");
 
-const webcam =
-  $("#webcam");
+const aiThinking = $("#aiThinking");
 
-const cameraStage =
-  $("#cameraStage");
+const muteBtn = $("#muteBtn");
 
-const boardEl =
-  $("#board");
+const restartBtn = $("#restartBtn");
+const resignBtn = $("#resignBtn");
+const newGameBtn = $("#newGameBtn");
 
-const handCursor =
-  $("#handCursor");
+const onlineRoomBar = $("#onlineRoomBar");
 
+const roomCodeLabel = $("#roomCodeLabel");
+const copyRoomBtn = $("#copyRoomBtn");
 
-const gameStatus =
-  $("#gameStatus");
+const connectionLabel = $("#connectionLabel");
 
-const moveHistoryEl =
-  $("#moveHistory");
-
-
-const whiteNameEl =
-  $("#whiteName");
-
-const blackNameEl =
-  $("#blackName");
-
-const whiteClockEl =
-  $("#whiteClock");
-
-const blackClockEl =
-  $("#blackClock");
-
-const whitePlayer =
-  $("#whitePlayer");
-
-const blackPlayer =
-  $("#blackPlayer");
-
-
-const aiThinking =
-  $("#aiThinking");
-
-
-const muteBtn =
-  $("#muteBtn");
-
-const restartBtn =
-  $("#restartBtn");
-
-const resignBtn =
-  $("#resignBtn");
-
-const newGameBtn =
-  $("#newGameBtn");
-
-
-const onlineRoomBar =
-  $("#onlineRoomBar");
-
-const roomCodeLabel =
-  $("#roomCodeLabel");
-
-const copyRoomBtn =
-  $("#copyRoomBtn");
-
-const connectionLabel =
-  $("#connectionLabel");
-
-const waitingOverlay =
-  $("#waitingOverlay");
-
-const waitingText =
-  $("#waitingText");
-
-const waitingCode =
-  $("#waitingCode");
+const waitingOverlay = $("#waitingOverlay");
+const waitingText = $("#waitingText");
+const waitingCode = $("#waitingCode");
 
 const copyWaitingCodeBtn =
   $("#copyWaitingCodeBtn");
@@ -217,13 +133,9 @@ document
   .querySelectorAll(
     "#gestureHint, #belowCameraHint, .instructions, .hand-info"
   )
-  .forEach(
-    (element) => {
-
-      element.remove();
-
-    }
-  );
+  .forEach((element) => {
+    element.remove();
+  });
 
 
 /* =========================================================
@@ -231,19 +143,12 @@ document
 ========================================================= */
 
 const FILES = [
-  "a",
-  "b",
-  "c",
-  "d",
-  "e",
-  "f",
-  "g",
-  "h"
+  "a", "b", "c", "d",
+  "e", "f", "g", "h"
 ];
 
 
 const PIECES = {
-
   wp: "♟",
   wn: "♞",
   wb: "♝",
@@ -257,57 +162,144 @@ const PIECES = {
   br: "♜",
   bq: "♛",
   bk: "♚"
-
 };
 
 
 /* =========================================================
-   EXTRA GAME UI
+   AIR CONTROL SETTINGS
 ========================================================= */
 
-let capturedPanel =
-  null;
+const SELECT_DWELL_MS = 120;
 
-let capturedByWhiteEl =
-  null;
+const MOVE_DWELL_MS = 200;
 
-let capturedByBlackEl =
-  null;
+const SWITCH_DWELL_MS = 120;
 
-let resultOverlay =
-  null;
 
-let resultTitle =
-  null;
+/*
+  Cursor responsiveness.
+*/
+const SMOOTHING = 0.88;
 
-let resultSubtitle =
-  null;
 
-let lastResultSignature =
-  null;
+/*
+  Source-piece hit area.
+*/
+const SELECTION_CORE_MARGIN = 0.11;
+
+
+/*
+  Destination magnetism.
+*/
+const MAGNET_RADIUS = 0.50;
+
+const KING_MAGNET_RADIUS = 0.66;
+
+
+/*
+  Fly-over protection.
+
+  Prevents d2 → d4 becoming d3.
+*/
+const STABLE_MOTION_FRACTION = 0.055;
+
+const REQUIRED_STABLE_FRAMES = 2;
+
+
+/*
+  Bottom-row assistance.
+*/
+const BOTTOM_EDGE_ASSIST = 0.42;
+
+
+/* =========================================================
+   AI CLOCK FAIRNESS
+========================================================= */
+
+/*
+  Human air-control refund.
+
+  IMPORTANT:
+  Ghost Board never adds a free 700 ms.
+
+  It only refunds up to 700 ms of time
+  that ACTUALLY passed during your turn.
+
+  Example:
+
+  Turn took 4.2 seconds
+  → refund 0.7 s
+  → clock loses 3.5 s
+
+  Turn took 0.4 seconds
+  → refund only 0.4 s
+  → clock loses ~0 s
+*/
+const HUMAN_AIR_REFUND_MS = 700;
+
+
+/*
+  Nova's minimum thinking delay.
+
+  The AI clock keeps ticking for the
+  ENTIRE delay, plus however long its
+  minimax calculation actually takes.
+*/
+const AI_THINK_RANGES = {
+  easy: {
+    min: 1400,
+    max: 1800
+  },
+
+  medium: {
+    min: 1100,
+    max: 1500
+  },
+
+  hard: {
+    min: 900,
+    max: 1300
+  },
+
+  expert: {
+    min: 800,
+    max: 1100
+  }
+};
+
+
+/* =========================================================
+   EXTRA UI
+   CAPTURED PIECES + RESULT
+========================================================= */
+
+let capturedPanel = null;
+
+let capturedByWhiteEl = null;
+let capturedByBlackEl = null;
+
+let resultOverlay = null;
+let resultTitle = null;
+let resultSubtitle = null;
+
+let lastResultSignature = null;
 
 
 function createExtraGameUI() {
 
   if (
-    cameraStage
-    && !$("#capturedPanel")
+    cameraStage &&
+    !$("#capturedPanel")
   ) {
 
     capturedPanel =
-      document.createElement(
-        "div"
-      );
-
+      document.createElement("div");
 
     capturedPanel.id =
       "capturedPanel";
 
-
     capturedPanel.innerHTML = `
-
       <div class="captured-line">
-
         <span class="captured-label">
           White captured
         </span>
@@ -318,12 +310,9 @@ function createExtraGameUI() {
         >
           —
         </span>
-
       </div>
 
-
       <div class="captured-line">
-
         <span class="captured-label">
           Black captured
         </span>
@@ -334,17 +323,13 @@ function createExtraGameUI() {
         >
           —
         </span>
-
       </div>
-
     `;
-
 
     cameraStage.insertAdjacentElement(
       "afterend",
       capturedPanel
     );
-
   }
 
 
@@ -359,55 +344,38 @@ function createExtraGameUI() {
 
 
   if (
-    cameraStage
-    && !$("#ghostResultOverlay")
+    cameraStage &&
+    !$("#ghostResultOverlay")
   ) {
 
     resultOverlay =
-      document.createElement(
-        "div"
-      );
-
+      document.createElement("div");
 
     resultOverlay.id =
       "ghostResultOverlay";
 
-
     resultOverlay.className =
       "ghost-result-overlay hidden";
 
+    const stars =
+      Array.from(
+        { length: 20 },
+        (_, index) => {
+          return `
+            <span style="--i:${index}">
+              ✦
+            </span>
+          `;
+        }
+      ).join("");
+
 
     resultOverlay.innerHTML = `
-
       <div class="result-confetti">
-
-        ${Array.from(
-          {
-            length:
-              20
-          },
-
-          (_, index) => {
-
-            return `
-
-              <span
-                style="--i:${index}"
-              >
-                ✦
-              </span>
-
-            `;
-
-          }
-
-        ).join("")}
-
+        ${stars}
       </div>
 
-
       <div class="ghost-result-card">
-
         <div
           id="ghostResultTitle"
           class="ghost-result-title"
@@ -421,16 +389,12 @@ function createExtraGameUI() {
         >
           Checkmate
         </div>
-
       </div>
-
     `;
-
 
     cameraStage.appendChild(
       resultOverlay
     );
-
   }
 
 
@@ -442,7 +406,6 @@ function createExtraGameUI() {
 
   resultSubtitle =
     $("#ghostResultSubtitle");
-
 }
 
 
@@ -450,47 +413,38 @@ createExtraGameUI();
 
 
 /* =========================================================
-   RUNTIME CSS
+   EXTRA UI CSS
 ========================================================= */
 
 const runtimeStyle =
-  document.createElement(
-    "style"
-  );
+  document.createElement("style");
 
 
 runtimeStyle.textContent = `
 
   #capturedPanel {
-
     width: 100%;
-
     margin-top: 10px;
-
     padding: 10px 14px;
 
     border:
       1px solid
       rgba(255,255,255,.10);
 
-    border-radius:
-      13px;
+    border-radius: 13px;
 
     background:
       rgba(12,12,18,.88);
 
     display: grid;
-
     gap: 6px;
   }
 
 
   .captured-line {
-
     min-height: 28px;
 
     display: flex;
-
     align-items: center;
 
     gap: 10px;
@@ -498,14 +452,12 @@ runtimeStyle.textContent = `
 
 
   .captured-label {
-
     min-width: 105px;
 
     color:
       rgba(255,255,255,.58);
 
     font-size: 11px;
-
     font-weight: 700;
 
     text-transform: uppercase;
@@ -515,7 +467,6 @@ runtimeStyle.textContent = `
 
 
   .captured-pieces {
-
     display: flex;
 
     align-items: center;
@@ -535,7 +486,6 @@ runtimeStyle.textContent = `
 
 
   .captured-piece-white {
-
     color: #f6f6fa;
 
     text-shadow:
@@ -544,7 +494,6 @@ runtimeStyle.textContent = `
 
 
   .captured-piece-black {
-
     color: #737381;
 
     text-shadow:
@@ -554,7 +503,6 @@ runtimeStyle.textContent = `
 
 
   #ghostResultOverlay {
-
     position: absolute;
 
     inset: 0;
@@ -564,7 +512,6 @@ runtimeStyle.textContent = `
     display: flex;
 
     align-items: center;
-
     justify-content: center;
 
     overflow: hidden;
@@ -578,13 +525,11 @@ runtimeStyle.textContent = `
 
 
   #ghostResultOverlay.hidden {
-
     display: none !important;
   }
 
 
   .ghost-result-card {
-
     position: relative;
 
     z-index: 5;
@@ -604,8 +549,7 @@ runtimeStyle.textContent = `
       1px solid
       rgba(255,255,255,.22);
 
-    border-radius:
-      22px;
+    border-radius: 22px;
 
     background:
       rgba(15,13,24,.94);
@@ -627,7 +571,6 @@ runtimeStyle.textContent = `
 
 
   .ghost-result-title {
-
     font-size:
       clamp(
         24px,
@@ -644,13 +587,13 @@ runtimeStyle.textContent = `
 
     animation:
       ghostTitlePulse
-      1.1s ease-in-out
+      1.1s
+      ease-in-out
       infinite alternate;
   }
 
 
   .ghost-result-subtitle {
-
     margin-top: 7px;
 
     color:
@@ -663,7 +606,6 @@ runtimeStyle.textContent = `
 
 
   .result-confetti {
-
     position: absolute;
 
     inset: 0;
@@ -675,7 +617,6 @@ runtimeStyle.textContent = `
 
 
   .result-confetti span {
-
     --column:
       calc(
         (
@@ -685,11 +626,9 @@ runtimeStyle.textContent = `
 
     position: absolute;
 
-    left:
-      var(--column);
+    left: var(--column);
 
-    top:
-      -12%;
+    top: -12%;
 
     font-size:
       calc(
@@ -722,19 +661,16 @@ runtimeStyle.textContent = `
 
 
   .result-confetti span:nth-child(3n) {
-
     color: #ffd454;
   }
 
 
   .result-confetti span:nth-child(3n + 1) {
-
     color: #ba83ff;
   }
 
 
   .result-confetti span:nth-child(3n + 2) {
-
     color: #67dcff;
   }
 
@@ -742,7 +678,6 @@ runtimeStyle.textContent = `
   @keyframes ghostResultPop {
 
     from {
-
       opacity: 0;
 
       transform:
@@ -751,55 +686,46 @@ runtimeStyle.textContent = `
     }
 
     to {
-
       opacity: 1;
 
       transform:
         scale(1)
         translateY(0);
     }
-
   }
 
 
   @keyframes ghostTitlePulse {
 
     from {
-
       transform:
         scale(1);
     }
 
     to {
-
       transform:
         scale(1.035);
     }
-
   }
 
 
   @keyframes ghostConfettiFall {
 
     from {
-
       transform:
         translateY(-10%)
         rotate(0deg);
     }
 
     to {
-
       transform:
         translateY(700px)
         rotate(520deg);
     }
-
   }
 
 
   #cameraStage {
-
     position: relative;
   }
 
@@ -812,114 +738,29 @@ document.head.appendChild(
 
 
 /* =========================================================
-   AIR CONTROL SETTINGS
-========================================================= */
-
-/*
-  Selecting a piece.
-*/
-
-const SELECT_DWELL_MS =
-  120;
-
-
-/*
-  Making the actual move.
-*/
-
-const MOVE_DWELL_MS =
-  200;
-
-
-/*
-  Switching from one friendly piece
-  to another should feel like selecting,
-  not like making a move.
-*/
-
-const SWITCH_DWELL_MS =
-  120;
-
-
-/*
-  Cursor responsiveness.
-*/
-
-const SMOOTHING =
-  0.88;
-
-
-/*
-  Source selection central area.
-*/
-
-const SELECTION_CORE_MARGIN =
-  0.11;
-
-
-/*
-  Destination magnetism.
-*/
-
-const MAGNET_RADIUS =
-  0.50;
-
-
-const KING_MAGNET_RADIUS =
-  0.66;
-
-
-/*
-  Fly-over protection.
-*/
-
-const STABLE_MOTION_FRACTION =
-  0.055;
-
-
-const REQUIRED_STABLE_FRAMES =
-  2;
-
-
-/*
-  Bottom rank extension.
-*/
-
-const BOTTOM_EDGE_ASSIST =
-  0.42;
-
-
-/* =========================================================
    GAME STATE
 ========================================================= */
 
 let game =
   new Chess();
 
-
 let settings =
   null;
-
 
 let selectedSquare =
   null;
 
-
 let legalTargets =
   [];
-
 
 let lastMove =
   null;
 
-
 let hoveredSquare =
   null;
 
-
 let gameActive =
   false;
-
 
 let aiBusy =
   false;
@@ -932,289 +773,227 @@ let aiBusy =
 let currentHoverSquare =
   null;
 
-
 let hoverStartTime =
   0;
-
 
 let lastActivatedSquare =
   null;
 
-
 let smoothX =
   null;
-
 
 let smoothY =
   null;
 
-
 let previousPointerX =
   null;
 
-
 let previousPointerY =
   null;
-
 
 let stableFrames =
   0;
 
 
 /* =========================================================
-   CLOCK
+   CLOCK STATE
 ========================================================= */
 
 let whiteTimeMs =
   300000;
 
-
 let blackTimeMs =
   300000;
-
 
 let incrementMs =
   0;
 
-
 let lastClockTick =
   0;
-
 
 let clockTimer =
   null;
 
 
+/*
+  Used specifically for fair AI-mode
+  air-control refund.
+
+  This marks when the CURRENT local
+  chess turn began.
+*/
+let localTurnStartedAt =
+  0;
+
+
 /* =========================================================
-   CAMERA
+   CAMERA STATE
 ========================================================= */
 
 let cameraStream =
   null;
 
-
 let handLandmarker =
   null;
-
 
 let handLoopStarted =
   false;
 
 
 /* =========================================================
-   SOUND
+   AUDIO STATE
 ========================================================= */
 
 let soundEnabled =
   true;
-
 
 let audioContext =
   null;
 
 
 /* =========================================================
-   FIREBASE
+   FIREBASE STATE
 ========================================================= */
 
 let firebaseApp =
   null;
 
-
 let auth =
   null;
-
 
 let db =
   null;
 
-
 let firebaseUser =
   null;
-
 
 let serverTimeOffset =
   0;
 
-
 let currentRoomCode =
   null;
-
 
 let currentRoomRef =
   null;
 
-
 let roomUnsubscribe =
   null;
-
 
 let onlineRoomState =
   null;
 
-
 let onlineColor =
   null;
-
 
 let onlineMovePending =
   false;
 
 
 /* =========================================================
-   HELPERS
+   GENERAL HELPERS
 ========================================================= */
 
 function mode() {
 
   return (
-    settings?.mode
-    || gameModeInput?.value
-    || "ai"
+    settings?.mode ||
+    gameModeInput?.value ||
+    "ai"
   );
-
 }
 
 
-function colorKey(
-  color
-) {
+function colorKey(color) {
 
   return (
     color === "w"
       ? "white"
       : "black"
   );
-
 }
 
 
-function otherColor(
-  color
-) {
+function otherColor(color) {
 
   return (
     color === "w"
       ? "b"
       : "w"
   );
-
 }
 
 
 function serverNow() {
 
   return (
-    Date.now()
-    + serverTimeOffset
+    Date.now() +
+    serverTimeOffset
   );
-
 }
 
 
-function normalizeArray(
-  value
-) {
+function normalizeArray(value) {
 
   if (
     Array.isArray(value)
   ) {
 
     return value;
-
   }
 
 
   if (
-    !value
-    || typeof value !==
-    "object"
+    !value ||
+    typeof value !== "object"
   ) {
 
     return [];
-
   }
 
 
   return Object
     .keys(value)
     .sort(
-      (a, b) => {
-
-        return (
-          Number(a)
-          - Number(b)
-        );
-
-      }
+      (a, b) =>
+        Number(a) - Number(b)
     )
     .map(
-      (key) => {
-
-        return value[key];
-
-      }
+      (key) =>
+        value[key]
     );
-
 }
 
 
 /* =========================================================
-   OWN PIECE HELPERS
+   PIECE SWITCH HELPERS
 ========================================================= */
 
-function isOwnTurnPiece(
-  square
-) {
+function isOwnTurnPiece(square) {
 
-  if (
-    !square
-  ) {
-
+  if (!square) {
     return false;
-
   }
 
 
   const piece =
-    game.get(
-      square
-    );
+    game.get(square);
 
 
   return Boolean(
-
-    piece
-
-    && piece.color ===
-    game.turn()
-
+    piece &&
+    piece.color === game.turn()
   );
-
 }
 
 
-/*
-  True when another friendly piece is
-  being deliberately selected while one
-  is already selected.
-
-  Castling is excluded because pointing
-  King → Rook should still castle.
-*/
-
-function isPieceSwitch(
-  square
-) {
+function isPieceSwitch(square) {
 
   if (
-    !selectedSquare
-    || square ===
-    selectedSquare
+    !selectedSquare ||
+    square === selectedSquare
   ) {
 
     return false;
-
   }
 
 
@@ -1226,52 +1005,37 @@ function isPieceSwitch(
   ) {
 
     return false;
-
   }
 
 
   return isOwnTurnPiece(
     square
   );
-
 }
 
 
 /* =========================================================
-   FIREBASE
+   FIREBASE CONFIG
 ========================================================= */
 
 function isFirebaseConfigured() {
 
   return [
-
     firebaseConfig.apiKey,
-
     firebaseConfig.authDomain,
-
     firebaseConfig.databaseURL,
-
     firebaseConfig.projectId,
-
     firebaseConfig.appId
-
   ].every(
     (value) => {
 
       return (
-
-        value
-
-        && !String(value)
-          .includes(
-            "PASTE_"
-          )
-
+        value &&
+        !String(value)
+          .includes("PASTE_")
       );
-
     }
   );
-
 }
 
 
@@ -1284,13 +1048,10 @@ async function initOnlineBackend() {
     throw new Error(
       "Firebase is not configured correctly."
     );
-
   }
 
 
-  if (
-    !firebaseApp
-  ) {
+  if (!firebaseApp) {
 
     firebaseApp =
       initializeApp(
@@ -1319,7 +1080,6 @@ async function initOnlineBackend() {
 
 
     onValue(
-
       ref(
         db,
         ".info/serverTimeOffset"
@@ -1328,16 +1088,11 @@ async function initOnlineBackend() {
       (snapshot) => {
 
         serverTimeOffset =
-          snapshot.val()
-          || 0;
-
+          snapshot.val() || 0;
       }
-
     );
 
-  } else if (
-    !firebaseUser
-  ) {
+  } else if (!firebaseUser) {
 
     firebaseUser =
       (
@@ -1345,14 +1100,12 @@ async function initOnlineBackend() {
           auth
         )
       ).user;
-
   }
-
 }
 
 
 /* =========================================================
-   ROOM CODE
+   ROOM CODES
 ========================================================= */
 
 function generateRoomCode() {
@@ -1366,32 +1119,26 @@ function generateRoomCode() {
 
 
   for (
-    let index = 0;
-    index < 4;
-    index++
+    let i = 0;
+    i < 4;
+    i++
   ) {
 
     suffix +=
       chars[
         Math.floor(
-          Math.random()
-          * chars.length
+          Math.random() *
+          chars.length
         )
       ];
-
   }
 
 
-  return (
-    `GHOST-${suffix}`
-  );
-
+  return `GHOST-${suffix}`;
 }
 
 
-function normalizeRoomCode(
-  code
-) {
+function normalizeRoomCode(code) {
 
   return String(
     code || ""
@@ -1402,12 +1149,11 @@ function normalizeRoomCode(
       /\s+/g,
       ""
     );
-
 }
 
 
 /* =========================================================
-   MODE UI
+   SETUP UI
 ========================================================= */
 
 function updateModeUI() {
@@ -1420,8 +1166,7 @@ function updateModeUI() {
     ?.classList
     .toggle(
       "hidden",
-      selectedMode !==
-      "ai"
+      selectedMode !== "ai"
     );
 
 
@@ -1429,8 +1174,7 @@ function updateModeUI() {
     ?.classList
     .toggle(
       "hidden",
-      selectedMode !==
-      "local"
+      selectedMode !== "local"
     );
 
 
@@ -1438,51 +1182,39 @@ function updateModeUI() {
     ?.classList
     .toggle(
       "hidden",
-      selectedMode !==
-      "online"
+      selectedMode !== "online"
     );
 
 
-  if (
-    !startGameBtn
-  ) {
-
+  if (!startGameBtn) {
     return;
-
   }
 
 
   if (
-    selectedMode ===
-    "ai"
+    selectedMode === "ai"
   ) {
 
     startGameBtn.textContent =
       "START VS AI";
-
   }
 
 
   if (
-    selectedMode ===
-    "local"
+    selectedMode === "local"
   ) {
 
     startGameBtn.textContent =
       "START LOCAL GAME";
-
   }
 
 
   if (
-    selectedMode ===
-    "online"
+    selectedMode === "online"
   ) {
 
     updateOnlineActionUI();
-
   }
-
 }
 
 
@@ -1501,31 +1233,22 @@ function updateOnlineActionUI() {
     );
 
 
-  if (
-    startGameBtn
-  ) {
+  if (startGameBtn) {
 
     startGameBtn.textContent =
       joining
         ? "JOIN ONLINE GAME"
         : "CREATE ONLINE GAME";
-
   }
 
 
-  if (
-    onlineNote
-  ) {
+  if (onlineNote) {
 
     onlineNote.textContent =
       joining
-
         ? "Enter the room code from the other player."
-
         : "Create a room and share the code with another device.";
-
   }
-
 }
 
 
@@ -1555,7 +1278,6 @@ timeControlInput
           timeControlInput.value !==
           "custom"
         );
-
     }
   );
 
@@ -1569,15 +1291,11 @@ boardThemeInput
         boardThemeInput.value;
 
 
-      if (
-        liveTheme
-      ) {
+      if (liveTheme) {
 
         liveTheme.value =
           boardThemeInput.value;
-
       }
-
     }
   );
 
@@ -1595,7 +1313,6 @@ liveTheme
         "ghostboard-theme",
         liveTheme.value
       );
-
     }
   );
 
@@ -1605,9 +1322,7 @@ liveTheme
 ========================================================= */
 
 document
-  .querySelectorAll(
-    ".sticker"
-  )
+  .querySelectorAll(".sticker")
   .forEach(
     (button) => {
 
@@ -1616,25 +1331,21 @@ document
         () => {
 
           player1NameInput.value =
-
             `${player1NameInput.value.trim()} ${button.textContent.trim()}`.trim();
-
         }
       );
-
     }
   );
 
 
 /* =========================================================
-   SAVED VALUES
+   SAVED SETTINGS
 ========================================================= */
 
 const savedName =
   localStorage.getItem(
     "ghostboard-name"
   );
-
 
 const savedTheme =
   localStorage.getItem(
@@ -1643,43 +1354,33 @@ const savedTheme =
 
 
 if (
-  savedName
-  && player1NameInput
+  savedName &&
+  player1NameInput
 ) {
 
   player1NameInput.value =
     savedName;
-
 }
 
 
-if (
-  savedTheme
-) {
+if (savedTheme) {
 
-  if (
-    boardThemeInput
-  ) {
+  if (boardThemeInput) {
 
     boardThemeInput.value =
       savedTheme;
-
   }
 
 
-  if (
-    liveTheme
-  ) {
+  if (liveTheme) {
 
     liveTheme.value =
       savedTheme;
-
   }
 
 
   app.dataset.theme =
     savedTheme;
-
 }
 
 
@@ -1693,7 +1394,6 @@ updateModeUI();
 function collectSettings() {
 
   let minutes;
-
   let increment;
 
 
@@ -1707,8 +1407,7 @@ function collectSettings() {
         1,
         Number(
           customMinutes.value
-        )
-        || 1
+        ) || 1
       );
 
 
@@ -1717,8 +1416,7 @@ function collectSettings() {
         0,
         Number(
           customIncrement.value
-        )
-        || 0
+        ) || 0
       );
 
   } else {
@@ -1731,7 +1429,6 @@ function collectSettings() {
         .value
         .split(",")
         .map(Number);
-
   }
 
 
@@ -1742,16 +1439,13 @@ function collectSettings() {
 
 
     whiteName:
-
       player1NameInput
         .value
         .trim()
-
       || "Player",
 
 
     blackName:
-
       gameModeInput.value ===
       "ai"
 
@@ -1761,22 +1455,16 @@ function collectSettings() {
           player2NameInput
             ?.value
             .trim()
-
           || "Player 2"
         ),
 
 
     difficulty:
-
-      difficultyInput
-        ?.value
-
+      difficultyInput?.value
       || "medium",
 
 
     minutes,
-
-
     increment,
 
 
@@ -1785,14 +1473,9 @@ function collectSettings() {
 
 
     sound:
-
-      soundToggle
-        ?.checked
-
+      soundToggle?.checked
       ?? true
-
   };
-
 }
 
 
@@ -1830,13 +1513,10 @@ startGameBtn
           settings.theme;
 
 
-        if (
-          liveTheme
-        ) {
+        if (liveTheme) {
 
           liveTheme.value =
             settings.theme;
-
         }
 
 
@@ -1854,13 +1534,11 @@ startGameBtn
 
         await startCamera();
 
-
         await initHandTracking();
 
 
         if (
-          settings.mode ===
-          "online"
+          settings.mode === "online"
         ) {
 
           await initOnlineBackend();
@@ -1876,13 +1554,10 @@ startGameBtn
           } else {
 
             await joinOnlineRoom(
-
               normalizeRoomCode(
                 roomCodeInput.value
               )
-
             );
-
           }
 
         } else {
@@ -1894,15 +1569,11 @@ startGameBtn
 
           openGameScreen();
 
-
           initializeLocalGame();
-
         }
 
 
-        if (
-          !handLoopStarted
-        ) {
+        if (!handLoopStarted) {
 
           handLoopStarted =
             true;
@@ -1911,29 +1582,22 @@ startGameBtn
           requestAnimationFrame(
             handTrackingLoop
           );
-
         }
 
       } catch (error) {
 
-        console.error(
-          error
-        );
+        console.error(error);
 
 
         setupMessage.textContent =
-
-          error?.message
-
-          || "Could not start Ghost Board.";
+          error?.message ||
+          "Could not start Ghost Board.";
 
       } finally {
 
         startGameBtn.disabled =
           false;
-
       }
-
     }
   );
 
@@ -1942,22 +1606,17 @@ function openGameScreen() {
 
   setupScreen
     ?.classList
-    .add(
-      "hidden"
-    );
+    .add("hidden");
 
 
   gameScreen
     ?.classList
-    .remove(
-      "hidden"
-    );
+    .remove("hidden");
 
 
   requestAnimationFrame(
     fitBoardToCamera
   );
-
 }
 
 
@@ -1967,12 +1626,8 @@ function openGameScreen() {
 
 async function startCamera() {
 
-  if (
-    cameraStream
-  ) {
-
+  if (cameraStream) {
     return;
-
   }
 
 
@@ -1985,36 +1640,27 @@ async function startCamera() {
     throw new Error(
       "Camera unavailable. Use HTTPS or localhost."
     );
-
   }
 
 
   cameraStream =
-
     await navigator
       .mediaDevices
       .getUserMedia({
 
         video: {
-
-          facingMode:
-            "user",
+          facingMode: "user",
 
           width: {
-            ideal:
-              1280
+            ideal: 1280
           },
 
           height: {
-            ideal:
-              720
+            ideal: 720
           }
-
         },
 
-        audio:
-          false
-
+        audio: false
       });
 
 
@@ -2023,7 +1669,6 @@ async function startCamera() {
 
 
   await webcam.play();
-
 }
 
 
@@ -2038,73 +1683,51 @@ async function createLandmarker(
 
   return HandLandmarker
     .createFromOptions(
-
       vision,
-
       {
 
         baseOptions: {
 
           modelAssetPath:
-
             "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
 
           delegate
-
         },
 
+        runningMode: "VIDEO",
 
-        runningMode:
-          "VIDEO",
-
-
-        numHands:
-          1,
-
+        numHands: 1,
 
         minHandDetectionConfidence:
           0.55,
 
-
         minHandPresenceConfidence:
           0.55,
 
-
         minTrackingConfidence:
           0.50
-
       }
-
     );
-
 }
 
 
 async function initHandTracking() {
 
-  if (
-    handLandmarker
-  ) {
-
+  if (handLandmarker) {
     return;
-
   }
 
 
   const vision =
-
     await FilesetResolver
       .forVisionTasks(
-
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.0.1/wasm"
-
       );
 
 
   try {
 
     handLandmarker =
-
       await createLandmarker(
         vision,
         "GPU"
@@ -2119,14 +1742,11 @@ async function initHandTracking() {
 
 
     handLandmarker =
-
       await createLandmarker(
         vision,
         "CPU"
       );
-
   }
-
 }
 
 
@@ -2143,26 +1763,20 @@ function initializeLocalGame() {
   selectedSquare =
     null;
 
-
   legalTargets =
     [];
-
 
   lastMove =
     null;
 
-
   hoveredSquare =
     null;
-
 
   gameActive =
     true;
 
-
   aiBusy =
     false;
-
 
   onlineColor =
     null;
@@ -2174,28 +1788,36 @@ function initializeLocalGame() {
 
   hideResultOverlay();
 
-
   resetHover();
 
 
   whiteTimeMs =
-
-    settings.minutes
-    * 60
-    * 1000;
+    settings.minutes *
+    60 *
+    1000;
 
 
   blackTimeMs =
-
-    settings.minutes
-    * 60
-    * 1000;
+    settings.minutes *
+    60 *
+    1000;
 
 
   incrementMs =
+    settings.increment *
+    1000;
 
-    settings.increment
-    * 1000;
+
+  const now =
+    performance.now();
+
+
+  lastClockTick =
+    now;
+
+
+  localTurnStartedAt =
+    now;
 
 
   whiteNameEl.textContent =
@@ -2203,89 +1825,66 @@ function initializeLocalGame() {
 
 
   blackNameEl.textContent =
-
-    settings.mode ===
-    "ai"
-
+    settings.mode === "ai"
       ? "Nova AI 🤖"
-
       : settings.blackName;
 
 
   onlineRoomBar
     ?.classList
-    .add(
-      "hidden"
-    );
+    .add("hidden");
 
 
   waitingOverlay
     ?.classList
-    .add(
-      "hidden"
-    );
+    .add("hidden");
 
 
   restartBtn
     ?.classList
-    .remove(
-      "hidden"
-    );
+    .remove("hidden");
 
 
   whitePlayer
     ?.classList
-    .remove(
-      "my-player"
-    );
+    .remove("my-player");
 
 
   blackPlayer
     ?.classList
-    .remove(
-      "my-player"
-    );
+    .remove("my-player");
 
 
   renderBoard();
 
-
   renderHistory();
-
 
   updateStatus();
 
-
   startClock();
-
 }
 
 
 /* =========================================================
-   CREATE ONLINE ROOM
+   ONLINE ROOM CREATE
 ========================================================= */
 
 async function createOnlineRoom() {
 
   const initialMs =
-
-    settings.minutes
-    * 60
-    * 1000;
+    settings.minutes *
+    60 *
+    1000;
 
 
   const incMs =
-
-    settings.increment
-    * 1000;
-
-
-  let code =
-    null;
+    settings.increment *
+    1000;
 
 
-  let roomReference =
-    null;
+  let code = null;
+
+  let roomReference = null;
 
 
   for (
@@ -2311,9 +1910,7 @@ async function createOnlineRoom() {
       );
 
 
-    if (
-      !snapshot.exists()
-    ) {
+    if (!snapshot.exists()) {
 
       code =
         candidate;
@@ -2324,20 +1921,15 @@ async function createOnlineRoom() {
 
 
       break;
-
     }
-
   }
 
 
-  if (
-    !code
-  ) {
+  if (!code) {
 
     throw new Error(
       "Could not generate a room. Try again."
     );
-
   }
 
 
@@ -2358,70 +1950,46 @@ async function createOnlineRoom() {
 
 
   await set(
-
     currentRoomRef,
-
     {
 
-      version:
-        7,
+      version: 8,
 
-
-      status:
-        "waiting",
-
+      status: "waiting",
 
       createdAt:
         serverNow(),
 
-
       hostUid:
         firebaseUser.uid,
-
 
       fen:
         initialGame.fen(),
 
+      turn: "w",
 
-      turn:
-        "w",
-
-
-      ply:
-        0,
-
+      ply: 0,
 
       initialTimeMs:
         initialMs,
 
-
       incrementMs:
         incMs,
-
 
       whiteTimeMs:
         initialMs,
 
-
       blackTimeMs:
         initialMs,
-
 
       turnStartedAt:
         null,
 
+      history: [],
 
-      history:
-        [],
+      moves: [],
 
-
-      moves:
-        [],
-
-
-      lastMove:
-        null,
-
+      lastMove: null,
 
       players: {
 
@@ -2435,48 +2003,31 @@ async function createOnlineRoom() {
 
           connected:
             true
-
         }
-
       }
-
     }
-
   );
 
 
   await onDisconnect(
-
     ref(
-
       db,
-
       `rooms/${code}/players/white/connected`
-
     )
-
-  ).set(
-    false
-  );
+  ).set(false);
 
 
   openGameScreen();
 
-
-  subscribeToRoom(
-    code
-  );
-
+  subscribeToRoom(code);
 }
 
 
 /* =========================================================
-   JOIN ONLINE ROOM
+   ONLINE ROOM JOIN
 ========================================================= */
 
-async function joinOnlineRoom(
-  code
-) {
+async function joinOnlineRoom(code) {
 
   if (
     !/^GHOST-[A-Z0-9]{4}$/.test(
@@ -2487,7 +2038,6 @@ async function joinOnlineRoom(
     throw new Error(
       "Enter a code like GHOST-7K29."
     );
-
   }
 
 
@@ -2504,14 +2054,11 @@ async function joinOnlineRoom(
     );
 
 
-  if (
-    !snapshot.exists()
-  ) {
+  if (!snapshot.exists()) {
 
     throw new Error(
       "Room not found."
     );
-
   }
 
 
@@ -2527,7 +2074,6 @@ async function joinOnlineRoom(
     throw new Error(
       "That room is no longer waiting."
     );
-
   }
 
 
@@ -2540,36 +2086,27 @@ async function joinOnlineRoom(
     throw new Error(
       "That room already has two players."
     );
-
   }
 
 
   const blackPlayerRef =
-
     ref(
-
       db,
-
       `rooms/${code}/players/black`
-
     );
 
 
   const claimResult =
-
     await runTransaction(
-
       blackPlayerRef,
 
       (currentBlack) => {
 
         if (
-          currentBlack
-            ?.uid
+          currentBlack?.uid
         ) {
 
           return;
-
         }
 
 
@@ -2583,16 +2120,13 @@ async function joinOnlineRoom(
 
           connected:
             true
-
         };
-
       },
 
       {
         applyLocally:
           false
       }
-
     );
 
 
@@ -2603,16 +2137,13 @@ async function joinOnlineRoom(
     throw new Error(
       "That room already has a Black player."
     );
-
   }
 
 
   try {
 
     await update(
-
       roomReference,
-
       {
 
         status:
@@ -2623,9 +2154,7 @@ async function joinOnlineRoom(
 
         turnStartedAt:
           serverNow()
-
       }
-
     );
 
   } catch (error) {
@@ -2638,16 +2167,13 @@ async function joinOnlineRoom(
       );
 
     } catch {
-
       // Ignore cleanup failure.
-
     }
 
 
     throw new Error(
       "Joined the room, but Firebase blocked the game start."
     );
-
   }
 
 
@@ -2664,27 +2190,16 @@ async function joinOnlineRoom(
 
 
   await onDisconnect(
-
     ref(
-
       db,
-
       `rooms/${code}/players/black/connected`
-
     )
-
-  ).set(
-    false
-  );
+  ).set(false);
 
 
   openGameScreen();
 
-
-  subscribeToRoom(
-    code
-  );
-
+  subscribeToRoom(code);
 }
 
 
@@ -2692,21 +2207,15 @@ async function joinOnlineRoom(
    ROOM LISTENER
 ========================================================= */
 
-function subscribeToRoom(
-  code
-) {
+function subscribeToRoom(code) {
 
-  if (
-    roomUnsubscribe
-  ) {
+  if (roomUnsubscribe) {
 
     roomUnsubscribe();
-
   }
 
 
   currentRoomRef =
-
     ref(
       db,
       `rooms/${code}`
@@ -2714,16 +2223,12 @@ function subscribeToRoom(
 
 
   roomUnsubscribe =
-
     onValue(
-
       currentRoomRef,
 
       (snapshot) => {
 
-        if (
-          !snapshot.exists()
-        ) {
+        if (!snapshot.exists()) {
 
           gameActive =
             false;
@@ -2734,7 +2239,6 @@ function subscribeToRoom(
 
 
           return;
-
         }
 
 
@@ -2743,28 +2247,22 @@ function subscribeToRoom(
 
 
         syncOnlineRoom();
-
       },
 
       (error) => {
 
-        console.error(
-          error
-        );
+        console.error(error);
 
 
         gameStatus.textContent =
           "Firebase connection error.";
-
       }
-
     );
-
 }
 
 
 /* =========================================================
-   SYNC ONLINE ROOM
+   ONLINE SYNC
 ========================================================= */
 
 function syncOnlineRoom() {
@@ -2773,12 +2271,8 @@ function syncOnlineRoom() {
     onlineRoomState;
 
 
-  if (
-    !room
-  ) {
-
+  if (!room) {
     return;
-
   }
 
 
@@ -2789,8 +2283,7 @@ function syncOnlineRoom() {
   if (
     room.players
       ?.white
-      ?.uid ===
-    uid
+      ?.uid === uid
   ) {
 
     onlineColor =
@@ -2799,13 +2292,11 @@ function syncOnlineRoom() {
   } else if (
     room.players
       ?.black
-      ?.uid ===
-    uid
+      ?.uid === uid
   ) {
 
     onlineColor =
       "b";
-
   }
 
 
@@ -2822,14 +2313,12 @@ function syncOnlineRoom() {
   try {
 
     for (
-      const move
-      of moves
+      const move of moves
     ) {
 
       rebuilt.move(
         move
       );
-
     }
 
 
@@ -2855,9 +2344,7 @@ function syncOnlineRoom() {
 
       game =
         new Chess();
-
     }
-
   }
 
 
@@ -2877,30 +2364,24 @@ function syncOnlineRoom() {
 
 
   lastMove =
-    room.lastMove
-    || null;
+    room.lastMove || null;
 
 
   incrementMs =
-    room.incrementMs
-    || 0;
+    room.incrementMs || 0;
 
 
   whiteNameEl.textContent =
-
     room.players
       ?.white
       ?.name
-
     || "White";
 
 
   blackNameEl.textContent =
-
     room.players
       ?.black
       ?.name
-
     || "Waiting…";
 
 
@@ -2908,8 +2389,7 @@ function syncOnlineRoom() {
     ?.classList
     .toggle(
       "my-player",
-      onlineColor ===
-      "w"
+      onlineColor === "w"
     );
 
 
@@ -2917,52 +2397,37 @@ function syncOnlineRoom() {
     ?.classList
     .toggle(
       "my-player",
-      onlineColor ===
-      "b"
+      onlineColor === "b"
     );
 
 
   onlineRoomBar
     ?.classList
-    .remove(
-      "hidden"
-    );
+    .remove("hidden");
 
 
-  if (
-    roomCodeLabel
-  ) {
+  if (roomCodeLabel) {
 
     roomCodeLabel.textContent =
       currentRoomCode;
-
   }
 
 
-  if (
-    waitingCode
-  ) {
+  if (waitingCode) {
 
     waitingCode.textContent =
       currentRoomCode;
-
   }
 
 
   restartBtn
     ?.classList
-    .add(
-      "hidden"
-    );
+    .add("hidden");
 
 
   const opponentKey =
-
-    onlineColor ===
-    "w"
-
+    onlineColor === "w"
       ? "black"
-
       : "white";
 
 
@@ -2985,37 +2450,27 @@ function syncOnlineRoom() {
 
     waitingOverlay
       ?.classList
-      .remove(
-        "hidden"
-      );
+      .remove("hidden");
 
 
-    if (
-      waitingText
-    ) {
+    if (waitingText) {
 
       waitingText.textContent =
         "Share this code with another player.";
-
     }
 
 
-    if (
-      connectionLabel
-    ) {
+    if (connectionLabel) {
 
       connectionLabel.textContent =
         "Waiting for opponent";
-
     }
 
   } else {
 
     waitingOverlay
       ?.classList
-      .add(
-        "hidden"
-      );
+      .add("hidden");
 
 
     gameActive =
@@ -3023,9 +2478,7 @@ function syncOnlineRoom() {
       "playing";
 
 
-    if (
-      connectionLabel
-    ) {
+    if (connectionLabel) {
 
       if (
         opponent
@@ -3048,11 +2501,8 @@ function syncOnlineRoom() {
 
         connectionLabel.className =
           "connection-label online";
-
       }
-
     }
-
   }
 
 
@@ -3080,9 +2530,7 @@ function syncOnlineRoom() {
     showOnlineResult(
       room
     );
-
   }
-
 }
 
 
@@ -3096,14 +2544,13 @@ async function submitOnlineMove(
 ) {
 
   if (
-    !currentRoomRef
-    || onlineMovePending
-    || !onlineRoomState
-    || !onlineColor
+    !currentRoomRef ||
+    onlineMovePending ||
+    !onlineRoomState ||
+    !onlineColor
   ) {
 
     return;
-
   }
 
 
@@ -3114,28 +2561,22 @@ async function submitOnlineMove(
   try {
 
     const result =
-
       await runTransaction(
-
         currentRoomRef,
 
         (room) => {
 
           if (
-            !room
-            || room.status !==
-            "playing"
-            || room.turn !==
-            onlineColor
+            !room ||
+            room.status !== "playing" ||
+            room.turn !== onlineColor
           ) {
 
             return;
-
           }
 
 
           const player =
-
             room.players
               ?.[
                 colorKey(
@@ -3145,13 +2586,12 @@ async function submitOnlineMove(
 
 
           if (
-            !player
-            || player.uid !==
+            !player ||
+            player.uid !==
             firebaseUser.uid
           ) {
 
             return;
-
           }
 
 
@@ -3168,71 +2608,50 @@ async function submitOnlineMove(
           try {
 
             for (
-              const move
-              of moves
+              const move of moves
             ) {
 
               board.move(
                 move
               );
-
             }
 
           } catch {
 
             return;
-
           }
 
 
           let whiteTime =
-
             Number(
-
               room.whiteTimeMs
-
               ?? room.initialTimeMs
-
               ?? 300000
-
             );
 
 
           let blackTime =
-
             Number(
-
               room.blackTimeMs
-
               ?? room.initialTimeMs
-
               ?? 300000
-
             );
 
 
           const elapsed =
-
             Math.max(
-
               0,
 
-              serverNow()
-
-              - Number(
-
-                room.turnStartedAt
-
-                || serverNow()
-
+              serverNow() -
+              Number(
+                room.turnStartedAt ||
+                serverNow()
               )
-
             );
 
 
           if (
-            onlineColor ===
-            "w"
+            onlineColor === "w"
           ) {
 
             whiteTime =
@@ -3248,17 +2667,12 @@ async function submitOnlineMove(
                 0,
                 blackTime - elapsed
               );
-
           }
 
 
           const remaining =
-
-            onlineColor ===
-            "w"
-
+            onlineColor === "w"
               ? whiteTime
-
               : blackTime;
 
 
@@ -3293,97 +2707,76 @@ async function submitOnlineMove(
 
 
             return room;
-
           }
 
 
-          let moveResult;
+          let resultMove;
 
 
           try {
 
-            moveResult =
-
+            resultMove =
               board.move({
 
                 from,
-
                 to,
 
                 promotion:
                   "q"
-
               });
 
           } catch {
 
             return;
-
           }
 
 
-          if (
-            !moveResult
-          ) {
-
+          if (!resultMove) {
             return;
-
           }
 
 
           if (
-            onlineColor ===
-            "w"
+            onlineColor === "w"
           ) {
 
             whiteTime +=
-
               Number(
-                room.incrementMs
-                || 0
+                room.incrementMs || 0
               );
 
           } else {
 
             blackTime +=
-
               Number(
-                room.incrementMs
-                || 0
+                room.incrementMs || 0
               );
-
           }
 
 
           room.moves = [
-
             ...moves,
 
             {
-
               from:
-                moveResult.from,
+                resultMove.from,
 
               to:
-                moveResult.to,
+                resultMove.to,
 
               promotion:
-                moveResult.promotion
+                resultMove.promotion
                 || "q"
-
             }
-
           ];
 
 
           room.history = [
-
             ...normalizeArray(
               room.history
             ),
 
-            moveResult.san
-
+            resultMove.san
           ];
 
 
@@ -3396,13 +2789,9 @@ async function submitOnlineMove(
 
 
           room.ply =
-
             Number(
-              room.ply
-              || 0
-            )
-
-            + 1;
+              room.ply || 0
+            ) + 1;
 
 
           room.whiteTimeMs =
@@ -3420,25 +2809,24 @@ async function submitOnlineMove(
           room.lastMove = {
 
             from:
-              moveResult.from,
+              resultMove.from,
 
             to:
-              moveResult.to,
+              resultMove.to,
 
             piece:
-              moveResult.piece,
+              resultMove.piece,
 
             captured:
-              moveResult.captured
+              resultMove.captured
               || null,
 
             san:
-              moveResult.san,
+              resultMove.san,
 
             flags:
-              moveResult.flags
+              resultMove.flags
               || ""
-
           };
 
 
@@ -3466,19 +2854,16 @@ async function submitOnlineMove(
 
             room.turnStartedAt =
               null;
-
           }
 
 
           return room;
-
         },
 
         {
           applyLocally:
             false
         }
-
       );
 
 
@@ -3489,7 +2874,6 @@ async function submitOnlineMove(
       playUiTone(
         "error"
       );
-
     }
 
   } catch (error) {
@@ -3507,9 +2891,7 @@ async function submitOnlineMove(
 
     onlineMovePending =
       false;
-
   }
-
 }
 
 
@@ -3520,34 +2902,30 @@ async function submitOnlineMove(
 async function claimOnlineTimeout() {
 
   if (
-    !currentRoomRef
-    || !onlineRoomState
-    || onlineRoomState.status !==
+    !currentRoomRef ||
+    !onlineRoomState ||
+    onlineRoomState.status !==
     "playing"
   ) {
 
     return;
-
   }
 
 
   try {
 
     await runTransaction(
-
       currentRoomRef,
 
       (room) => {
 
         if (
-          !room
-          || room.status !==
-          "playing"
-          || !room.turnStartedAt
+          !room ||
+          room.status !== "playing" ||
+          !room.turnStartedAt
         ) {
 
           return;
-
         }
 
 
@@ -3556,29 +2934,20 @@ async function claimOnlineTimeout() {
 
 
         const remaining =
-
           Number(
-
-            active ===
-            "w"
-
+            active === "w"
               ? room.whiteTimeMs
-
               : room.blackTimeMs
-
           )
 
           - Math.max(
+              0,
 
-            0,
-
-            serverNow()
-
-            - Number(
-              room.turnStartedAt
-            )
-
-          );
+              serverNow() -
+              Number(
+                room.turnStartedAt
+              )
+            );
 
 
         if (
@@ -3586,13 +2955,11 @@ async function claimOnlineTimeout() {
         ) {
 
           return;
-
         }
 
 
         if (
-          active ===
-          "w"
+          active === "w"
         ) {
 
           room.whiteTimeMs =
@@ -3602,7 +2969,6 @@ async function claimOnlineTimeout() {
 
           room.blackTimeMs =
             0;
-
         }
 
 
@@ -3625,14 +2991,12 @@ async function claimOnlineTimeout() {
 
 
         return room;
-
       },
 
       {
         applyLocally:
           false
       }
-
     );
 
   } catch (error) {
@@ -3641,19 +3005,15 @@ async function claimOnlineTimeout() {
       "Timeout error:",
       error
     );
-
   }
-
 }
 
 
 /* =========================================================
-   GAME END INFO
+   GAME END DESCRIPTION
 ========================================================= */
 
-function describeGameEnd(
-  board
-) {
+function describeGameEnd(board) {
 
   if (
     board.isCheckmate()
@@ -3668,9 +3028,7 @@ function describeGameEnd(
         otherColor(
           board.turn()
         )
-
     };
-
   }
 
 
@@ -3685,9 +3043,7 @@ function describeGameEnd(
 
       winner:
         null
-
     };
-
   }
 
 
@@ -3702,9 +3058,7 @@ function describeGameEnd(
 
       winner:
         null
-
     };
-
   }
 
 
@@ -3719,9 +3073,7 @@ function describeGameEnd(
 
       winner:
         null
-
     };
-
   }
 
 
@@ -3732,9 +3084,7 @@ function describeGameEnd(
 
     winner:
       null
-
   };
-
 }
 
 
@@ -3745,44 +3095,37 @@ function describeGameEnd(
 function canControlTurn() {
 
   if (
-    !gameActive
-    || aiBusy
-    || onlineMovePending
+    !gameActive ||
+    aiBusy ||
+    onlineMovePending
   ) {
 
     return false;
-
   }
 
 
   if (
-    mode() ===
-    "ai"
+    mode() === "ai"
   ) {
 
     return (
-      game.turn() ===
-      "w"
+      game.turn() === "w"
     );
-
   }
 
 
   if (
-    mode() ===
-    "online"
+    mode() === "online"
   ) {
 
     return (
       onlineColor ===
       game.turn()
     );
-
   }
 
 
   return true;
-
 }
 
 
@@ -3793,70 +3136,44 @@ function canControlTurn() {
 function boardPerspective() {
 
   return (
-
-    mode() ===
-    "online"
-
-    && onlineColor ===
-    "b"
+    mode() === "online" &&
+    onlineColor === "b"
 
       ? "b"
 
       : "w"
-
   );
-
 }
 
 
 function fileOrder() {
 
   return (
-
-    boardPerspective() ===
-    "w"
+    boardPerspective() === "w"
 
       ? FILES
 
       : [...FILES]
         .reverse()
-
   );
-
 }
 
 
 function rankOrder() {
 
   return (
-
-    boardPerspective() ===
-    "w"
+    boardPerspective() === "w"
 
       ? [
-        8,
-        7,
-        6,
-        5,
-        4,
-        3,
-        2,
-        1
+        8, 7, 6, 5,
+        4, 3, 2, 1
       ]
 
       : [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8
+        1, 2, 3, 4,
+        5, 6, 7, 8
       ]
-
   );
-
 }
 
 
@@ -3891,12 +3208,10 @@ function renderBoard() {
     ) {
 
       const squareName =
-
         `${files[col]}${ranks[row]}`;
 
 
       const square =
-
         document.createElement(
           "div"
         );
@@ -3911,14 +3226,9 @@ function renderBoard() {
 
 
       square.classList.add(
-
-        (row + col) % 2 ===
-        0
-
+        (row + col) % 2 === 0
           ? "light"
-
           : "dark"
-
       );
 
 
@@ -3930,7 +3240,6 @@ function renderBoard() {
         square.classList.add(
           "ghost-hover"
         );
-
       }
 
 
@@ -3942,7 +3251,6 @@ function renderBoard() {
         square.classList.add(
           "selected"
         );
-
       }
 
 
@@ -3955,19 +3263,15 @@ function renderBoard() {
         square.classList.add(
           "legal"
         );
-
       }
 
 
       if (
-        lastMove
-
-        && (
+        lastMove &&
+        (
           lastMove.from ===
           squareName
-
           ||
-
           lastMove.to ===
           squareName
         )
@@ -3976,7 +3280,6 @@ function renderBoard() {
         square.classList.add(
           "last-move"
         );
-
       }
 
 
@@ -3986,9 +3289,7 @@ function renderBoard() {
         );
 
 
-      if (
-        piece
-      ) {
+      if (piece) {
 
         square.classList.add(
           "has-piece"
@@ -3996,25 +3297,20 @@ function renderBoard() {
 
 
         const pieceElement =
-
           document.createElement(
             "span"
           );
 
 
         pieceElement.className =
-
           `piece ${
             piece.color === "w"
-
               ? "white-piece"
-
               : "black-piece"
           }`;
 
 
         pieceElement.textContent =
-
           PIECES[
             `${piece.color}${piece.type}`
           ];
@@ -4023,16 +3319,13 @@ function renderBoard() {
         square.appendChild(
           pieceElement
         );
-
       }
 
 
       boardEl.appendChild(
         square
       );
-
     }
-
   }
 
 
@@ -4042,7 +3335,6 @@ function renderBoard() {
   requestAnimationFrame(
     fitBoardToCamera
   );
-
 }
 
 
@@ -4053,12 +3345,11 @@ function renderBoard() {
 function renderCapturedPieces() {
 
   if (
-    !capturedByWhiteEl
-    || !capturedByBlackEl
+    !capturedByWhiteEl ||
+    !capturedByBlackEl
   ) {
 
     return;
-
   }
 
 
@@ -4070,29 +3361,24 @@ function renderCapturedPieces() {
     [];
 
 
-  let history =
-    [];
+  let history = [];
 
 
   try {
 
     history =
       game.history({
-        verbose:
-          true
+        verbose: true
       });
 
   } catch {
 
-    history =
-      [];
-
+    history = [];
   }
 
 
   for (
-    const move
-    of history
+    const move of history
   ) {
 
     if (
@@ -4100,13 +3386,11 @@ function renderCapturedPieces() {
     ) {
 
       continue;
-
     }
 
 
     if (
-      move.color ===
-      "w"
+      move.color === "w"
     ) {
 
       capturedByWhite.push(
@@ -4118,59 +3402,34 @@ function renderCapturedPieces() {
       capturedByBlack.push(
         move.captured
       );
-
     }
-
   }
 
 
   const order = {
 
-    q:
-      1,
-
-    r:
-      2,
-
-    b:
-      3,
-
-    n:
-      4,
-
-    p:
-      5
-
+    q: 1,
+    r: 2,
+    b: 3,
+    n: 4,
+    p: 5
   };
 
 
   capturedByWhite.sort(
-    (a, b) => {
-
-      return (
-        order[a]
-        - order[b]
-      );
-
-    }
+    (a, b) =>
+      order[a] - order[b]
   );
 
 
   capturedByBlack.sort(
-    (a, b) => {
-
-      return (
-        order[a]
-        - order[b]
-      );
-
-    }
+    (a, b) =>
+      order[a] - order[b]
   );
 
 
   if (
-    capturedByWhite.length ===
-    0
+    capturedByWhite.length === 0
   ) {
 
     capturedByWhiteEl.textContent =
@@ -4179,31 +3438,20 @@ function renderCapturedPieces() {
   } else {
 
     capturedByWhiteEl.innerHTML =
-
       capturedByWhite
         .map(
-          (piece) => {
-
-            return `
-
-              <span
-                class="captured-piece-black"
-              >
-                ${PIECES[`b${piece}`]}
-              </span>
-
-            `;
-
-          }
+          (piece) => `
+            <span class="captured-piece-black">
+              ${PIECES[`b${piece}`]}
+            </span>
+          `
         )
         .join("");
-
   }
 
 
   if (
-    capturedByBlack.length ===
-    0
+    capturedByBlack.length === 0
   ) {
 
     capturedByBlackEl.textContent =
@@ -4212,27 +3460,16 @@ function renderCapturedPieces() {
   } else {
 
     capturedByBlackEl.innerHTML =
-
       capturedByBlack
         .map(
-          (piece) => {
-
-            return `
-
-              <span
-                class="captured-piece-white"
-              >
-                ${PIECES[`w${piece}`]}
-              </span>
-
-            `;
-
-          }
+          (piece) => `
+            <span class="captured-piece-white">
+              ${PIECES[`w${piece}`]}
+            </span>
+          `
         )
         .join("");
-
   }
-
 }
 
 
@@ -4246,7 +3483,6 @@ boardEl
     (event) => {
 
       const square =
-
         event.target
           .closest(
             ".square"
@@ -4254,22 +3490,20 @@ boardEl
 
 
       if (
-        square
-        && canControlTurn()
+        square &&
+        canControlTurn()
       ) {
 
         handleSquareInput(
           square.dataset.square
         );
-
       }
-
     }
   );
 
 
 /* =========================================================
-   HAND TRACKING LOOP
+   HAND LOOP
 ========================================================= */
 
 function handTrackingLoop() {
@@ -4277,13 +3511,15 @@ function handTrackingLoop() {
   if (
     gameScreen
       ?.classList
-      .contains(
-        "hidden"
-      )
+      .contains("hidden")
 
-    || !handLandmarker
+    ||
 
-    || webcam.readyState < 2
+    !handLandmarker
+
+    ||
+
+    webcam.readyState < 2
   ) {
 
     requestAnimationFrame(
@@ -4292,7 +3528,6 @@ function handTrackingLoop() {
 
 
     return;
-
   }
 
 
@@ -4303,7 +3538,6 @@ function handTrackingLoop() {
   try {
 
     processHand(
-
       handLandmarker
         .detectForVideo(
           webcam,
@@ -4311,7 +3545,6 @@ function handTrackingLoop() {
         ),
 
       now
-
     );
 
   } catch (error) {
@@ -4320,14 +3553,12 @@ function handTrackingLoop() {
       "Hand tracking:",
       error
     );
-
   }
 
 
   requestAnimationFrame(
     handTrackingLoop
   );
-
 }
 
 
@@ -4350,9 +3581,7 @@ function processHand(
 
     handCursor
       ?.classList
-      .add(
-        "hidden"
-      );
+      .add("hidden");
 
 
     resetHover();
@@ -4380,7 +3609,6 @@ function processHand(
 
 
     return;
-
   }
 
 
@@ -4389,28 +3617,22 @@ function processHand(
 
 
   const stageRect =
-
     cameraStage
       .getBoundingClientRect();
 
 
   const rawX =
-
-    (1 - indexTip.x)
-
-    * stageRect.width;
+    (1 - indexTip.x) *
+    stageRect.width;
 
 
   const rawY =
-
-    indexTip.y
-
-    * stageRect.height;
+    indexTip.y *
+    stageRect.height;
 
 
   if (
-    smoothX ===
-    null
+    smoothX === null
   ) {
 
     smoothX =
@@ -4423,32 +3645,23 @@ function processHand(
   } else {
 
     smoothX +=
-
       (
-        rawX
-        - smoothX
-      )
-
-      * SMOOTHING;
+        rawX - smoothX
+      ) *
+      SMOOTHING;
 
 
     smoothY +=
-
       (
-        rawY
-        - smoothY
-      )
-
-      * SMOOTHING;
-
+        rawY - smoothY
+      ) *
+      SMOOTHING;
   }
 
 
   handCursor
     ?.classList
-    .remove(
-      "hidden"
-    );
+    .remove("hidden");
 
 
   handCursor.style.left =
@@ -4460,15 +3673,12 @@ function processHand(
 
 
   const square =
-
     squareFromPoint(
+      stageRect.left +
+      smoothX,
 
-      stageRect.left
-      + smoothX,
-
-      stageRect.top
-      + smoothY
-
+      stageRect.top +
+      smoothY
     );
 
 
@@ -4478,19 +3688,14 @@ function processHand(
 
 
   const boardRect =
-
     boardEl
       .getBoundingClientRect();
 
 
   const squareSize =
-
     Math.min(
-
       boardRect.width / 8,
-
       boardRect.height / 8
-
     );
 
 
@@ -4499,29 +3704,21 @@ function processHand(
 
 
   if (
-    previousPointerX !==
-    null
-
-    && previousPointerY !==
-    null
-
-    && squareSize > 0
+    previousPointerX !== null &&
+    previousPointerY !== null &&
+    squareSize > 0
   ) {
 
     motionFraction =
-
       Math.hypot(
+        smoothX -
+        previousPointerX,
 
-        smoothX
-        - previousPointerX,
-
-        smoothY
-        - previousPointerY
-
+        smoothY -
+        previousPointerY
       )
 
       / squareSize;
-
   }
 
 
@@ -4534,28 +3731,25 @@ function processHand(
 
 
   if (
-    !square
-    || !canControlTurn()
+    !square ||
+    !canControlTurn()
   ) {
 
     resetHoverProgress();
 
 
     return;
-
   }
 
 
   if (
-    lastActivatedSquare
-
-    && square !==
+    lastActivatedSquare &&
+    square !==
     lastActivatedSquare
   ) {
 
     lastActivatedSquare =
       null;
-
   }
 
 
@@ -4570,7 +3764,6 @@ function processHand(
 
 
     return;
-
   }
 
 
@@ -4584,16 +3777,12 @@ function processHand(
 
 
     return;
-
   }
 
 
   /*
-    Still travelling.
-
-    Do not activate anything.
+    Fly-over protection.
   */
-
   if (
     motionFraction >
     STABLE_MOTION_FRACTION
@@ -4617,7 +3806,6 @@ function processHand(
 
 
     return;
-
   }
 
 
@@ -4644,7 +3832,6 @@ function processHand(
 
 
     return;
-
   }
 
 
@@ -4663,28 +3850,15 @@ function processHand(
 
 
     return;
-
   }
 
 
-  if (
-    !hoverStartTime
-  ) {
+  if (!hoverStartTime) {
 
     hoverStartTime =
       now;
-
   }
 
-
-  /*
-    NEW:
-
-    Switching to another friendly piece
-    uses the fast selection delay.
-
-    Actual moves still use 200 ms.
-  */
 
   let requiredTime;
 
@@ -4709,23 +3883,19 @@ function processHand(
 
     requiredTime =
       SELECT_DWELL_MS;
-
   }
 
 
   const progress =
-
     Math.min(
-
       1,
 
       (
-        now
-        - hoverStartTime
+        now -
+        hoverStartTime
       )
 
       / requiredTime
-
     );
 
 
@@ -4735,8 +3905,7 @@ function processHand(
 
 
   if (
-    progress >=
-    1
+    progress >= 1
   ) {
 
     handleSquareInput(
@@ -4784,11 +3953,8 @@ function processHand(
       },
 
       70
-
     );
-
   }
-
 }
 
 
@@ -4798,31 +3964,23 @@ function processHand(
 
 function updateHandColor() {
 
-  if (
-    !cameraStage
-  ) {
-
+  if (!cameraStage) {
     return;
-
   }
 
 
   cameraStage.dataset.handColor =
-
-    mode() ===
-    "online"
-
-    && onlineColor
+    mode() === "online" &&
+    onlineColor
 
       ? onlineColor
 
       : game.turn();
-
 }
 
 
 /* =========================================================
-   CURSOR -> BOARD SQUARE
+   CURSOR → BOARD
 ========================================================= */
 
 function squareFromPoint(
@@ -4831,7 +3989,6 @@ function squareFromPoint(
 ) {
 
   const rect =
-
     boardEl
       .getBoundingClientRect();
 
@@ -4852,121 +4009,82 @@ function squareFromPoint(
     rect.height / 8;
 
 
-  /*
-    Allow a little space below the board
-    for easier bottom-row interaction.
-
-    This now works whether or not another
-    piece is already selected.
-  */
-
   const extraBottom =
-
-    squareHeight
-    * BOTTOM_EDGE_ASSIST;
+    squareHeight *
+    BOTTOM_EDGE_ASSIST;
 
 
   if (
-    clientX <
-    rect.left
-
-    || clientX >
-    rect.right
-
-    || clientY <
-    rect.top
-
-    || clientY >
-    rect.bottom
-    + extraBottom
+    clientX < rect.left ||
+    clientX > rect.right ||
+    clientY < rect.top ||
+    clientY > rect.bottom + extraBottom
   ) {
 
     return null;
-
   }
 
 
   const clampedClientY =
-
     Math.min(
-
-      rect.bottom
-      - 0.5,
+      rect.bottom - 0.5,
 
       Math.max(
         rect.top,
         clientY
       )
-
     );
 
 
   const boardX =
-
-    clientX
-    - rect.left;
+    clientX -
+    rect.left;
 
 
   const boardY =
-
-    clampedClientY
-    - rect.top;
+    clampedClientY -
+    rect.top;
 
 
   const col =
-
     Math.min(
-
       7,
 
       Math.max(
-
         0,
 
         Math.floor(
-          boardX
-          / squareWidth
+          boardX /
+          squareWidth
         )
-
       )
-
     );
 
 
   const row =
-
     Math.min(
-
       7,
 
       Math.max(
-
         0,
 
         Math.floor(
-          boardY
-          / squareHeight
+          boardY /
+          squareHeight
         )
-
       )
-
     );
 
 
   const rawSquare =
-
     `${files[col]}${ranks[row]}`;
 
 
   /*
-    No piece currently selected.
-
-    No magnetic source snapping.
+    Initial selection.
+    No magnetic snapping.
   */
-
-  if (
-    !selectedSquare
-  ) {
+  if (!selectedSquare) {
 
     const piece =
       game.get(
@@ -4975,14 +4093,12 @@ function squareFromPoint(
 
 
     if (
-      !piece
-
-      || piece.color !==
+      !piece ||
+      piece.color !==
       game.turn()
     ) {
 
       return null;
-
     }
 
 
@@ -4992,24 +4108,19 @@ function squareFromPoint(
     ) {
 
       return rawSquare;
-
     }
 
 
     const localX =
-
-      boardX
-      / squareWidth
-
-      - col;
+      boardX /
+      squareWidth -
+      col;
 
 
     const localY =
-
-      boardY
-      / squareHeight
-
-      - row;
+      boardY /
+      squareHeight -
+      row;
 
 
     const margin =
@@ -5017,41 +4128,26 @@ function squareFromPoint(
 
 
     if (
-      localX <
-      margin
-
-      || localX >
-      1 - margin
-
-      || localY <
-      margin
-
-      || localY >
-      1 - margin
+      localX < margin ||
+      localX > 1 - margin ||
+      localY < margin ||
+      localY > 1 - margin
     ) {
 
       return null;
-
     }
 
 
     return rawSquare;
-
   }
 
 
   /*
-    IMPORTANT AUTO-SWITCH LOGIC
+    AUTO-SWITCH:
 
-    If your finger is physically inside
-    another friendly piece's square,
-    return that exact piece.
-
-    We do not magnetically attract toward
-    friendly pieces, so this only happens
-    when you genuinely point at one.
+    If the fingertip is truly over another
+    friendly piece, use that piece directly.
   */
-
   if (
     isOwnTurnPiece(
       rawSquare
@@ -5059,15 +4155,12 @@ function squareFromPoint(
   ) {
 
     return rawSquare;
-
   }
 
 
   /*
-    Exact selected square,
-    legal move or castling target.
+    Exact legal destination.
   */
-
   if (
     isActionableSquare(
       rawSquare
@@ -5075,16 +4168,11 @@ function squareFromPoint(
   ) {
 
     return rawSquare;
-
   }
 
 
   /*
-    Mild magnetism for MOVE DESTINATIONS
-    only.
-
-    Friendly pieces are deliberately not
-    included here.
+    Mild magnetism to legal move targets.
   */
 
   let nearestSquare =
@@ -5100,8 +4188,8 @@ function squareFromPoint(
 
 
   for (
-    const square
-    of getMagneticTargets()
+    const square of
+    getMagneticTargets()
   ) {
 
     const targetCol =
@@ -5119,54 +4207,43 @@ function squareFromPoint(
 
 
     if (
-      targetCol < 0
-      || targetRow < 0
+      targetCol < 0 ||
+      targetRow < 0
     ) {
 
       continue;
-
     }
 
 
     const centerX =
-
       (
-        targetCol
-        + 0.5
-      )
-
-      * squareWidth;
+        targetCol +
+        0.5
+      ) *
+      squareWidth;
 
 
     const centerY =
-
       (
-        targetRow
-        + 0.5
-      )
-
-      * squareHeight;
+        targetRow +
+        0.5
+      ) *
+      squareHeight;
 
 
     const distance =
-
       Math.hypot(
+        (
+          boardX -
+          centerX
+        ) /
+        squareWidth,
 
         (
-          boardX
-          - centerX
-        )
-
-        / squareWidth,
-
-
-        (
-          boardY
-          - centerY
-        )
-
-        / squareHeight
-
+          boardY -
+          centerY
+        ) /
+        squareHeight
       );
 
 
@@ -5177,13 +4254,8 @@ function squareFromPoint(
 
 
     const limit =
-
-      targetPiece
-        ?.type ===
-      "k"
-
+      targetPiece?.type === "k"
         ? KING_MAGNET_RADIUS
-
         : MAGNET_RADIUS;
 
 
@@ -5202,61 +4274,37 @@ function squareFromPoint(
 
       nearestLimit =
         limit;
-
     }
-
   }
 
 
   return (
-
-    nearestSquare
-
-    && nearestDistance <=
+    nearestSquare &&
+    nearestDistance <=
     nearestLimit
 
       ? nearestSquare
 
       : rawSquare
-
   );
-
 }
 
 
 /* =========================================================
-   MAGNETIC TARGETS
+   MAGNET TARGETS
 ========================================================= */
 
 function getMagneticTargets() {
 
-  if (
-    !selectedSquare
-  ) {
-
+  if (!selectedSquare) {
     return [];
-
   }
 
 
-  /*
-    IMPORTANT:
-
-    Other friendly pieces are NOT put
-    in this magnetic target list.
-
-    They can only switch selection if
-    the user actually points at them.
-  */
-
   const targets =
-
     new Set([
-
       selectedSquare,
-
       ...legalTargets
-
     ]);
 
 
@@ -5267,86 +4315,53 @@ function getMagneticTargets() {
 
 
   /*
-    Castling rook remains an intentional
-    magnetic target.
+    Castling assistance.
   */
-
   if (
-    selectedPiece
-      ?.type ===
+    selectedPiece?.type ===
     "k"
   ) {
 
     if (
-      selectedSquare ===
-      "e1"
-
-      && legalTargets.includes(
-        "g1"
-      )
+      selectedSquare === "e1" &&
+      legalTargets.includes("g1")
     ) {
 
-      targets.add(
-        "h1"
-      );
-
+      targets.add("h1");
     }
 
 
     if (
-      selectedSquare ===
-      "e1"
-
-      && legalTargets.includes(
-        "c1"
-      )
+      selectedSquare === "e1" &&
+      legalTargets.includes("c1")
     ) {
 
-      targets.add(
-        "a1"
-      );
-
+      targets.add("a1");
     }
 
 
     if (
-      selectedSquare ===
-      "e8"
-
-      && legalTargets.includes(
-        "g8"
-      )
+      selectedSquare === "e8" &&
+      legalTargets.includes("g8")
     ) {
 
-      targets.add(
-        "h8"
-      );
-
+      targets.add("h8");
     }
 
 
     if (
-      selectedSquare ===
-      "e8"
-
-      && legalTargets.includes(
-        "c8"
-      )
+      selectedSquare === "e8" &&
+      legalTargets.includes("c8")
     ) {
 
-      targets.add(
-        "a8"
-      );
-
+      targets.add("a8");
     }
-
   }
 
 
   return [
     ...targets
   ];
-
 }
 
 
@@ -5360,12 +4375,11 @@ function getCastlingMove(
 ) {
 
   if (
-    !firstSquare
-    || !secondSquare
+    !firstSquare ||
+    !secondSquare
   ) {
 
     return null;
-
   }
 
 
@@ -5394,17 +4408,12 @@ function getCastlingMove(
 
 
   /*
-    King -> Rook
+    King → Rook
   */
-
   if (
-    first?.type ===
-    "k"
-
-    && second?.type ===
-    "r"
-
-    && first.color ===
+    first?.type === "k" &&
+    second?.type === "r" &&
+    first.color ===
     second.color
   ) {
 
@@ -5418,22 +4427,16 @@ function getCastlingMove(
 
     color =
       first.color;
-
   }
 
 
   /*
-    Rook -> King
+    Rook → King
   */
-
   else if (
-    first?.type ===
-    "r"
-
-    && second?.type ===
-    "k"
-
-    && first.color ===
+    first?.type === "r" &&
+    second?.type === "k" &&
+    first.color ===
     second.color
   ) {
 
@@ -5447,17 +4450,14 @@ function getCastlingMove(
 
     color =
       second.color;
-
   }
 
 
   /*
-    King -> g/c square
+    King → castling destination
   */
-
   else if (
-    first?.type ===
-    "k"
+    first?.type === "k"
   ) {
 
     kingSquare =
@@ -5469,202 +4469,136 @@ function getCastlingMove(
 
 
     if (
-      firstSquare ===
-      "e1"
-
-      && secondSquare ===
-      "g1"
+      firstSquare === "e1" &&
+      secondSquare === "g1"
     ) {
 
       rookSquare =
         "h1";
-
     }
 
 
     if (
-      firstSquare ===
-      "e1"
-
-      && secondSquare ===
-      "c1"
+      firstSquare === "e1" &&
+      secondSquare === "c1"
     ) {
 
       rookSquare =
         "a1";
-
     }
 
 
     if (
-      firstSquare ===
-      "e8"
-
-      && secondSquare ===
-      "g8"
+      firstSquare === "e8" &&
+      secondSquare === "g8"
     ) {
 
       rookSquare =
         "h8";
-
     }
 
 
     if (
-      firstSquare ===
-      "e8"
-
-      && secondSquare ===
-      "c8"
+      firstSquare === "e8" &&
+      secondSquare === "c8"
     ) {
 
       rookSquare =
         "a8";
-
     }
-
   }
 
 
   if (
-    !kingSquare
-    || !rookSquare
-    || !color
+    !kingSquare ||
+    !rookSquare ||
+    !color
   ) {
 
     return null;
-
   }
 
 
   const legalKingMoves =
-
     game
       .moves({
-
         square:
           kingSquare,
 
         verbose:
           true
-
       })
-
       .map(
-        (move) => {
-
-          return move.to;
-
-        }
+        (move) =>
+          move.to
       );
 
 
   if (
-    color ===
-    "w"
-
-    && kingSquare ===
-    "e1"
-
-    && rookSquare ===
-    "h1"
-
-    && legalKingMoves.includes(
+    color === "w" &&
+    kingSquare === "e1" &&
+    rookSquare === "h1" &&
+    legalKingMoves.includes(
       "g1"
     )
   ) {
 
     return {
-      from:
-        "e1",
-
-      to:
-        "g1"
+      from: "e1",
+      to: "g1"
     };
-
   }
 
 
   if (
-    color ===
-    "w"
-
-    && kingSquare ===
-    "e1"
-
-    && rookSquare ===
-    "a1"
-
-    && legalKingMoves.includes(
+    color === "w" &&
+    kingSquare === "e1" &&
+    rookSquare === "a1" &&
+    legalKingMoves.includes(
       "c1"
     )
   ) {
 
     return {
-      from:
-        "e1",
-
-      to:
-        "c1"
+      from: "e1",
+      to: "c1"
     };
-
   }
 
 
   if (
-    color ===
-    "b"
-
-    && kingSquare ===
-    "e8"
-
-    && rookSquare ===
-    "h8"
-
-    && legalKingMoves.includes(
+    color === "b" &&
+    kingSquare === "e8" &&
+    rookSquare === "h8" &&
+    legalKingMoves.includes(
       "g8"
     )
   ) {
 
     return {
-      from:
-        "e8",
-
-      to:
-        "g8"
+      from: "e8",
+      to: "g8"
     };
-
   }
 
 
   if (
-    color ===
-    "b"
-
-    && kingSquare ===
-    "e8"
-
-    && rookSquare ===
-    "a8"
-
-    && legalKingMoves.includes(
+    color === "b" &&
+    kingSquare === "e8" &&
+    rookSquare === "a8" &&
+    legalKingMoves.includes(
       "c8"
     )
   ) {
 
     return {
-      from:
-        "e8",
-
-      to:
-        "c8"
+      from: "e8",
+      to: "c8"
     };
-
   }
 
 
   return null;
-
 }
 
 
@@ -5677,34 +4611,21 @@ function isActionableSquare(
 ) {
 
   if (
-    !square
-    || !canControlTurn()
+    !square ||
+    !canControlTurn()
   ) {
 
     return false;
-
   }
 
 
-  /*
-    Nothing selected:
-    current player's pieces.
-  */
-
-  if (
-    !selectedSquare
-  ) {
+  if (!selectedSquare) {
 
     return isOwnTurnPiece(
       square
     );
-
   }
 
-
-  /*
-    Current selected piece.
-  */
 
   if (
     square ===
@@ -5712,38 +4633,24 @@ function isActionableSquare(
   ) {
 
     return true;
-
   }
 
 
-  /*
-    Castling comes BEFORE normal
-    friendly-piece switching.
-  */
-
   if (
     getCastlingMove(
-
       selectedSquare,
-
       square
-
     )
   ) {
 
     return true;
-
   }
 
 
   /*
-    NEW:
-
-    Other friendly piece is actionable
-    because it can immediately replace
-    the current selection.
+    Other friendly pieces can
+    automatically replace selection.
   */
-
   if (
     isOwnTurnPiece(
       square
@@ -5751,24 +4658,18 @@ function isActionableSquare(
   ) {
 
     return true;
-
   }
 
-
-  /*
-    Otherwise it must be a legal move.
-  */
 
   return legalTargets
     .includes(
       square
     );
-
 }
 
 
 /* =========================================================
-   HANDLE SQUARE INPUT
+   HANDLE INPUT
 ========================================================= */
 
 function handleSquareInput(
@@ -5780,17 +4681,10 @@ function handleSquareInput(
   ) {
 
     return;
-
   }
 
 
-  /*
-    No piece selected yet.
-  */
-
-  if (
-    !selectedSquare
-  ) {
+  if (!selectedSquare) {
 
     selectSquare(
       square
@@ -5798,53 +4692,30 @@ function handleSquareInput(
 
 
     return;
-
   }
 
 
   /*
-    IMPORTANT:
-
-    Castling must be checked before
-    friendly-piece switching.
-
-    Otherwise selecting King → Rook
-    would only switch to the rook.
+    Castling before piece-switch.
   */
-
   const castle =
-
     getCastlingMove(
-
       selectedSquare,
-
       square
-
     );
 
 
-  if (
-    castle
-  ) {
+  if (castle) {
 
     submitMove(
-
       castle.from,
-
       castle.to
-
     );
 
 
     return;
-
   }
 
-
-  /*
-    Point at currently selected piece:
-    cancel selection.
-  */
 
   if (
     square ===
@@ -5855,20 +4726,13 @@ function handleSquareInput(
 
 
     return;
-
   }
 
 
   /*
-    NEW AUTO-SWITCH:
-
-    If player points at another friendly
-    piece, immediately replace current
-    selection with that piece.
-
-    No manual deselection required.
+    Automatically switch to another
+    friendly piece.
   */
-
   if (
     isOwnTurnPiece(
       square
@@ -5881,13 +4745,8 @@ function handleSquareInput(
 
 
     return;
-
   }
 
-
-  /*
-    Normal legal move.
-  */
 
   if (
     legalTargets.includes(
@@ -5896,15 +4755,10 @@ function handleSquareInput(
   ) {
 
     submitMove(
-
       selectedSquare,
-
       square
-
     );
-
   }
-
 }
 
 
@@ -5923,51 +4777,31 @@ function selectSquare(
 
 
   if (
-    !piece
-
-    || piece.color !==
+    !piece ||
+    piece.color !==
     game.turn()
   ) {
 
     return;
-
   }
 
-
-  /*
-    Replace old selection.
-  */
 
   selectedSquare =
     square;
 
 
   legalTargets =
-
     game
       .moves({
-
         square,
-
         verbose:
           true
-
       })
-
       .map(
-        (move) => {
-
-          return move.to;
-
-        }
+        (move) =>
+          move.to
       );
 
-
-  /*
-    Reset hover so the newly selected
-    piece doesn't instantly trigger
-    something else.
-  */
 
   resetHoverProgress();
 
@@ -5978,7 +4812,6 @@ function selectSquare(
   playUiTone(
     "select"
   );
-
 }
 
 
@@ -6000,7 +4833,6 @@ function clearSelection() {
 
 
   renderBoard();
-
 }
 
 
@@ -6014,8 +4846,7 @@ function submitMove(
 ) {
 
   if (
-    mode() ===
-    "online"
+    mode() === "online"
   ) {
 
     submitOnlineMove(
@@ -6029,14 +4860,14 @@ function submitMove(
       from,
       to
     );
-
   }
-
 }
 
 
 /* =========================================================
    LOCAL MOVE
+
+   HUMAN AIR REFUND IS APPLIED HERE.
 ========================================================= */
 
 function tryLocalMove(
@@ -6044,6 +4875,29 @@ function tryLocalMove(
   to
 ) {
 
+  /*
+    Capture time BEFORE move is made.
+
+    localTurnStartedAt was set when
+    this turn began.
+  */
+  const moveCompletedAt =
+    performance.now();
+
+
+  const turnElapsedMs =
+    Math.max(
+      0,
+
+      moveCompletedAt -
+      localTurnStartedAt
+    );
+
+
+  /*
+    Bring the clock completely up to date
+    before changing turns.
+  */
   updateLocalClock();
 
 
@@ -6054,42 +4908,72 @@ function tryLocalMove(
   try {
 
     move =
-
       game.move({
-
         from,
-
         to,
-
         promotion:
           "q"
-
       });
 
   } catch {
 
     move =
       null;
-
   }
 
 
-  if (
-    !move
-  ) {
+  if (!move) {
 
     lastClockTick =
       performance.now();
 
 
     return;
-
   }
 
 
+  /*
+    ======================================
+    FAIR AI CLOCK — HUMAN REFUND
+    ======================================
+
+    Only applies when:
+
+    - playing VS AI
+    - human White just moved
+
+    We refund UP TO 700 ms.
+
+    We NEVER refund more than the time
+    that actually passed during the turn.
+  */
   if (
-    move.color ===
-    "w"
+    settings.mode === "ai" &&
+    move.color === "w"
+  ) {
+
+    const refundMs =
+      Math.min(
+        HUMAN_AIR_REFUND_MS,
+        turnElapsedMs
+      );
+
+
+    whiteTimeMs +=
+      refundMs;
+
+
+    console.log(
+      `Air-control refund: ${(refundMs / 1000).toFixed(2)}s`
+    );
+  }
+
+
+  /*
+    Normal chess increment.
+  */
+  if (
+    move.color === "w"
   ) {
 
     whiteTimeMs +=
@@ -6099,22 +4983,30 @@ function tryLocalMove(
 
     blackTimeMs +=
       incrementMs;
-
   }
 
 
-  lastClockTick =
+  const newTurnTime =
     performance.now();
 
 
-  lastMove = {
+  lastClockTick =
+    newTurnTime;
 
+
+  /*
+    The opponent's turn begins NOW.
+  */
+  localTurnStartedAt =
+    newTurnTime;
+
+
+  lastMove = {
     from:
       move.from,
 
     to:
       move.to
-
   };
 
 
@@ -6136,9 +5028,7 @@ function tryLocalMove(
 
   renderBoard();
 
-
   renderHistory();
-
 
   updateStatus();
 
@@ -6148,22 +5038,48 @@ function tryLocalMove(
   ) {
 
     return;
-
   }
 
 
   if (
-    settings.mode ===
-    "ai"
-
-    && game.turn() ===
-    "b"
+    settings.mode === "ai" &&
+    game.turn() === "b"
   ) {
 
     scheduleAiMove();
-
   }
+}
 
+
+/* =========================================================
+   AI THINK DELAY
+========================================================= */
+
+function getAiThinkDelay() {
+
+  const difficulty =
+    settings?.difficulty ||
+    "medium";
+
+
+  const range =
+    AI_THINK_RANGES[
+      difficulty
+    ]
+
+    ||
+
+    AI_THINK_RANGES.medium;
+
+
+  return Math.round(
+    range.min +
+    Math.random() *
+    (
+      range.max -
+      range.min
+    )
+  );
 }
 
 
@@ -6184,18 +5100,35 @@ function scheduleAiMove() {
     );
 
 
+  /*
+    AI clock is ALREADY RUNNING because
+    game.turn() is Black.
+
+    Therefore this delay genuinely costs
+    Nova clock time.
+  */
+  const thinkDelay =
+    getAiThinkDelay();
+
+
+  console.log(
+    `Nova thinking for at least ${(thinkDelay / 1000).toFixed(2)}s`
+  );
+
+
   setTimeout(
     () => {
 
-      if (
-        !gameActive
-      ) {
+      /*
+        Nova may have already lost on
+        time while waiting.
+      */
+      if (!gameActive) {
 
         finishAiThinking();
 
 
         return;
-
       }
 
 
@@ -6203,15 +5136,8 @@ function scheduleAiMove() {
 
     },
 
-    settings.difficulty ===
-    "expert"
-
-      ? 420
-
-      : 250
-
+    thinkDelay
   );
-
 }
 
 
@@ -6226,36 +5152,73 @@ function finishAiThinking() {
     .add(
       "hidden"
     );
-
 }
 
 
 function makeAiMove() {
 
+  /*
+    Count everything up to this exact
+    point against Nova's clock:
+
+    - intentional delay
+    - minimax calculation from previous
+      frames/ticks
+  */
   updateLocalClock();
+
+
+  if (
+    blackTimeMs <= 0
+  ) {
+
+    finishAiThinking();
+
+    endLocalOnTime();
+
+
+    return;
+  }
 
 
   const move =
     chooseAiMove();
 
 
+  /*
+    AI calculation itself also consumed
+    real time.
+
+    Update once again after calculation.
+  */
+  updateLocalClock();
+
+
   if (
-    !move
+    blackTimeMs <= 0
   ) {
 
     finishAiThinking();
 
+    endLocalOnTime();
+
+
+    return;
+  }
+
+
+  if (!move) {
+
+    finishAiThinking();
 
     checkLocalGameEnd();
 
 
     return;
-
   }
 
 
   const result =
-
     game.move({
 
       from:
@@ -6267,16 +5230,32 @@ function makeAiMove() {
       promotion:
         move.promotion
         || "q"
-
     });
 
 
+  /*
+    Normal increment for AI.
+  */
   blackTimeMs +=
     incrementMs;
 
 
-  lastClockTick =
+  const newTurnTime =
     performance.now();
+
+
+  lastClockTick =
+    newTurnTime;
+
+
+  /*
+    Human's new turn begins now.
+
+    This timestamp is later used to
+    calculate the human air refund.
+  */
+  localTurnStartedAt =
+    newTurnTime;
 
 
   lastMove = {
@@ -6286,7 +5265,6 @@ function makeAiMove() {
 
     to:
       result.to
-
   };
 
 
@@ -6300,20 +5278,16 @@ function makeAiMove() {
 
   renderBoard();
 
-
   renderHistory();
-
 
   updateStatus();
 
-
   checkLocalGameEnd();
-
 }
 
 
 /* =========================================================
-   AI CHOICE
+   AI MOVE CHOICE
 ========================================================= */
 
 function chooseAiMove() {
@@ -6325,12 +5299,9 @@ function chooseAiMove() {
     });
 
 
-  if (
-    !moves.length
-  ) {
+  if (!moves.length) {
 
     return null;
-
   }
 
 
@@ -6338,37 +5309,30 @@ function chooseAiMove() {
     settings.difficulty ===
     "easy"
 
-    && Math.random() <
+    &&
+
+    Math.random() <
     0.68
   ) {
 
     return moves[
-
       Math.floor(
-
-        Math.random()
-        * moves.length
-
+        Math.random() *
+        moves.length
       )
-
     ];
-
   }
 
 
   const depth = {
 
-    easy:
-      1,
+    easy: 1,
 
-    medium:
-      2,
+    medium: 2,
 
-    hard:
-      2,
+    hard: 2,
 
-    expert:
-      3
+    expert: 3
 
   }[
     settings.difficulty
@@ -6384,8 +5348,7 @@ function chooseAiMove() {
 
 
   for (
-    const move
-    of moves
+    const move of moves
   ) {
 
     const clone =
@@ -6405,24 +5368,16 @@ function chooseAiMove() {
       promotion:
         move.promotion
         || "q"
-
     });
 
 
     const score =
-
       minimax(
-
         clone,
-
         depth - 1,
-
         -Infinity,
-
         Infinity,
-
         false
-
       );
 
 
@@ -6446,23 +5401,16 @@ function chooseAiMove() {
       bestMoves.push(
         move
       );
-
     }
-
   }
 
 
   return bestMoves[
-
     Math.floor(
-
-      Math.random()
-      * bestMoves.length
-
+      Math.random() *
+      bestMoves.length
     )
-
   ];
-
 }
 
 
@@ -6479,14 +5427,13 @@ function minimax(
 ) {
 
   if (
-    depth <= 0
-    || chess.isGameOver()
+    depth <= 0 ||
+    chess.isGameOver()
   ) {
 
     return evaluate(
       chess
     );
-
   }
 
 
@@ -6497,17 +5444,14 @@ function minimax(
     });
 
 
-  if (
-    maximizingBlack
-  ) {
+  if (maximizingBlack) {
 
     let best =
       -Infinity;
 
 
     for (
-      const move
-      of moves
+      const move of moves
     ) {
 
       const child =
@@ -6527,30 +5471,20 @@ function minimax(
         promotion:
           move.promotion
           || "q"
-
       });
 
 
       best =
-
         Math.max(
-
           best,
 
           minimax(
-
             child,
-
             depth - 1,
-
             alpha,
-
             beta,
-
             false
-
           )
-
         );
 
 
@@ -6562,19 +5496,15 @@ function minimax(
 
 
       if (
-        beta <=
-        alpha
+        beta <= alpha
       ) {
 
         break;
-
       }
-
     }
 
 
     return best;
-
   }
 
 
@@ -6583,8 +5513,7 @@ function minimax(
 
 
   for (
-    const move
-    of moves
+    const move of moves
   ) {
 
     const child =
@@ -6604,30 +5533,20 @@ function minimax(
       promotion:
         move.promotion
         || "q"
-
     });
 
 
     best =
-
       Math.min(
-
         best,
 
         minimax(
-
           child,
-
           depth - 1,
-
           alpha,
-
           beta,
-
           true
-
         )
-
       );
 
 
@@ -6639,68 +5558,49 @@ function minimax(
 
 
     if (
-      beta <=
-      alpha
+      beta <= alpha
     ) {
 
       break;
-
     }
-
   }
 
 
   return best;
-
 }
 
 
 /* =========================================================
-   EVALUATION
+   AI EVALUATION
 ========================================================= */
 
-function evaluate(
-  chess
-) {
+function evaluate(chess) {
 
   if (
     chess.isCheckmate()
   ) {
 
     return (
-
-      chess.turn() ===
-      "w"
-
+      chess.turn() === "w"
         ? 100000
-
         : -100000
-
     );
-
   }
 
 
   const values = {
 
-    p:
-      100,
+    p: 100,
 
-    n:
-      320,
+    n: 320,
 
-    b:
-      330,
+    b: 330,
 
-    r:
-      500,
+    r: 500,
 
-    q:
-      900,
+    q: 900,
 
-    k:
-      0
-
+    k: 0
   };
 
 
@@ -6709,28 +5609,20 @@ function evaluate(
 
 
   for (
-    const row
-    of chess.board()
+    const row of chess.board()
   ) {
 
     for (
-      const piece
-      of row
+      const piece of row
     ) {
 
-      if (
-        !piece
-      ) {
-
+      if (!piece) {
         continue;
-
       }
 
 
       score +=
-
-        piece.color ===
-        "b"
+        piece.color === "b"
 
           ? values[
             piece.type
@@ -6739,14 +5631,11 @@ function evaluate(
           : -values[
             piece.type
           ];
-
     }
-
   }
 
 
   return score;
-
 }
 
 
@@ -6769,13 +5658,11 @@ function startClock() {
 
 
   clockTimer =
-
     setInterval(
       () => {
 
         if (
-          mode() ===
-          "online"
+          mode() === "online"
         ) {
 
           renderClocks();
@@ -6798,23 +5685,17 @@ function startClock() {
             ) {
 
               claimOnlineTimeout();
-
             }
-
           }
 
 
           return;
-
         }
 
 
-        if (
-          !gameActive
-        ) {
+        if (!gameActive) {
 
           return;
-
         }
 
 
@@ -6825,20 +5706,17 @@ function startClock() {
 
 
         if (
-          whiteTimeMs <= 0
-          || blackTimeMs <= 0
+          whiteTimeMs <= 0 ||
+          blackTimeMs <= 0
         ) {
 
           endLocalOnTime();
-
         }
 
       },
 
       100
-
     );
-
 }
 
 
@@ -6849,13 +5727,11 @@ function startClock() {
 function updateLocalClock() {
 
   if (
-    !gameActive
-    || mode() ===
-    "online"
+    !gameActive ||
+    mode() === "online"
   ) {
 
     return;
-
   }
 
 
@@ -6864,8 +5740,8 @@ function updateLocalClock() {
 
 
   const elapsed =
-    now
-    - lastClockTick;
+    now -
+    lastClockTick;
 
 
   lastClockTick =
@@ -6873,8 +5749,7 @@ function updateLocalClock() {
 
 
   if (
-    game.turn() ===
-    "w"
+    game.turn() === "w"
   ) {
 
     whiteTimeMs -=
@@ -6884,7 +5759,6 @@ function updateLocalClock() {
 
     blackTimeMs -=
       elapsed;
-
   }
 
 
@@ -6900,7 +5774,6 @@ function updateLocalClock() {
       0,
       blackTimeMs
     );
-
 }
 
 
@@ -6908,63 +5781,41 @@ function updateLocalClock() {
    ONLINE CLOCK
 ========================================================= */
 
-function getOnlineClockMs(
-  color
-) {
+function getOnlineClockMs(color) {
 
   const room =
     onlineRoomState;
 
 
-  if (
-    !room
-  ) {
+  if (!room) {
 
     return 0;
-
   }
 
 
   let remaining =
-
     Number(
-
-      color ===
-      "w"
-
+      color === "w"
         ? room.whiteTimeMs
-
         : room.blackTimeMs
-
-    )
-
-    || 0;
+    ) || 0;
 
 
   if (
-    room.status ===
-    "playing"
-
-    && room.turn ===
-    color
-
-    && room.turnStartedAt
+    room.status === "playing" &&
+    room.turn === color &&
+    room.turnStartedAt
   ) {
 
     remaining -=
-
       Math.max(
-
         0,
 
-        serverNow()
-
-        - Number(
+        serverNow() -
+        Number(
           room.turnStartedAt
         )
-
       );
-
   }
 
 
@@ -6972,7 +5823,6 @@ function getOnlineClockMs(
     0,
     remaining
   );
-
 }
 
 
@@ -6986,26 +5836,26 @@ function formatClock(
 
   const totalSeconds =
     Math.ceil(
-      milliseconds / 1000
+      milliseconds /
+      1000
     );
 
 
   const minutes =
     Math.floor(
-      totalSeconds / 60
+      totalSeconds /
+      60
     );
 
 
   const seconds =
-    totalSeconds % 60;
+    totalSeconds %
+    60;
 
 
   return (
-
     `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
-
   );
-
 }
 
 
@@ -7016,25 +5866,17 @@ function formatClock(
 function renderClocks() {
 
   const whiteTime =
+    mode() === "online"
 
-    mode() ===
-    "online"
-
-      ? getOnlineClockMs(
-        "w"
-      )
+      ? getOnlineClockMs("w")
 
       : whiteTimeMs;
 
 
   const blackTime =
+    mode() === "online"
 
-    mode() ===
-    "online"
-
-      ? getOnlineClockMs(
-        "b"
-      )
+      ? getOnlineClockMs("b")
 
       : blackTimeMs;
 
@@ -7054,58 +5896,41 @@ function renderClocks() {
   whiteClockEl
     ?.classList
     .toggle(
-
       "low-time",
 
-      whiteTime <=
-      10000
-
-      && gameActive
-
+      whiteTime <= 10000 &&
+      gameActive
     );
 
 
   blackClockEl
     ?.classList
     .toggle(
-
       "low-time",
 
-      blackTime <=
-      10000
-
-      && gameActive
-
+      blackTime <= 10000 &&
+      gameActive
     );
 
 
   whitePlayer
     ?.classList
     .toggle(
-
       "active-player",
 
-      gameActive
-
-      && game.turn() ===
-      "w"
-
+      gameActive &&
+      game.turn() === "w"
     );
 
 
   blackPlayer
     ?.classList
     .toggle(
-
       "active-player",
 
-      gameActive
-
-      && game.turn() ===
-      "b"
-
+      gameActive &&
+      game.turn() === "b"
     );
-
 }
 
 
@@ -7115,12 +5940,8 @@ function renderClocks() {
 
 function endLocalOnTime() {
 
-  if (
-    !gameActive
-  ) {
-
+  if (!gameActive) {
     return;
-
   }
 
 
@@ -7133,44 +5954,36 @@ function endLocalOnTime() {
   );
 
 
+  /*
+    If White hit zero → Black won.
+
+    If Black hit zero → White won.
+  */
   const winnerColor =
-
-    whiteTimeMs <=
-    0
-
+    whiteTimeMs <= 0
       ? "b"
-
       : "w";
 
 
   const winnerName =
-
-    winnerColor ===
-    "w"
-
+    winnerColor === "w"
       ? settings.whiteName
-
       : settings.blackName;
 
 
   gameStatus.textContent =
-
     `⏱ ${winnerName} wins on time`;
 
 
   showLocalResult(
-
     winnerColor,
-
     "time"
-
   );
 
 
   playUiTone(
     "gameover"
   );
-
 }
 
 
@@ -7178,9 +5991,7 @@ function endLocalOnTime() {
    CHECK
 ========================================================= */
 
-function isInCheck(
-  chess
-) {
+function isInCheck(chess) {
 
   if (
     typeof chess.isCheck ===
@@ -7188,7 +5999,6 @@ function isInCheck(
   ) {
 
     return chess.isCheck();
-
   }
 
 
@@ -7198,12 +6008,10 @@ function isInCheck(
   ) {
 
     return chess.inCheck();
-
   }
 
 
   return false;
-
 }
 
 
@@ -7215,25 +6023,19 @@ function updateStatus() {
 
   renderClocks();
 
-
   updateHandColor();
 
 
   if (
-    mode() ===
-    "online"
+    mode() === "online"
   ) {
 
     const room =
       onlineRoomState;
 
 
-    if (
-      !room
-    ) {
-
+    if (!room) {
       return;
-
     }
 
 
@@ -7243,12 +6045,10 @@ function updateStatus() {
     ) {
 
       gameStatus.textContent =
-
         `Room ${currentRoomCode} — waiting for opponent`;
 
 
       return;
-
     }
 
 
@@ -7258,38 +6058,28 @@ function updateStatus() {
     ) {
 
       gameStatus.textContent =
-
         describeOnlineStatus(
           room
         );
 
 
       return;
-
     }
 
 
     const side =
-
-      game.turn() ===
-      "w"
-
+      game.turn() === "w"
         ? "White"
-
         : "Black";
 
 
     const yourTurn =
-
       onlineColor ===
       game.turn();
 
 
     gameStatus.textContent =
-
-      isInCheck(
-        game
-      )
+      isInCheck(game)
 
         ? `⚠ ${side} is in check${yourTurn ? " — your turn" : ""}`
 
@@ -7301,61 +6091,43 @@ function updateStatus() {
 
 
     return;
-
   }
 
 
-  if (
-    !gameActive
-  ) {
-
+  if (!gameActive) {
     return;
-
   }
 
 
   const side =
-
-    game.turn() ===
-    "w"
-
+    game.turn() === "w"
       ? "White"
-
       : "Black";
 
 
   gameStatus.textContent =
-
-    isInCheck(
-      game
-    )
+    isInCheck(game)
 
       ? `⚠ ${side} is in check`
 
       : `${side} to move`;
-
 }
 
 
 /* =========================================================
-   ONLINE RESULT TEXT
+   ONLINE STATUS
 ========================================================= */
 
-function describeOnlineStatus(
-  room
-) {
+function describeOnlineStatus(room) {
 
   const winnerName =
-
-    room.winner ===
-    "w"
+    room.winner === "w"
 
       ? room.players
         ?.white
         ?.name
 
-      : room.winner ===
-      "b"
+      : room.winner === "b"
 
         ? room.players
           ?.black
@@ -7372,7 +6144,6 @@ function describeOnlineStatus(
     return (
       `♛ Checkmate — ${winnerName} wins`
     );
-
   }
 
 
@@ -7384,7 +6155,6 @@ function describeOnlineStatus(
     return (
       `⏱ ${winnerName} wins on time`
     );
-
   }
 
 
@@ -7396,7 +6166,6 @@ function describeOnlineStatus(
     return (
       `${winnerName} wins by resignation`
     );
-
   }
 
 
@@ -7408,7 +6177,6 @@ function describeOnlineStatus(
     return (
       "½–½ Stalemate"
     );
-
   }
 
 
@@ -7420,7 +6188,6 @@ function describeOnlineStatus(
     return (
       "½–½ Draw by repetition"
     );
-
   }
 
 
@@ -7432,14 +6199,10 @@ function describeOnlineStatus(
     return (
       "½–½ Draw — insufficient material"
     );
-
   }
 
 
-  return (
-    "½–½ Draw"
-  );
-
+  return "½–½ Draw";
 }
 
 
@@ -7454,7 +6217,6 @@ function checkLocalGameEnd() {
   ) {
 
     return false;
-
   }
 
 
@@ -7478,9 +6240,7 @@ function checkLocalGameEnd() {
 
 
     const winner =
-
-      winnerColor ===
-      "w"
+      winnerColor === "w"
 
         ? settings.whiteName
 
@@ -7488,7 +6248,6 @@ function checkLocalGameEnd() {
 
 
     gameStatus.textContent =
-
       `♛ Checkmate — ${winner} wins`;
 
 
@@ -7546,7 +6305,6 @@ function checkLocalGameEnd() {
       null,
       "draw"
     );
-
   }
 
 
@@ -7556,7 +6314,6 @@ function checkLocalGameEnd() {
 
 
   return true;
-
 }
 
 
@@ -7575,56 +6332,44 @@ function hideResultOverlay() {
     .add(
       "hidden"
     );
-
 }
 
 
-function reasonLabel(
-  reason
-) {
+function reasonLabel(reason) {
 
   if (
-    reason ===
-    "checkmate"
+    reason === "checkmate"
   ) {
 
     return "Checkmate";
-
   }
 
 
   if (
-    reason ===
-    "time"
+    reason === "time"
   ) {
 
     return "Win on time";
-
   }
 
 
   if (
-    reason ===
-    "resign"
+    reason === "resign"
   ) {
 
     return "Opponent resigned";
-
   }
 
 
   if (
-    reason ===
-    "stalemate"
+    reason === "stalemate"
   ) {
 
     return "Stalemate";
-
   }
 
 
   return "Draw";
-
 }
 
 
@@ -7640,7 +6385,6 @@ function showResultOverlay(
   ) {
 
     return;
-
   }
 
 
@@ -7648,23 +6392,17 @@ function showResultOverlay(
     signature;
 
 
-  if (
-    resultTitle
-  ) {
+  if (resultTitle) {
 
     resultTitle.textContent =
       title;
-
   }
 
 
-  if (
-    resultSubtitle
-  ) {
+  if (resultSubtitle) {
 
     resultSubtitle.textContent =
       subtitle;
-
   }
 
 
@@ -7673,7 +6411,6 @@ function showResultOverlay(
     .remove(
       "hidden"
     );
-
 }
 
 
@@ -7683,17 +6420,14 @@ function showLocalResult(
 ) {
 
   if (
-    settings.mode ===
-    "ai"
+    settings.mode === "ai"
   ) {
 
     if (
-      winnerColor ===
-      "w"
+      winnerColor === "w"
     ) {
 
       showResultOverlay(
-
         "Yayy, you won! 🎉",
 
         reasonLabel(
@@ -7701,38 +6435,31 @@ function showLocalResult(
         ),
 
         `ai-win-${reason}`
-
       );
 
 
       return;
-
     }
 
 
     if (
-      winnerColor ===
-      "b"
+      winnerColor === "b"
     ) {
 
       showResultOverlay(
-
         "Good game! ♟️",
 
         "Nova AI wins",
 
         `ai-loss-${reason}`
-
       );
 
 
       return;
-
     }
 
 
     showResultOverlay(
-
       "Draw! 🤝",
 
       reasonLabel(
@@ -7740,23 +6467,17 @@ function showLocalResult(
       ),
 
       `ai-draw-${reason}`
-
     );
 
 
     return;
-
   }
 
 
-  if (
-    winnerColor
-  ) {
+  if (winnerColor) {
 
     const winnerName =
-
-      winnerColor ===
-      "w"
+      winnerColor === "w"
 
         ? settings.whiteName
 
@@ -7764,7 +6485,6 @@ function showLocalResult(
 
 
     showResultOverlay(
-
       `${winnerName} wins! 🎉`,
 
       reasonLabel(
@@ -7772,13 +6492,11 @@ function showLocalResult(
       ),
 
       `local-${winnerColor}-${reason}`
-
     );
 
   } else {
 
     showResultOverlay(
-
       "Draw! 🤝",
 
       reasonLabel(
@@ -7786,20 +6504,14 @@ function showLocalResult(
       ),
 
       `local-draw-${reason}`
-
     );
-
   }
-
 }
 
 
-function showOnlineResult(
-  room
-) {
+function showOnlineResult(room) {
 
   const signature =
-
     `online-${currentRoomCode}-${room.endReason}-${room.winner}`;
 
 
@@ -7809,7 +6521,6 @@ function showOnlineResult(
   ) {
 
     showResultOverlay(
-
       "Yayy, you won! 🎉",
 
       reasonLabel(
@@ -7817,21 +6528,16 @@ function showOnlineResult(
       ),
 
       signature
-
     );
 
 
     return;
-
   }
 
 
-  if (
-    !room.winner
-  ) {
+  if (!room.winner) {
 
     showResultOverlay(
-
       "Draw! 🤝",
 
       reasonLabel(
@@ -7839,25 +6545,20 @@ function showOnlineResult(
       ),
 
       signature
-
     );
 
 
     return;
-
   }
 
 
   showResultOverlay(
-
     "Good game! ♟️",
 
     "Your opponent won",
 
     signature
-
   );
-
 }
 
 
@@ -7870,23 +6571,17 @@ function renderHistory(
 ) {
 
   const history =
-
-    override
-
-    || game.history();
+    override ||
+    game.history();
 
 
-  if (
-    !history.length
-  ) {
+  if (!history.length) {
 
     moveHistoryEl.innerHTML =
-
       '<div class="empty-history">Moves will appear here.</div>';
 
 
     return;
-
   }
 
 
@@ -7921,7 +6616,6 @@ function renderHistory(
 
 
     number.textContent =
-
       `${Math.floor(index / 2) + 1}.`;
 
 
@@ -7932,8 +6626,7 @@ function renderHistory(
 
 
     white.textContent =
-      history[index]
-      || "";
+      history[index] || "";
 
 
     const black =
@@ -7943,31 +6636,24 @@ function renderHistory(
 
 
     black.textContent =
-      history[index + 1]
-      || "";
+      history[index + 1] || "";
 
 
     row.append(
-
       number,
-
       white,
-
       black
-
     );
 
 
     moveHistoryEl.appendChild(
       row
     );
-
   }
 
 
   moveHistoryEl.scrollTop =
     moveHistoryEl.scrollHeight;
-
 }
 
 
@@ -7978,41 +6664,32 @@ function renderHistory(
 function fitBoardToCamera() {
 
   if (
-    !cameraStage
-    || !boardEl
+    !cameraStage ||
+    !boardEl
   ) {
 
     return;
-
   }
 
 
   const rect =
-
     cameraStage
       .getBoundingClientRect();
 
 
   if (
-    !rect.width
-    || !rect.height
+    !rect.width ||
+    !rect.height
   ) {
 
     return;
-
   }
 
 
   const size =
-
     Math.min(
-
-      rect.width
-      * 0.66,
-
-      rect.height
-      * 0.78
-
+      rect.width * 0.66,
+      rect.height * 0.78
     );
 
 
@@ -8029,12 +6706,10 @@ function fitBoardToCamera() {
 
 
   const pieceSize =
-
     (
       size / 8
-    )
-
-    * 0.72;
+    ) *
+    0.72;
 
 
   boardEl
@@ -8046,10 +6721,8 @@ function fitBoardToCamera() {
 
         square.style.fontSize =
           `${pieceSize}px`;
-
       }
     );
-
 }
 
 
@@ -8060,7 +6733,7 @@ window.addEventListener(
 
 
 /* =========================================================
-   HOVER
+   HOVER HELPERS
 ========================================================= */
 
 function resetHover() {
@@ -8084,7 +6757,6 @@ function resetHover() {
   setCursorProgress(
     0
   );
-
 }
 
 
@@ -8105,7 +6777,6 @@ function resetHoverProgress() {
   setCursorProgress(
     0
   );
-
 }
 
 
@@ -8116,13 +6787,9 @@ function setCursorProgress(
   handCursor
     ?.style
     .setProperty(
-
       "--ghost-progress",
-
       `${Math.round(progress * 360)}deg`
-
     );
-
 }
 
 
@@ -8136,7 +6803,6 @@ function setHoveredSquare(
   ) {
 
     return;
-
   }
 
 
@@ -8154,17 +6820,12 @@ function setHoveredSquare(
         element
           .classList
           .toggle(
-
             "ghost-hover",
-
             element.dataset.square ===
             square
-
           );
-
       }
     );
-
 }
 
 
@@ -8174,20 +6835,13 @@ function setHoveredSquare(
 
 function ensureAudio() {
 
-  if (
-    !audioContext
-  ) {
+  if (!audioContext) {
 
     audioContext =
-
       new (
-
-        window.AudioContext
-
-        || window.webkitAudioContext
-
+        window.AudioContext ||
+        window.webkitAudioContext
       )();
-
   }
 
 
@@ -8197,9 +6851,7 @@ function ensureAudio() {
   ) {
 
     audioContext.resume();
-
   }
-
 }
 
 
@@ -8211,12 +6863,8 @@ function beep(
   delay = 0
 ) {
 
-  if (
-    !soundEnabled
-  ) {
-
+  if (!soundEnabled) {
     return;
-
   }
 
 
@@ -8224,20 +6872,16 @@ function beep(
 
 
   const start =
-
-    audioContext.currentTime
-
-    + delay;
+    audioContext.currentTime +
+    delay;
 
 
   const oscillator =
-
     audioContext
       .createOscillator();
 
 
   const amplifier =
-
     audioContext
       .createGain();
 
@@ -8262,11 +6906,8 @@ function beep(
 
   amplifier.gain
     .exponentialRampToValueAtTime(
-
       0.0001,
-
       start + duration
-
     );
 
 
@@ -8288,17 +6929,13 @@ function beep(
   oscillator.stop(
     start + duration
   );
-
 }
 
 
-function playUiTone(
-  type
-) {
+function playUiTone(type) {
 
   if (
-    type ===
-    "select"
+    type === "select"
   ) {
 
     beep(
@@ -8307,13 +6944,11 @@ function playUiTone(
       "sine",
       0.022
     );
-
   }
 
 
   if (
-    type ===
-    "error"
+    type === "error"
   ) {
 
     beep(
@@ -8322,13 +6957,11 @@ function playUiTone(
       "square",
       0.02
     );
-
   }
 
 
   if (
-    type ===
-    "gameover"
+    type === "gameover"
   ) {
 
     beep(
@@ -8355,45 +6988,24 @@ function playUiTone(
       0.04,
       0.22
     );
-
   }
-
 }
 
 
-function playMoveSound(
-  move
-) {
+function playMoveSound(move) {
 
-  if (
-    !move
-  ) {
-
+  if (!move) {
     return;
-
   }
 
 
   const base = {
-
-    p:
-      330,
-
-    n:
-      430,
-
-    b:
-      500,
-
-    r:
-      280,
-
-    q:
-      620,
-
-    k:
-      220
-
+    p: 330,
+    n: 430,
+    b: 500,
+    r: 280,
+    q: 620,
+    k: 220
   }[
     move.piece
   ] || 330;
@@ -8418,24 +7030,18 @@ function playMoveSound(
       0.022,
       0.055
     );
-
   }
-
 }
 
 
 /* =========================================================
-   COPY ROOM
+   COPY ROOM CODE
 ========================================================= */
 
 async function copyRoomCode() {
 
-  if (
-    !currentRoomCode
-  ) {
-
+  if (!currentRoomCode) {
     return;
-
   }
 
 
@@ -8448,13 +7054,10 @@ async function copyRoomCode() {
       );
 
 
-    if (
-      connectionLabel
-    ) {
+    if (connectionLabel) {
 
       connectionLabel.textContent =
         "Room code copied";
-
     }
 
   } catch {
@@ -8462,9 +7065,7 @@ async function copyRoomCode() {
     console.log(
       currentRoomCode
     );
-
   }
-
 }
 
 
@@ -8496,13 +7097,9 @@ muteBtn
 
 
       muteBtn.textContent =
-
         soundEnabled
-
           ? "🔊"
-
           : "🔇";
-
     }
   );
 
@@ -8517,16 +7114,12 @@ restartBtn
     () => {
 
       if (
-        settings
-
-        && mode() !==
-        "online"
+        settings &&
+        mode() !== "online"
       ) {
 
         initializeLocalGame();
-
       }
-
     }
   );
 
@@ -8540,44 +7133,36 @@ resignBtn
     "click",
     async () => {
 
-      if (
-        !gameActive
-      ) {
-
+      if (!gameActive) {
         return;
-
       }
 
 
       if (
-        mode() ===
-        "online"
+        mode() === "online"
       ) {
 
         if (
-          !currentRoomRef
-          || !onlineColor
+          !currentRoomRef ||
+          !onlineColor
         ) {
 
           return;
-
         }
 
 
         await runTransaction(
-
           currentRoomRef,
 
           (room) => {
 
             if (
-              !room
-              || room.status !==
+              !room ||
+              room.status !==
               "playing"
             ) {
 
               return;
-
             }
 
 
@@ -8600,19 +7185,16 @@ resignBtn
 
 
             return room;
-
           },
 
           {
             applyLocally:
               false
           }
-
         );
 
 
         return;
-
       }
 
 
@@ -8632,17 +7214,12 @@ resignBtn
 
 
       const winner =
-
-        winnerColor ===
-        "w"
-
+        winnerColor === "w"
           ? settings.whiteName
-
           : settings.blackName;
 
 
       gameStatus.textContent =
-
         `${winner} wins by resignation`;
 
 
@@ -8655,7 +7232,6 @@ resignBtn
       playUiTone(
         "gameover"
       );
-
     }
   );
 
@@ -8673,14 +7249,12 @@ newGameBtn
 
 
       if (
-        mode() ===
-        "online"
+        mode() === "online"
       ) {
 
         await leaveOnlineState(
           true
         );
-
       }
 
 
@@ -8695,34 +7269,24 @@ newGameBtn
 
       handCursor
         ?.classList
-        .add(
-          "hidden"
-        );
+        .add("hidden");
 
 
       gameScreen
         ?.classList
-        .add(
-          "hidden"
-        );
+        .add("hidden");
 
 
       setupScreen
         ?.classList
-        .remove(
-          "hidden"
-        );
+        .remove("hidden");
 
 
-      if (
-        setupMessage
-      ) {
+      if (setupMessage) {
 
         setupMessage.textContent =
           "Ghost Board ready.";
-
       }
-
     }
   );
 
@@ -8738,29 +7302,20 @@ async function leaveOnlineState(
   try {
 
     if (
-      markDisconnected
-
-      && db
-
-      && currentRoomCode
-
-      && onlineColor
+      markDisconnected &&
+      db &&
+      currentRoomCode &&
+      onlineColor
     ) {
 
       await set(
-
         ref(
-
           db,
-
           `rooms/${currentRoomCode}/players/${colorKey(onlineColor)}/connected`
-
         ),
 
         false
-
       );
-
     }
 
   } catch (error) {
@@ -8769,16 +7324,12 @@ async function leaveOnlineState(
       "Presence error:",
       error
     );
-
   }
 
 
-  if (
-    roomUnsubscribe
-  ) {
+  if (roomUnsubscribe) {
 
     roomUnsubscribe();
-
   }
 
 
@@ -8808,24 +7359,17 @@ async function leaveOnlineState(
 
   onlineRoomBar
     ?.classList
-    .add(
-      "hidden"
-    );
+    .add("hidden");
 
 
   waitingOverlay
     ?.classList
-    .add(
-      "hidden"
-    );
+    .add("hidden");
 
 
   restartBtn
     ?.classList
-    .remove(
-      "hidden"
-    );
-
+    .remove("hidden");
 }
 
 
@@ -8843,9 +7387,7 @@ window.addEventListener(
         (track) => {
 
           track.stop();
-
         }
       );
-
   }
 );
