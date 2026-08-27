@@ -14,12 +14,15 @@ import {
    GHOST BOARD
    FULL MAIN.JS
 
-   Controls:
-   - Index finger = cursor
-   - Hover 0.10 sec = activate
    - No pinch
-   - Magnetic square targeting
-   - Castling assist
+   - 0.10 sec hover activation
+   - Magnetic square assist
+   - Improved king targeting
+   - Easy castling:
+       King -> Rook
+       Rook -> King
+       King -> g/c square
+   - No gameplay instruction text
 ========================================================= */
 
 document.title = "Ghost Board";
@@ -99,9 +102,6 @@ const boardEl =
 const handCursor =
   $("#handCursor");
 
-const gestureHint =
-  $("#gestureHint");
-
 const gameStatus =
   $("#gameStatus");
 
@@ -146,15 +146,15 @@ const newGameBtn =
    BRANDING
 ========================================================= */
 
-const heading =
+const mainHeading =
   document.querySelector(
     ".logo h1, .brand h1, h1"
   );
 
 
-if (heading) {
+if (mainHeading) {
 
-  heading.textContent =
+  mainHeading.textContent =
     "Ghost Board";
 }
 
@@ -180,121 +180,71 @@ if (startGameBtn) {
 
 
 /* =========================================================
-   REMOVE OLD INSTRUCTIONS
-   + ADD COMPACT INSTRUCTIONS BELOW CAMERA
+   REMOVE ALL OLD GAMEPLAY INSTRUCTIONS
 ========================================================= */
 
-let belowCameraHint =
-  document.querySelector(
-    "#belowCameraHint"
-  );
-
-
-if (
-  cameraStage
-  && !belowCameraHint
-) {
-
-  belowCameraHint =
-    document.createElement(
-      "div"
-    );
-
-
-  belowCameraHint.id =
-    "belowCameraHint";
-
-
-  belowCameraHint.innerHTML = `
-    <b>☝ Air controls:</b>
-    hover over a piece to select •
-    hover over a highlighted square to move
-  `;
-
-
-  cameraStage.insertAdjacentElement(
-    "afterend",
-    belowCameraHint
-  );
-}
-
-
 /*
-  Remove hint inside camera.
+  Remove the instruction inside
+  the camera.
 */
 
-if (gestureHint) {
+const oldGestureHint =
+  $("#gestureHint");
 
-  gestureHint.style.display =
-    "none";
+
+if (oldGestureHint) {
+
+  oldGestureHint.remove();
 }
 
 
 /*
-  Remove big instructions box
-  on the right.
+  Remove any instruction previously
+  inserted underneath the camera.
+*/
+
+const oldBelowHint =
+  $("#belowCameraHint");
+
+
+if (oldBelowHint) {
+
+  oldBelowHint.remove();
+}
+
+
+/*
+  Remove the right-side instruction
+  card completely.
 */
 
 document
   .querySelectorAll(
-    ".hand-info, .instructions"
+    ".instructions, .hand-info"
   )
   .forEach(
     (element) => {
 
-      element.style.display =
-        "none";
+      element.remove();
     }
   );
 
 
 /* =========================================================
-   VISUAL FIXES
+   VISUAL PATCH
 ========================================================= */
 
-const ghostStyle =
+const stylePatch =
   document.createElement(
     "style"
   );
 
 
-ghostStyle.textContent = `
-
-  #belowCameraHint {
-
-    margin:
-      10px 4px 3px;
-
-    padding:
-      10px 14px;
-
-    border:
-      1px solid
-      rgba(255,255,255,.10);
-
-    border-radius:
-      12px;
-
-    background:
-      rgba(15,15,20,.88);
-
-    color:
-      #aaaab5;
-
-    font-size:
-      12px;
-
-    text-align:
-      center;
-  }
+stylePatch.id =
+  "ghostboard-runtime-style";
 
 
-  #belowCameraHint b {
-
-    color:
-      white;
-  }
-
+stylePatch.textContent = `
 
   #board.chessboard {
 
@@ -330,18 +280,21 @@ ghostStyle.textContent = `
 
     border:
       4px solid
-      rgba(10,10,15,.94)
+      rgba(10, 10, 15, .95)
       !important;
 
     outline:
       1px solid
-      rgba(255,255,255,.25);
+      rgba(255, 255, 255, .25);
 
     box-shadow:
+
       0 20px 55px
-      rgba(0,0,0,.58),
-      0 0 32px
-      rgba(120,80,220,.16)
+      rgba(0, 0, 0, .60),
+
+      0 0 34px
+      rgba(130, 85, 230, .16)
+
       !important;
   }
 
@@ -389,8 +342,10 @@ ghostStyle.textContent = `
   #board .square.ghost-hover {
 
     box-shadow:
+
       inset 0 0 0 100px
-      rgba(255,255,255,.19)
+      rgba(255, 255, 255, .19)
+
       !important;
   }
 
@@ -398,8 +353,10 @@ ghostStyle.textContent = `
   #board .square.selected {
 
     box-shadow:
+
       inset 0 0 0 5px
       var(--selected)
+
       !important;
   }
 
@@ -407,8 +364,10 @@ ghostStyle.textContent = `
   #board .square.last-move {
 
     box-shadow:
+
       inset 0 0 0 100px
-      rgba(255,220,60,.20)
+      rgba(255, 220, 60, .20)
+
       !important;
   }
 
@@ -431,12 +390,13 @@ ghostStyle.textContent = `
       50%;
 
     background:
-      rgba(255,255,255,.74)
+      rgba(255, 255, 255, .74)
       !important;
 
     box-shadow:
+
       0 0 14px
-      rgba(255,255,255,.32);
+      rgba(255, 255, 255, .30);
   }
 
 
@@ -444,17 +404,18 @@ ghostStyle.textContent = `
   .square.legal.has-piece::after {
 
     width:
-      72%;
+      73%;
 
     height:
-      72%;
+      73%;
 
     background:
       transparent !important;
 
     border:
+
       4px solid
-      rgba(255,255,255,.72);
+      rgba(255, 255, 255, .72);
 
     border-radius:
       50%;
@@ -479,9 +440,10 @@ ghostStyle.textContent = `
       translateY(-1px);
 
     filter:
+
       drop-shadow(
         0 3px 2px
-        rgba(0,0,0,.48)
+        rgba(0, 0, 0, .48)
       );
   }
 
@@ -493,8 +455,13 @@ ghostStyle.textContent = `
       !important;
 
     text-shadow:
-      0 1px 1px black,
-      0 0 2px black
+
+      0 1px 1px
+      black,
+
+      0 0 2px
+      black
+
       !important;
   }
 
@@ -506,8 +473,10 @@ ghostStyle.textContent = `
       !important;
 
     text-shadow:
+
       0 1px 1px
-      rgba(255,255,255,.23)
+      rgba(255, 255, 255, .23)
+
       !important;
   }
 
@@ -518,10 +487,10 @@ ghostStyle.textContent = `
       0deg;
 
     width:
-      44px !important;
+      40px !important;
 
     height:
-      44px !important;
+      40px !important;
 
     pointer-events:
       none !important;
@@ -552,7 +521,7 @@ ghostStyle.textContent = `
         var(--accent)
         var(--ghost-progress),
 
-        rgba(255,255,255,.20)
+        rgba(255, 255, 255, .20)
         0deg
       );
 
@@ -585,17 +554,18 @@ ghostStyle.textContent = `
   #handCursor .cursor-dot {
 
     width:
-      11px !important;
+      10px !important;
 
     height:
-      11px !important;
+      10px !important;
 
     background:
       white !important;
 
     box-shadow:
-      0 0 14px white
-      !important;
+
+      0 0 14px
+      white !important;
   }
 
 
@@ -607,8 +577,10 @@ ghostStyle.textContent = `
       !important;
 
     box-shadow:
+
       0 0 22px
       var(--accent)
+
       !important;
   }
 
@@ -622,9 +594,9 @@ ghostStyle.textContent = `
 
         to bottom,
 
-        rgba(0,0,0,.03),
+        rgba(0, 0, 0, .03),
 
-        rgba(0,0,0,.16)
+        rgba(0, 0, 0, .15)
       )
 
       !important;
@@ -634,12 +606,12 @@ ghostStyle.textContent = `
 
 
 document.head.appendChild(
-  ghostStyle
+  stylePatch
 );
 
 
 /* =========================================================
-   GAME STATE
+   CHESS STATE
 ========================================================= */
 
 let game =
@@ -710,11 +682,11 @@ const FILES = [
 
 
 /* =========================================================
-   AIR CONTROL SETTINGS
+   AIR CONTROL
 ========================================================= */
 
 /*
-  0.10 seconds.
+  User requested 0.10 seconds.
 */
 
 const HOVER_TIME_MS =
@@ -722,47 +694,36 @@ const HOVER_TIME_MS =
 
 
 /*
-  Higher = faster cursor.
-
-  Still slightly smoothed,
-  so it doesn't shake badly.
+  Fairly responsive smoothing.
 */
 
 const SMOOTHING =
-  0.58;
+  0.62;
 
 
 /*
-  Magnetic targeting.
-
-  Makes it easier to hit
-  squares without perfect accuracy.
+  Magnetic assistance.
 */
 
 const MAGNET_RADIUS =
-  0.78;
+  0.70;
 
 
 /*
-  King gets slightly stronger
-  magnetic assistance.
+  Slightly stronger king assistance.
 */
 
 const KING_MAGNET_RADIUS =
-  0.95;
+  0.92;
 
-
-/*
-  Prevent a single square from
-  activating repeatedly while
-  the finger remains there.
-*/
 
 let currentHoverSquare =
   null;
 
+
 let hoverStartTime =
   0;
+
 
 let lastActivatedSquare =
   null;
@@ -770,6 +731,7 @@ let lastActivatedSquare =
 
 let smoothX =
   null;
+
 
 let smoothY =
   null;
@@ -782,14 +744,18 @@ let smoothY =
 let whiteTimeMs =
   300000;
 
+
 let blackTimeMs =
   300000;
+
 
 let incrementMs =
   0;
 
+
 let lastClockTick =
   0;
+
 
 let clockTimer =
   null;
@@ -802,8 +768,10 @@ let clockTimer =
 let cameraStream =
   null;
 
+
 let handLandmarker =
   null;
+
 
 let handLoopStarted =
   false;
@@ -816,6 +784,7 @@ let handLoopStarted =
 let soundEnabled =
   true;
 
+
 let audioContext =
   null;
 
@@ -827,6 +796,7 @@ let audioContext =
 function updateModeUI() {
 
   const aiMode =
+
     gameModeInput.value
     === "ai";
 
@@ -834,7 +804,9 @@ function updateModeUI() {
   difficultyField
     ?.classList
     .toggle(
+
       "hidden",
+
       !aiMode
     );
 
@@ -842,7 +814,9 @@ function updateModeUI() {
   player2Field
     ?.classList
     .toggle(
+
       "hidden",
+
       aiMode
     );
 }
@@ -850,7 +824,9 @@ function updateModeUI() {
 
 gameModeInput
   ?.addEventListener(
+
     "change",
+
     updateModeUI
   );
 
@@ -860,7 +836,9 @@ updateModeUI();
 
 timeControlInput
   ?.addEventListener(
+
     "change",
+
     () => {
 
       customTime
@@ -878,7 +856,9 @@ timeControlInput
 
 boardThemeInput
   ?.addEventListener(
+
     "change",
+
     () => {
 
       app.dataset.theme =
@@ -896,7 +876,9 @@ boardThemeInput
 
 liveTheme
   ?.addEventListener(
+
     "change",
+
     () => {
 
       app.dataset.theme =
@@ -925,18 +907,14 @@ document
     (button) => {
 
       button.addEventListener(
+
         "click",
+
         () => {
-
-          const emoji =
-            button
-              .textContent
-              .trim();
-
 
           player1NameInput.value =
 
-            `${player1NameInput.value.trim()} ${emoji}`.trim();
+            `${player1NameInput.value.trim()} ${button.textContent.trim()}`.trim();
         }
       );
     }
@@ -948,12 +926,14 @@ document
 ========================================================= */
 
 const savedName =
+
   localStorage.getItem(
     "ghostboard-name"
   );
 
 
 const savedTheme =
+
   localStorage.getItem(
     "ghostboard-theme"
   );
@@ -968,11 +948,8 @@ if (savedName) {
 
 if (savedTheme) {
 
-  if (boardThemeInput) {
-
-    boardThemeInput.value =
-      savedTheme;
-  }
+  boardThemeInput.value =
+    savedTheme;
 
 
   if (liveTheme) {
@@ -988,7 +965,7 @@ if (savedTheme) {
 
 
 /* =========================================================
-   SETTINGS
+   COLLECT SETTINGS
 ========================================================= */
 
 function collectSettings() {
@@ -1004,6 +981,7 @@ function collectSettings() {
   ) {
 
     minutes =
+
       Math.max(
 
         1,
@@ -1015,6 +993,7 @@ function collectSettings() {
 
 
     increment =
+
       Math.max(
 
         0,
@@ -1090,12 +1069,14 @@ function collectSettings() {
 
 
 /* =========================================================
-   START
+   START GAME
 ========================================================= */
 
 startGameBtn
   ?.addEventListener(
+
     "click",
+
     async () => {
 
       startGameBtn.disabled =
@@ -1202,7 +1183,7 @@ startGameBtn
 
 
 /* =========================================================
-   BOARD SIZE
+   FIT BOARD
 ========================================================= */
 
 function fitBoardToCamera() {
@@ -1217,13 +1198,14 @@ function fitBoardToCamera() {
 
 
   const rect =
+
     cameraStage
       .getBoundingClientRect();
 
 
   if (
-    rect.width === 0
-    || rect.height === 0
+    !rect.width
+    || !rect.height
   ) {
 
     return;
@@ -1231,6 +1213,7 @@ function fitBoardToCamera() {
 
 
   const size =
+
     Math.min(
 
       rect.width * 0.70,
@@ -1248,7 +1231,10 @@ function fitBoardToCamera() {
 
 
   const pieceSize =
-    size / 8 * 0.72;
+
+    size
+    / 8
+    * 0.72;
 
 
   boardEl
@@ -1290,7 +1276,7 @@ async function startCamera() {
   ) {
 
     throw new Error(
-      "Camera API unavailable."
+      "Camera unavailable."
     );
   }
 
@@ -1364,7 +1350,7 @@ async function createLandmarker(
           0.55,
 
         minTrackingConfidence:
-          0.5
+          0.50
       }
     );
 }
@@ -1424,10 +1410,6 @@ async function initHandTracking() {
 
 function handTrackingLoop() {
 
-  /*
-    Setup screen currently visible.
-  */
-
   if (
     gameScreen
       .classList
@@ -1439,6 +1421,7 @@ function handTrackingLoop() {
     requestAnimationFrame(
       handTrackingLoop
     );
+
 
     return;
   }
@@ -1452,6 +1435,7 @@ function handTrackingLoop() {
     requestAnimationFrame(
       handTrackingLoop
     );
+
 
     return;
   }
@@ -1467,20 +1451,24 @@ function handTrackingLoop() {
 
       handLandmarker
         .detectForVideo(
+
           webcam,
+
           now
         );
 
 
     processHand(
+
       result,
+
       now
     );
 
   } catch (error) {
 
     console.error(
-      "Hand tracking error:",
+      "Hand tracking:",
       error
     );
   }
@@ -1493,7 +1481,7 @@ function handTrackingLoop() {
 
 
 /* =========================================================
-   HAND CONTROL
+   PROCESS HAND
 ========================================================= */
 
 function processHand(
@@ -1503,7 +1491,7 @@ function processHand(
 
   if (
     !result.landmarks
-    || result.landmarks.length === 0
+    || !result.landmarks.length
   ) {
 
     handCursor
@@ -1537,11 +1525,6 @@ function processHand(
     result.landmarks[0];
 
 
-  /*
-    Landmark 8 =
-    index fingertip.
-  */
-
   const indexTip =
     hand[8];
 
@@ -1553,8 +1536,8 @@ function processHand(
 
 
   /*
-    Mirror horizontal coordinate,
-    matching mirrored webcam.
+    Mirror the X coordinate because
+    the webcam is visually mirrored.
   */
 
   const rawX =
@@ -1570,7 +1553,7 @@ function processHand(
 
 
   /*
-    Smooth cursor slightly.
+    Cursor smoothing.
   */
 
   if (
@@ -1622,10 +1605,6 @@ function processHand(
     `${smoothY}px`;
 
 
-  /*
-    Magnetic square detection.
-  */
-
   const square =
 
     squareFromPoint(
@@ -1651,13 +1630,10 @@ function processHand(
 
     resetHoverProgress();
 
+
     return;
   }
 
-
-  /*
-    Human controls White in AI mode.
-  */
 
   if (
     settings.mode === "ai"
@@ -1666,13 +1642,15 @@ function processHand(
 
     resetHoverProgress();
 
+
     return;
   }
 
 
   /*
-    Once finger moves off a previously
-    activated square, unlock it.
+    Once user moves to another square,
+    allow previous square to activate
+    again later.
   */
 
   if (
@@ -1686,10 +1664,6 @@ function processHand(
   }
 
 
-  /*
-    Don't repeatedly activate same square.
-  */
-
   if (
     lastActivatedSquare
     === square
@@ -1699,13 +1673,10 @@ function processHand(
       0
     );
 
+
     return;
   }
 
-
-  /*
-    Only actionable squares activate.
-  */
 
   if (
     !isActionableSquare(
@@ -1715,12 +1686,13 @@ function processHand(
 
     resetHoverProgress();
 
+
     return;
   }
 
 
   /*
-    New hover square.
+    New square.
   */
 
   if (
@@ -1767,10 +1739,6 @@ function processHand(
   );
 
 
-  /*
-    0.10 second complete.
-  */
-
   if (
     progress >= 1
   ) {
@@ -1814,14 +1782,14 @@ function processHand(
           );
       },
 
-      90
+      70
     );
   }
 }
 
 
 /* =========================================================
-   MAGNETIC SQUARE TARGETING
+   MAGNETIC TARGETING
 ========================================================= */
 
 function squareFromPoint(
@@ -1864,10 +1832,6 @@ function squareFromPoint(
     - rect.top;
 
 
-  /*
-    Square directly underneath cursor.
-  */
-
   const rawCol =
 
     Math.min(
@@ -1879,8 +1843,7 @@ function squareFromPoint(
         0,
 
         Math.floor(
-          boardX
-          / squareWidth
+          boardX / squareWidth
         )
       )
     );
@@ -1897,8 +1860,7 @@ function squareFromPoint(
         0,
 
         Math.floor(
-          boardY
-          / squareHeight
+          boardY / squareHeight
         )
       )
     );
@@ -1910,8 +1872,26 @@ function squareFromPoint(
 
 
   /*
-    Useful targets only.
+    VERY IMPORTANT:
+
+    If the user is already physically
+    inside an actionable square, use it.
+
+    Do NOT let magnetic snapping steal
+    the cursor and move it to a neighbour.
+
+    This especially fixes the king.
   */
+
+  if (
+    isActionableSquare(
+      rawSquare
+    )
+  ) {
+
+    return rawSquare;
+  }
+
 
   const targets =
     getMagneticTargets();
@@ -1955,8 +1935,7 @@ function squareFromPoint(
     const centerX =
 
       (
-        fileIndex
-        + 0.5
+        fileIndex + 0.5
       )
 
       * squareWidth;
@@ -1965,52 +1944,36 @@ function squareFromPoint(
     const centerY =
 
       (
-        row
-        + 0.5
+        row + 0.5
       )
 
       * squareHeight;
 
 
-    const dx =
-
-      (
-        boardX
-        - centerX
-      )
-
-      / squareWidth;
-
-
-    const dy =
-
-      (
-        boardY
-        - centerY
-      )
-
-      / squareHeight;
-
-
     const distance =
 
       Math.hypot(
-        dx,
-        dy
+
+        (
+          boardX - centerX
+        )
+        / squareWidth,
+
+        (
+          boardY - centerY
+        )
+        / squareHeight
       );
 
 
     const piece =
+
       game.get(
         square
       );
 
 
-    /*
-      Stronger magnet for kings.
-    */
-
-    const limit =
+    const radius =
 
       piece?.type === "k"
 
@@ -2020,8 +1983,8 @@ function squareFromPoint(
 
 
     if (
-      distance
-      < nearestDistance
+      distance <
+      nearestDistance
     ) {
 
       nearestDistance =
@@ -2033,7 +1996,7 @@ function squareFromPoint(
 
 
       nearestLimit =
-        limit;
+        radius;
     }
   }
 
@@ -2053,7 +2016,7 @@ function squareFromPoint(
 
 
 /* =========================================================
-   MAGNET TARGET LIST
+   MAGNET TARGETS
 ========================================================= */
 
 function getMagneticTargets() {
@@ -2063,82 +2026,7 @@ function getMagneticTargets() {
 
 
   /*
-    Before selection:
-
-    All pieces belonging to
-    current player.
-  */
-
-  if (!selectedSquare) {
-
-    for (
-      let row = 0;
-      row < 8;
-      row++
-    ) {
-
-      for (
-        let col = 0;
-        col < 8;
-        col++
-      ) {
-
-        const square =
-          `${FILES[col]}${8 - row}`;
-
-
-        const piece =
-          game.get(
-            square
-          );
-
-
-        if (
-          piece
-          && piece.color
-          === game.turn()
-        ) {
-
-          targets.add(
-            square
-          );
-        }
-      }
-    }
-
-
-    return [
-      ...targets
-    ];
-  }
-
-
-  /*
-    Selected square.
-  */
-
-  targets.add(
-    selectedSquare
-  );
-
-
-  /*
-    Normal legal destinations.
-  */
-
-  legalTargets
-    .forEach(
-      (square) => {
-
-        targets.add(
-          square
-        );
-      }
-    );
-
-
-  /*
-    Other own pieces.
+    Own pieces always count.
   */
 
   for (
@@ -2154,10 +2042,12 @@ function getMagneticTargets() {
     ) {
 
       const square =
+
         `${FILES[col]}${8 - row}`;
 
 
       const piece =
+
         game.get(
           square
         );
@@ -2165,6 +2055,7 @@ function getMagneticTargets() {
 
       if (
         piece
+
         && piece.color
         === game.turn()
       ) {
@@ -2178,13 +2069,26 @@ function getMagneticTargets() {
 
 
   /*
-    Add castling rook squares
-    as valid air targets.
+    Legal moves once selected.
   */
 
-  addCastlingMagnetTargets(
-    targets
-  );
+  if (selectedSquare) {
+
+    targets.add(
+      selectedSquare
+    );
+
+
+    legalTargets
+      .forEach(
+        (square) => {
+
+          targets.add(
+            square
+          );
+        }
+      );
+  }
 
 
   return [
@@ -2194,33 +2098,221 @@ function getMagneticTargets() {
 
 
 /* =========================================================
-   CASTLING TARGETS
+   EASY CASTLING
 ========================================================= */
 
-function addCastlingMagnetTargets(
-  targets
+/*
+  Returns:
+
+  {
+    from: "e1",
+    to: "g1"
+  }
+
+  etc.
+
+  Works with:
+
+  king -> rook
+  rook -> king
+  king -> g1/c1/g8/c8
+*/
+
+function getCastlingMove(
+  firstSquare,
+  secondSquare
 ) {
 
-  if (!selectedSquare) {
+  if (
+    !firstSquare
+    || !secondSquare
+  ) {
 
-    return;
+    return null;
   }
 
 
-  const selectedPiece =
+  const firstPiece =
+
     game.get(
-      selectedSquare
+      firstSquare
     );
 
 
+  const secondPiece =
+
+    game.get(
+      secondSquare
+    );
+
+
+  /*
+    Determine whether the first/second
+    pair contains a king and rook.
+  */
+
+  let kingSquare =
+    null;
+
+
+  let rookSquare =
+    null;
+
+
+  let kingPiece =
+    null;
+
+
+  /*
+    KING -> ROOK
+  */
+
   if (
-    !selectedPiece
-    || selectedPiece.type
-    !== "k"
+    firstPiece?.type === "k"
+    && secondPiece?.type === "r"
+    && firstPiece.color
+    === secondPiece.color
   ) {
 
-    return;
+    kingSquare =
+      firstSquare;
+
+
+    rookSquare =
+      secondSquare;
+
+
+    kingPiece =
+      firstPiece;
   }
+
+
+  /*
+    ROOK -> KING
+  */
+
+  if (
+    firstPiece?.type === "r"
+    && secondPiece?.type === "k"
+    && firstPiece.color
+    === secondPiece.color
+  ) {
+
+    kingSquare =
+      secondSquare;
+
+
+    rookSquare =
+      firstSquare;
+
+
+    kingPiece =
+      secondPiece;
+  }
+
+
+  /*
+    KING -> destination square
+  */
+
+  if (
+    firstPiece?.type === "k"
+  ) {
+
+    kingSquare =
+      firstSquare;
+
+
+    kingPiece =
+      firstPiece;
+
+
+    if (
+      firstPiece.color === "w"
+      && firstSquare === "e1"
+    ) {
+
+      if (
+        secondSquare === "g1"
+      ) {
+
+        rookSquare =
+          "h1";
+      }
+
+
+      if (
+        secondSquare === "c1"
+      ) {
+
+        rookSquare =
+          "a1";
+      }
+    }
+
+
+    if (
+      firstPiece.color === "b"
+      && firstSquare === "e8"
+    ) {
+
+      if (
+        secondSquare === "g8"
+      ) {
+
+        rookSquare =
+          "h8";
+      }
+
+
+      if (
+        secondSquare === "c8"
+      ) {
+
+        rookSquare =
+          "a8";
+      }
+    }
+  }
+
+
+  if (
+    !kingSquare
+    || !rookSquare
+    || !kingPiece
+  ) {
+
+    return null;
+  }
+
+
+  /*
+    Ask chess.js what the king
+    can legally do RIGHT NOW.
+
+    This automatically handles:
+    - king already moved
+    - rook already moved
+    - pieces blocking
+    - king in check
+    - crossing attacked square
+  */
+
+  const kingMoves =
+
+    game
+      .moves({
+
+        square:
+          kingSquare,
+
+        verbose:
+          true
+      })
+      .map(
+        (move) =>
+          move.to
+      );
 
 
   /*
@@ -2228,30 +2320,43 @@ function addCastlingMagnetTargets(
   */
 
   if (
-    selectedSquare === "e1"
+    kingPiece.color === "w"
+    && kingSquare === "e1"
   ) {
 
     if (
-      legalTargets.includes(
+      rookSquare === "h1"
+      && kingMoves.includes(
         "g1"
       )
     ) {
 
-      targets.add(
-        "h1"
-      );
+      return {
+
+        from:
+          "e1",
+
+        to:
+          "g1"
+      };
     }
 
 
     if (
-      legalTargets.includes(
+      rookSquare === "a1"
+      && kingMoves.includes(
         "c1"
       )
     ) {
 
-      targets.add(
-        "a1"
-      );
+      return {
+
+        from:
+          "e1",
+
+        to:
+          "c1"
+      };
     }
   }
 
@@ -2261,148 +2366,43 @@ function addCastlingMagnetTargets(
   */
 
   if (
-    selectedSquare === "e8"
+    kingPiece.color === "b"
+    && kingSquare === "e8"
   ) {
 
     if (
-      legalTargets.includes(
+      rookSquare === "h8"
+      && kingMoves.includes(
         "g8"
       )
     ) {
 
-      targets.add(
-        "h8"
-      );
+      return {
+
+        from:
+          "e8",
+
+        to:
+          "g8"
+      };
     }
 
 
     if (
-      legalTargets.includes(
+      rookSquare === "a8"
+      && kingMoves.includes(
         "c8"
       )
     ) {
 
-      targets.add(
-        "a8"
-      );
-    }
-  }
-}
+      return {
 
+        from:
+          "e8",
 
-/* =========================================================
-   CASTLING ASSIST
-
-   After selecting king:
-
-   e1 → hover g1 OR h1
-   = O-O
-
-   e1 → hover c1 OR a1
-   = O-O-O
-========================================================= */
-
-function getCastlingDestination(
-  selected,
-  target
-) {
-
-  if (!selected) {
-
-    return null;
-  }
-
-
-  const piece =
-    game.get(
-      selected
-    );
-
-
-  if (
-    !piece
-    || piece.type
-    !== "k"
-  ) {
-
-    return null;
-  }
-
-
-  /*
-    WHITE KING
-  */
-
-  if (
-    selected === "e1"
-  ) {
-
-    if (
-      (
-        target === "g1"
-        || target === "h1"
-      )
-
-      && legalTargets.includes(
-        "g1"
-      )
-    ) {
-
-      return "g1";
-    }
-
-
-    if (
-      (
-        target === "c1"
-        || target === "a1"
-      )
-
-      && legalTargets.includes(
-        "c1"
-      )
-    ) {
-
-      return "c1";
-    }
-  }
-
-
-  /*
-    BLACK KING
-  */
-
-  if (
-    selected === "e8"
-  ) {
-
-    if (
-      (
-        target === "g8"
-        || target === "h8"
-      )
-
-      && legalTargets.includes(
-        "g8"
-      )
-    ) {
-
-      return "g8";
-    }
-
-
-    if (
-      (
-        target === "c8"
-        || target === "a8"
-      )
-
-      && legalTargets.includes(
-        "c8"
-      )
-    ) {
-
-      return "c8";
+        to:
+          "c8"
+      };
     }
   }
 
@@ -2419,15 +2419,22 @@ function isActionableSquare(
   square
 ) {
 
+  if (!square) {
+
+    return false;
+  }
+
+
   const piece =
+
     game.get(
       square
     );
 
 
   /*
-    Nothing selected:
-    only own pieces.
+    No selection:
+    any own piece.
   */
 
   if (!selectedSquare) {
@@ -2443,7 +2450,8 @@ function isActionableSquare(
 
 
   /*
-    Selected square = cancel.
+    Same piece:
+    cancel.
   */
 
   if (
@@ -2456,11 +2464,14 @@ function isActionableSquare(
 
 
   /*
-    Castling rook shortcut.
+    CASTLING PAIR.
+
+    This happens before the normal
+    own-piece behaviour.
   */
 
   if (
-    getCastlingDestination(
+    getCastlingMove(
 
       selectedSquare,
 
@@ -2473,11 +2484,12 @@ function isActionableSquare(
 
 
   /*
-    Switch own piece.
+    Another own piece.
   */
 
   if (
     piece
+
     && piece.color
     === game.turn()
   ) {
@@ -2487,7 +2499,7 @@ function isActionableSquare(
 
 
   /*
-    Normal legal move.
+    Legal destination.
   */
 
   return legalTargets
@@ -2544,8 +2556,7 @@ function setCursorProgress(
   const degrees =
 
     Math.round(
-      progress
-      * 360
+      progress * 360
     );
 
 
@@ -2682,9 +2693,6 @@ function initializeGame() {
   updateStatus();
 
 
-  updateBelowCameraHint();
-
-
   startClock();
 
 
@@ -2695,7 +2703,7 @@ function initializeGame() {
 
 
 /* =========================================================
-   BOARD
+   RENDER BOARD
 ========================================================= */
 
 function renderBoard() {
@@ -2747,8 +2755,8 @@ function renderBoard() {
 
 
       if (
-        hoveredSquare ===
-        squareName
+        hoveredSquare
+        === squareName
       ) {
 
         square.classList.add(
@@ -2758,8 +2766,8 @@ function renderBoard() {
 
 
       if (
-        selectedSquare ===
-        squareName
+        selectedSquare
+        === squareName
       ) {
 
         square.classList.add(
@@ -2784,13 +2792,13 @@ function renderBoard() {
         lastMove
 
         && (
-          lastMove.from ===
-          squareName
+          lastMove.from
+          === squareName
 
           ||
 
-          lastMove.to ===
-          squareName
+          lastMove.to
+          === squareName
         )
       ) {
 
@@ -2863,7 +2871,9 @@ function renderBoard() {
 ========================================================= */
 
 boardEl.addEventListener(
+
   "click",
+
   (event) => {
 
     const square =
@@ -2911,7 +2921,7 @@ function handleSquareInput(
 
 
   /*
-    Nothing selected yet.
+    First selection.
   */
 
   if (!selectedSquare) {
@@ -2920,19 +2930,21 @@ function handleSquareInput(
       square
     );
 
+
     return;
   }
 
 
   /*
-    Castling comes BEFORE own-piece
-    switching, because rook is also
-    your own piece.
+    CASTLING FIRST.
+
+    Must happen BEFORE normal
+    own-piece switching.
   */
 
-  const castleDestination =
+  const castle =
 
-    getCastlingDestination(
+    getCastlingMove(
 
       selectedSquare,
 
@@ -2940,13 +2952,13 @@ function handleSquareInput(
     );
 
 
-  if (castleDestination) {
+  if (castle) {
 
     tryMove(
 
-      selectedSquare,
+      castle.from,
 
-      castleDestination
+      castle.to
     );
 
 
@@ -2955,7 +2967,7 @@ function handleSquareInput(
 
 
   /*
-    Cancel.
+    Same piece = cancel.
   */
 
   if (
@@ -2964,6 +2976,7 @@ function handleSquareInput(
   ) {
 
     clearSelection();
+
 
     return;
   }
@@ -2977,7 +2990,8 @@ function handleSquareInput(
 
 
   /*
-    Switch selected piece.
+    Another own piece =
+    change selection.
   */
 
   if (
@@ -2990,6 +3004,7 @@ function handleSquareInput(
     selectSquare(
       square
     );
+
 
     return;
   }
@@ -3016,7 +3031,7 @@ function handleSquareInput(
 
 
 /* =========================================================
-   SELECT
+   SELECT PIECE
 ========================================================= */
 
 function selectSquare(
@@ -3054,7 +3069,6 @@ function selectSquare(
         verbose:
           true
       })
-
       .map(
         (move) =>
           move.to
@@ -3067,9 +3081,6 @@ function selectSquare(
   playUiTone(
     "select"
   );
-
-
-  updateBelowCameraHint();
 }
 
 
@@ -3088,70 +3099,6 @@ function clearSelection() {
 
 
   renderBoard();
-
-
-  updateBelowCameraHint();
-}
-
-
-/* =========================================================
-   BELOW CAMERA MESSAGE
-========================================================= */
-
-function updateBelowCameraHint() {
-
-  if (!belowCameraHint) {
-
-    return;
-  }
-
-
-  if (aiBusy) {
-
-    belowCameraHint.innerHTML =
-
-      `<b>🤖 Nova AI is thinking...</b>`;
-
-    return;
-  }
-
-
-  if (!selectedSquare) {
-
-    belowCameraHint.innerHTML = `
-
-      <b>☝ Air controls:</b>
-
-      hover over one of your pieces
-      to select it
-    `;
-
-  } else {
-
-    const piece =
-
-      game.get(
-        selectedSquare
-      );
-
-
-    const castleText =
-
-      piece?.type === "k"
-
-        ? " • hover the rook to castle"
-
-        : "";
-
-
-    belowCameraHint.innerHTML = `
-
-      <b>${selectedSquare} selected</b>
-
-      • hover a highlighted square
-      to move${castleText}
-    `;
-  }
 }
 
 
@@ -3246,9 +3193,6 @@ function tryMove(
   updateStatus();
 
 
-  updateBelowCameraHint();
-
-
   if (
     checkGameEnd()
   ) {
@@ -3285,15 +3229,14 @@ function scheduleAiMove() {
     );
 
 
-  updateBelowCameraHint();
-
-
   setTimeout(
+
     () => {
 
       if (!gameActive) {
 
         finishAiThinking();
+
 
         return;
       }
@@ -3303,8 +3246,8 @@ function scheduleAiMove() {
 
     },
 
-    settings.difficulty ===
-    "expert"
+    settings.difficulty
+    === "expert"
 
       ? 420
 
@@ -3324,9 +3267,6 @@ function finishAiThinking() {
     .add(
       "hidden"
     );
-
-
-  updateBelowCameraHint();
 }
 
 
@@ -3408,7 +3348,7 @@ function makeAiMove() {
 
 
 /* =========================================================
-   BASIC AI
+   AI MOVE CHOICE
 ========================================================= */
 
 function chooseAiMove() {
@@ -3427,10 +3367,11 @@ function chooseAiMove() {
 
 
   if (
-    settings.difficulty ===
-    "easy"
+    settings.difficulty
+    === "easy"
 
-    && Math.random() < 0.68
+    && Math.random()
+    < 0.68
   ) {
 
     return moves[
@@ -3512,8 +3453,7 @@ function chooseAiMove() {
 
 
     if (
-      score >
-      bestScore
+      score > bestScore
     ) {
 
       bestScore =
@@ -3524,8 +3464,7 @@ function chooseAiMove() {
         [move];
 
     } else if (
-      score ===
-      bestScore
+      score === bestScore
     ) {
 
       bestMoves.push(
@@ -3788,7 +3727,8 @@ function evaluate(
 
       score +=
 
-        piece.color === "b"
+        piece.color
+        === "b"
 
           ? values[
               piece.type
@@ -3856,6 +3796,7 @@ function startClock() {
   clockTimer =
 
     setInterval(
+
       () => {
 
         if (!gameActive) {
@@ -4033,6 +3974,7 @@ function renderClocks() {
       "active-player",
 
       gameActive
+
       && game.turn()
       === "w"
     );
@@ -4045,6 +3987,7 @@ function renderClocks() {
       "active-player",
 
       gameActive
+
       && game.turn()
       === "b"
     );
@@ -4207,7 +4150,7 @@ function checkGameEnd() {
 
 
 /* =========================================================
-   HISTORY
+   MOVE HISTORY
 ========================================================= */
 
 function renderHistory() {
@@ -4232,9 +4175,9 @@ function renderHistory() {
 
 
   for (
-    let i = 0;
-    i < history.length;
-    i += 2
+    let index = 0;
+    index < history.length;
+    index += 2
   ) {
 
     const row =
@@ -4261,7 +4204,7 @@ function renderHistory() {
 
     number.textContent =
 
-      `${Math.floor(i / 2) + 1}.`;
+      `${Math.floor(index / 2) + 1}.`;
 
 
     const white =
@@ -4272,7 +4215,9 @@ function renderHistory() {
 
 
     white.textContent =
-      history[i] || "";
+
+      history[index]
+      || "";
 
 
     const black =
@@ -4283,7 +4228,8 @@ function renderHistory() {
 
 
     black.textContent =
-      history[i + 1]
+
+      history[index + 1]
       || "";
 
 
@@ -4311,7 +4257,7 @@ function renderHistory() {
 
 
 /* =========================================================
-   SOUND
+   AUDIO
 ========================================================= */
 
 function ensureAudio() {
@@ -4330,8 +4276,8 @@ function ensureAudio() {
 
 
   if (
-    audioContext.state ===
-    "suspended"
+    audioContext.state
+    === "suspended"
   ) {
 
     audioContext.resume();
@@ -4446,11 +4392,11 @@ function playUiTone(
 
       700,
 
-      0.045,
+      0.04,
 
       "sine",
 
-      0.025
+      0.022
     );
   }
 
@@ -4548,6 +4494,31 @@ function playMoveSound(
   );
 
 
+  /*
+    Castling gets a small
+    double sound.
+  */
+
+  if (
+    move.flags?.includes("k")
+    || move.flags?.includes("q")
+  ) {
+
+    beep(
+
+      360,
+
+      0.055,
+
+      "triangle",
+
+      0.025,
+
+      0.07
+    );
+  }
+
+
   if (
     move.captured
   ) {
@@ -4594,7 +4565,9 @@ function playMoveSound(
 
 muteBtn
   ?.addEventListener(
+
     "click",
+
     () => {
 
       soundEnabled =
@@ -4614,7 +4587,9 @@ muteBtn
 
 restartBtn
   ?.addEventListener(
+
     "click",
+
     () => {
 
       if (settings) {
@@ -4627,7 +4602,9 @@ restartBtn
 
 resignBtn
   ?.addEventListener(
+
     "click",
+
     () => {
 
       if (!gameActive) {
@@ -4677,7 +4654,9 @@ resignBtn
 
 newGameBtn
   ?.addEventListener(
+
     "click",
+
     () => {
 
       gameActive =
@@ -4722,7 +4701,9 @@ newGameBtn
 ========================================================= */
 
 window.addEventListener(
+
   "beforeunload",
+
   () => {
 
     if (cameraStream) {
