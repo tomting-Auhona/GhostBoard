@@ -1,19 +1,40 @@
 <!doctype html>
+
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#07070a" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <meta
+    name="theme-color"
+    content="#07070a"
+  />
+
   <meta
     name="description"
     content="Ghost Board — camera chess with AI, local and online multiplayer."
   />
-  <title>Ghost Board</title>
+
+  <title>
+    Ghost Board
+  </title>
+
 </head>
+
 
 <body>
 
-  <div id="app" data-theme="galaxy">
+  <div
+    id="app"
+    data-theme="galaxy"
+  >
+
 
     <!-- ===================================================
          SETUP SCREEN
@@ -25,6 +46,11 @@
     >
 
       <div class="setup-card">
+
+
+        <!-- ===============================================
+             BRAND
+        ================================================ -->
 
         <div class="brand">
 
@@ -53,6 +79,9 @@
 
         <div class="setup-grid">
 
+
+          <!-- USERNAME -->
+
           <label class="field">
 
             <span>
@@ -67,6 +96,8 @@
 
           </label>
 
+
+          <!-- GAME MODE -->
 
           <label class="field">
 
@@ -93,6 +124,8 @@
           </label>
 
 
+          <!-- LOCAL PLAYER 2 -->
+
           <label
             id="player2Field"
             class="field hidden"
@@ -110,6 +143,8 @@
 
           </label>
 
+
+          <!-- AI DIFFICULTY -->
 
           <label
             id="difficultyField"
@@ -146,6 +181,8 @@
           </label>
 
 
+          <!-- TIME CONTROL -->
+
           <label class="field">
 
             <span>
@@ -153,6 +190,7 @@
             </span>
 
             <select id="timeControl">
+
 
               <optgroup label="Bullet">
 
@@ -230,6 +268,8 @@
           </label>
 
 
+          <!-- BOARD THEME -->
+
           <label class="field">
 
             <span>
@@ -270,9 +310,7 @@
           </label>
 
 
-          <!-- =============================================
-               CUSTOM TIME
-          ============================================== -->
+          <!-- CUSTOM TIME -->
 
           <div
             id="customTime"
@@ -315,9 +353,7 @@
           </div>
 
 
-          <!-- =============================================
-               SOUND
-          ============================================== -->
+          <!-- GAME SOUNDS -->
 
           <label class="toggle-row">
 
@@ -340,7 +376,7 @@
 
 
         <!-- ===============================================
-             ONLINE OPTIONS
+             ONLINE MULTIPLAYER OPTIONS
         ================================================ -->
 
         <div
@@ -405,7 +441,7 @@
 
 
         <!-- ===============================================
-             STICKERS
+             QUICK STICKERS
         ================================================ -->
 
         <div class="stickers">
@@ -493,7 +529,7 @@
 
 
         <!-- ===============================================
-             MESSAGE
+             SETUP MESSAGE
         ================================================ -->
 
         <div
@@ -525,8 +561,9 @@
       class="screen game-screen hidden"
     >
 
+
       <!-- ===============================================
-           HEADER
+           GAME HEADER
       ================================================ -->
 
       <header class="game-header">
@@ -537,6 +574,9 @@
 
 
         <div class="header-actions">
+
+
+          <!-- ONLINE ROOM -->
 
           <div
             id="onlineRoomBar"
@@ -563,6 +603,57 @@
 
           </div>
 
+
+          <!-- =============================================
+               LO-FI MUSIC CONTROLS
+          ============================================== -->
+
+          <div
+            id="lofiControls"
+            class="lofi-controls"
+          >
+
+            <button
+              id="lofiBtn"
+              type="button"
+              aria-pressed="false"
+              title="Toggle lo-fi background music"
+            >
+              🎧 Lo-fi OFF
+            </button>
+
+
+            <label
+              class="lofi-volume"
+              title="Lo-fi volume"
+            >
+
+              <span class="lofi-volume-label">
+                VOL
+              </span>
+
+
+              <input
+                id="lofiVolume"
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                value="24"
+                aria-label="Lo-fi music volume"
+              />
+
+
+              <span id="lofiVolumeNumber">
+                24%
+              </span>
+
+            </label>
+
+          </div>
+
+
+          <!-- LIVE THEME -->
 
           <select
             id="liveTheme"
@@ -596,13 +687,17 @@
           </select>
 
 
+          <!-- GAME SOUND -->
+
           <button
             id="muteBtn"
-            title="Toggle sound"
+            title="Toggle game sounds"
           >
             🔊
           </button>
 
+
+          <!-- RESTART -->
 
           <button
             id="restartBtn"
@@ -617,7 +712,7 @@
 
 
       <!-- ===============================================
-           GAME AREA
+           MAIN GAME AREA
       ================================================ -->
 
       <main class="game-layout">
@@ -643,8 +738,6 @@
                 Nova AI 🤖
               </div>
 
-
-              <!-- ALWAYS VISIBLE RATING -->
 
               <div
                 id="blackRating"
@@ -672,7 +765,7 @@
 
 
           <!-- =============================================
-               CAMERA + BOARD
+               CAMERA
           ============================================== -->
 
           <div
@@ -680,6 +773,9 @@
             class="camera-stage"
             data-hand-color="w"
           >
+
+
+            <!-- WEBCAM -->
 
             <video
               id="webcam"
@@ -690,9 +786,13 @@
             </video>
 
 
+            <!-- CAMERA OVERLAY -->
+
             <div class="camera-tint">
             </div>
 
+
+            <!-- CHESS BOARD -->
 
             <div
               id="board"
@@ -700,6 +800,8 @@
             >
             </div>
 
+
+            <!-- HAND CURSOR -->
 
             <div
               id="handCursor"
@@ -715,23 +817,35 @@
             </div>
 
 
+            <!-- LIVE CAMERA BADGE -->
+
             <div class="live-badge">
-              <span></span>
+
+              <span>
+              </span>
+
               LIVE
+
             </div>
 
+
+            <!-- AI THINKING -->
 
             <div
               id="aiThinking"
               class="ai-thinking hidden"
             >
-              <span></span>
+
+              <span>
+              </span>
+
               AI THINKING
+
             </div>
 
 
             <!-- ===========================================
-                 ONLINE WAITING
+                 WAITING FOR ONLINE PLAYER
             ============================================ -->
 
             <div
@@ -745,13 +859,16 @@
                   🌍
                 </div>
 
+
                 <h2>
                   Waiting for opponent
                 </h2>
 
+
                 <p id="waitingText">
                   Share your room code.
                 </p>
+
 
                 <div
                   id="waitingCode"
@@ -759,6 +876,7 @@
                 >
                   GHOST-0000
                 </div>
+
 
                 <button
                   id="copyWaitingCodeBtn"
@@ -793,8 +911,6 @@
               </div>
 
 
-              <!-- ALWAYS VISIBLE RATING -->
-
               <div
                 id="whiteRating"
                 class="player-rating"
@@ -828,6 +944,9 @@
 
         <aside class="side-panel">
 
+
+          <!-- GAME STATUS -->
+
           <div class="panel-card">
 
             <div class="panel-title">
@@ -843,6 +962,8 @@
 
           </div>
 
+
+          <!-- MOVES -->
 
           <div class="panel-card moves-card">
 
@@ -863,6 +984,8 @@
 
           </div>
 
+
+          <!-- GAME ACTIONS -->
 
           <div class="panel-card two-buttons">
 
@@ -893,7 +1016,7 @@
 
 
   <!-- =====================================================
-       SCRIPTS
+       GHOST BOARD MAIN GAME
   ====================================================== -->
 
   <script
@@ -903,11 +1026,27 @@
   </script>
 
 
+  <!-- =====================================================
+       ALWAYS-VISIBLE ELO
+  ====================================================== -->
+
   <script
     type="module"
     src="/src/rating-ui.js"
   >
   </script>
 
+
+  <!-- =====================================================
+       PROCEDURAL LO-FI MUSIC
+  ====================================================== -->
+
+  <script
+    type="module"
+    src="/src/lofi-music.js"
+  >
+  </script>
+
 </body>
+
 </html>
