@@ -39,7 +39,7 @@ import {
 ========================================================= */
 
 const BUILD_VERSION =
-  "GHOSTBOARD-UX-6";
+  "GHOSTBOARD-AUTO-SWITCH-7";
 
 console.log(
   `Ghost Board ${BUILD_VERSION}`
@@ -227,8 +227,42 @@ document
 
 
 /* =========================================================
-   EXTRA UI
-   CAPTURED PIECES + RESULT OVERLAY
+   CHESS CONSTANTS
+========================================================= */
+
+const FILES = [
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "f",
+  "g",
+  "h"
+];
+
+
+const PIECES = {
+
+  wp: "♟",
+  wn: "♞",
+  wb: "♝",
+  wr: "♜",
+  wq: "♛",
+  wk: "♚",
+
+  bp: "♟",
+  bn: "♞",
+  bb: "♝",
+  br: "♜",
+  bq: "♛",
+  bk: "♚"
+
+};
+
+
+/* =========================================================
+   EXTRA GAME UI
 ========================================================= */
 
 let capturedPanel =
@@ -257,9 +291,7 @@ function createExtraGameUI() {
 
   if (
     cameraStage
-    && !document.querySelector(
-      "#capturedPanel"
-    )
+    && !$("#capturedPanel")
   ) {
 
     capturedPanel =
@@ -273,7 +305,9 @@ function createExtraGameUI() {
 
 
     capturedPanel.innerHTML = `
+
       <div class="captured-line">
+
         <span class="captured-label">
           White captured
         </span>
@@ -284,9 +318,12 @@ function createExtraGameUI() {
         >
           —
         </span>
+
       </div>
 
+
       <div class="captured-line">
+
         <span class="captured-label">
           Black captured
         </span>
@@ -297,45 +334,33 @@ function createExtraGameUI() {
         >
           —
         </span>
+
       </div>
+
     `;
 
 
-    cameraStage
-      .insertAdjacentElement(
-        "afterend",
-        capturedPanel
-      );
-
-
-    capturedByWhiteEl =
-      $("#capturedByWhite");
-
-
-    capturedByBlackEl =
-      $("#capturedByBlack");
-
-  } else {
-
-    capturedPanel =
-      $("#capturedPanel");
-
-
-    capturedByWhiteEl =
-      $("#capturedByWhite");
-
-
-    capturedByBlackEl =
-      $("#capturedByBlack");
+    cameraStage.insertAdjacentElement(
+      "afterend",
+      capturedPanel
+    );
 
   }
 
 
+  capturedPanel =
+    $("#capturedPanel");
+
+  capturedByWhiteEl =
+    $("#capturedByWhite");
+
+  capturedByBlackEl =
+    $("#capturedByBlack");
+
+
   if (
     cameraStage
-    && !document.querySelector(
-      "#ghostResultOverlay"
-    )
+    && !$("#ghostResultOverlay")
   ) {
 
     resultOverlay =
@@ -355,23 +380,29 @@ function createExtraGameUI() {
     resultOverlay.innerHTML = `
 
       <div class="result-confetti">
+
         ${Array.from(
           {
             length:
               20
           },
+
           (_, index) => {
 
             return `
+
               <span
                 style="--i:${index}"
               >
                 ✦
               </span>
+
             `;
 
           }
+
         ).join("")}
+
       </div>
 
 
@@ -392,6 +423,7 @@ function createExtraGameUI() {
         </div>
 
       </div>
+
     `;
 
 
@@ -399,26 +431,17 @@ function createExtraGameUI() {
       resultOverlay
     );
 
-
-    resultTitle =
-      $("#ghostResultTitle");
-
-
-    resultSubtitle =
-      $("#ghostResultSubtitle");
-
-  } else {
-
-    resultOverlay =
-      $("#ghostResultOverlay");
-
-    resultTitle =
-      $("#ghostResultTitle");
-
-    resultSubtitle =
-      $("#ghostResultSubtitle");
-
   }
+
+
+  resultOverlay =
+    $("#ghostResultOverlay");
+
+  resultTitle =
+    $("#ghostResultTitle");
+
+  resultSubtitle =
+    $("#ghostResultSubtitle");
 
 }
 
@@ -438,11 +461,8 @@ const runtimeStyle =
 
 runtimeStyle.textContent = `
 
-  /* ==========================================
-     Captured pieces
-  ========================================== */
-
   #capturedPanel {
+
     width: 100%;
 
     margin-top: 10px;
@@ -453,7 +473,8 @@ runtimeStyle.textContent = `
       1px solid
       rgba(255,255,255,.10);
 
-    border-radius: 13px;
+    border-radius:
+      13px;
 
     background:
       rgba(12,12,18,.88);
@@ -465,6 +486,7 @@ runtimeStyle.textContent = `
 
 
   .captured-line {
+
     min-height: 28px;
 
     display: flex;
@@ -476,6 +498,7 @@ runtimeStyle.textContent = `
 
 
   .captured-label {
+
     min-width: 105px;
 
     color:
@@ -492,6 +515,7 @@ runtimeStyle.textContent = `
 
 
   .captured-pieces {
+
     display: flex;
 
     align-items: center;
@@ -499,9 +523,6 @@ runtimeStyle.textContent = `
     flex-wrap: wrap;
 
     gap: 2px;
-
-    color:
-      rgba(255,255,255,.86);
 
     font-family:
       "Segoe UI Symbol",
@@ -514,6 +535,7 @@ runtimeStyle.textContent = `
 
 
   .captured-piece-white {
+
     color: #f6f6fa;
 
     text-shadow:
@@ -522,6 +544,7 @@ runtimeStyle.textContent = `
 
 
   .captured-piece-black {
+
     color: #737381;
 
     text-shadow:
@@ -530,11 +553,8 @@ runtimeStyle.textContent = `
   }
 
 
-  /* ==========================================
-     Result overlay
-  ========================================== */
-
   #ghostResultOverlay {
+
     position: absolute;
 
     inset: 0;
@@ -558,19 +578,22 @@ runtimeStyle.textContent = `
 
 
   #ghostResultOverlay.hidden {
+
     display: none !important;
   }
 
 
   .ghost-result-card {
+
     position: relative;
 
     z-index: 5;
 
-    min-width: min(
-      80%,
-      430px
-    );
+    min-width:
+      min(
+        80%,
+        430px
+      );
 
     padding:
       25px 26px;
@@ -604,6 +627,7 @@ runtimeStyle.textContent = `
 
 
   .ghost-result-title {
+
     font-size:
       clamp(
         24px,
@@ -626,6 +650,7 @@ runtimeStyle.textContent = `
 
 
   .ghost-result-subtitle {
+
     margin-top: 7px;
 
     color:
@@ -638,6 +663,7 @@ runtimeStyle.textContent = `
 
 
   .result-confetti {
+
     position: absolute;
 
     inset: 0;
@@ -649,6 +675,7 @@ runtimeStyle.textContent = `
 
 
   .result-confetti span {
+
     --column:
       calc(
         (
@@ -695,16 +722,19 @@ runtimeStyle.textContent = `
 
 
   .result-confetti span:nth-child(3n) {
+
     color: #ffd454;
   }
 
 
   .result-confetti span:nth-child(3n + 1) {
+
     color: #ba83ff;
   }
 
 
   .result-confetti span:nth-child(3n + 2) {
+
     color: #67dcff;
   }
 
@@ -712,6 +742,7 @@ runtimeStyle.textContent = `
   @keyframes ghostResultPop {
 
     from {
+
       opacity: 0;
 
       transform:
@@ -720,6 +751,7 @@ runtimeStyle.textContent = `
     }
 
     to {
+
       opacity: 1;
 
       transform:
@@ -733,11 +765,13 @@ runtimeStyle.textContent = `
   @keyframes ghostTitlePulse {
 
     from {
+
       transform:
         scale(1);
     }
 
     to {
+
       transform:
         scale(1.035);
     }
@@ -748,12 +782,14 @@ runtimeStyle.textContent = `
   @keyframes ghostConfettiFall {
 
     from {
+
       transform:
         translateY(-10%)
         rotate(0deg);
     }
 
     to {
+
       transform:
         translateY(700px)
         rotate(520deg);
@@ -762,8 +798,8 @@ runtimeStyle.textContent = `
   }
 
 
-  /* Keep overlay anchored to camera */
   #cameraStage {
+
     position: relative;
   }
 
@@ -776,46 +812,11 @@ document.head.appendChild(
 
 
 /* =========================================================
-   PIECES
-========================================================= */
-
-const FILES = [
-  "a",
-  "b",
-  "c",
-  "d",
-  "e",
-  "f",
-  "g",
-  "h"
-];
-
-
-const PIECES = {
-
-  wp: "♟",
-  wn: "♞",
-  wb: "♝",
-  wr: "♜",
-  wq: "♛",
-  wk: "♚",
-
-  bp: "♟",
-  bn: "♞",
-  bb: "♝",
-  br: "♜",
-  bq: "♛",
-  bk: "♚"
-
-};
-
-
-/* =========================================================
-   AIR CONTROL
+   AIR CONTROL SETTINGS
 ========================================================= */
 
 /*
-  Quick source selection.
+  Selecting a piece.
 */
 
 const SELECT_DWELL_MS =
@@ -823,8 +824,7 @@ const SELECT_DWELL_MS =
 
 
 /*
-  Destination requires a tiny
-  bit more certainty.
+  Making the actual move.
 */
 
 const MOVE_DWELL_MS =
@@ -832,7 +832,17 @@ const MOVE_DWELL_MS =
 
 
 /*
-  Responsive cursor.
+  Switching from one friendly piece
+  to another should feel like selecting,
+  not like making a move.
+*/
+
+const SWITCH_DWELL_MS =
+  120;
+
+
+/*
+  Cursor responsiveness.
 */
 
 const SMOOTHING =
@@ -840,7 +850,7 @@ const SMOOTHING =
 
 
 /*
-  Prevent source-piece snapping.
+  Source selection central area.
 */
 
 const SELECTION_CORE_MARGIN =
@@ -848,7 +858,7 @@ const SELECTION_CORE_MARGIN =
 
 
 /*
-  Mild destination snapping.
+  Destination magnetism.
 */
 
 const MAGNET_RADIUS =
@@ -860,9 +870,7 @@ const KING_MAGNET_RADIUS =
 
 
 /*
-  Moving finger = no activation.
-
-  This is the d2 → d4 fix.
+  Fly-over protection.
 */
 
 const STABLE_MOTION_FRACTION =
@@ -874,14 +882,7 @@ const REQUIRED_STABLE_FRAMES =
 
 
 /*
-  NEW:
-
-  Bottom row gets an invisible
-  selection zone slightly below
-  the board.
-
-  Makes Rank 1 / bottom rank much
-  easier to reach.
+  Bottom rank extension.
 */
 
 const BOTTOM_EDGE_ASSIST =
@@ -1126,7 +1127,8 @@ function normalizeArray(
 
   if (
     !value
-    || typeof value !== "object"
+    || typeof value !==
+    "object"
   ) {
 
     return [];
@@ -1158,6 +1160,84 @@ function normalizeArray(
 
 
 /* =========================================================
+   OWN PIECE HELPERS
+========================================================= */
+
+function isOwnTurnPiece(
+  square
+) {
+
+  if (
+    !square
+  ) {
+
+    return false;
+
+  }
+
+
+  const piece =
+    game.get(
+      square
+    );
+
+
+  return Boolean(
+
+    piece
+
+    && piece.color ===
+    game.turn()
+
+  );
+
+}
+
+
+/*
+  True when another friendly piece is
+  being deliberately selected while one
+  is already selected.
+
+  Castling is excluded because pointing
+  King → Rook should still castle.
+*/
+
+function isPieceSwitch(
+  square
+) {
+
+  if (
+    !selectedSquare
+    || square ===
+    selectedSquare
+  ) {
+
+    return false;
+
+  }
+
+
+  if (
+    getCastlingMove(
+      selectedSquare,
+      square
+    )
+  ) {
+
+    return false;
+
+  }
+
+
+  return isOwnTurnPiece(
+    square
+  );
+
+}
+
+
+/* =========================================================
    FIREBASE
 ========================================================= */
 
@@ -1179,11 +1259,14 @@ function isFirebaseConfigured() {
     (value) => {
 
       return (
+
         value
+
         && !String(value)
           .includes(
             "PASTE_"
           )
+
       );
 
     }
@@ -1436,7 +1519,9 @@ function updateOnlineActionUI() {
 
     onlineNote.textContent =
       joining
+
         ? "Enter the room code from the other player."
+
         : "Create a room and share the code with another device.";
 
   }
@@ -1676,6 +1761,7 @@ function collectSettings() {
           player2NameInput
             ?.value
             .trim()
+
           || "Player 2"
         ),
 
@@ -1711,7 +1797,7 @@ function collectSettings() {
 
 
 /* =========================================================
-   START
+   START GAME
 ========================================================= */
 
 startGameBtn
@@ -2176,7 +2262,7 @@ function initializeLocalGame() {
 
 
 /* =========================================================
-   ONLINE CREATE
+   CREATE ONLINE ROOM
 ========================================================= */
 
 async function createOnlineRoom() {
@@ -2278,7 +2364,7 @@ async function createOnlineRoom() {
     {
 
       version:
-        6,
+        7,
 
 
       status:
@@ -2385,7 +2471,7 @@ async function createOnlineRoom() {
 
 
 /* =========================================================
-   ONLINE JOIN
+   JOIN ONLINE ROOM
 ========================================================= */
 
 async function joinOnlineRoom(
@@ -2459,6 +2545,7 @@ async function joinOnlineRoom(
 
 
   const blackPlayerRef =
+
     ref(
 
       db,
@@ -2552,7 +2639,7 @@ async function joinOnlineRoom(
 
     } catch {
 
-      // Ignore cleanup problem.
+      // Ignore cleanup failure.
 
     }
 
@@ -2602,7 +2689,7 @@ async function joinOnlineRoom(
 
 
 /* =========================================================
-   ONLINE LISTENER
+   ROOM LISTENER
 ========================================================= */
 
 function subscribeToRoom(
@@ -2677,7 +2764,7 @@ function subscribeToRoom(
 
 
 /* =========================================================
-   ONLINE SYNC
+   SYNC ONLINE ROOM
 ========================================================= */
 
 function syncOnlineRoom() {
@@ -2702,7 +2789,8 @@ function syncOnlineRoom() {
   if (
     room.players
       ?.white
-      ?.uid === uid
+      ?.uid ===
+    uid
   ) {
 
     onlineColor =
@@ -2711,7 +2799,8 @@ function syncOnlineRoom() {
   } else if (
     room.players
       ?.black
-      ?.uid === uid
+      ?.uid ===
+    uid
   ) {
 
     onlineColor =
@@ -3034,8 +3123,10 @@ async function submitOnlineMove(
 
           if (
             !room
-            || room.status !== "playing"
-            || room.turn !== onlineColor
+            || room.status !==
+            "playing"
+            || room.turn !==
+            onlineColor
           ) {
 
             return;
@@ -3055,7 +3146,8 @@ async function submitOnlineMove(
 
           if (
             !player
-            || player.uid !== firebaseUser.uid
+            || player.uid !==
+            firebaseUser.uid
           ) {
 
             return;
@@ -3449,7 +3541,8 @@ async function claimOnlineTimeout() {
 
         if (
           !room
-          || room.status !== "playing"
+          || room.status !==
+          "playing"
           || !room.turnStartedAt
         ) {
 
@@ -3466,7 +3559,8 @@ async function claimOnlineTimeout() {
 
           Number(
 
-            active === "w"
+            active ===
+            "w"
 
               ? room.whiteTimeMs
 
@@ -3497,7 +3591,8 @@ async function claimOnlineTimeout() {
 
 
         if (
-          active === "w"
+          active ===
+          "w"
         ) {
 
           room.whiteTimeMs =
@@ -3553,7 +3648,7 @@ async function claimOnlineTimeout() {
 
 
 /* =========================================================
-   GAME RESULT DATA
+   GAME END INFO
 ========================================================= */
 
 function describeGameEnd(
@@ -3692,16 +3787,18 @@ function canControlTurn() {
 
 
 /* =========================================================
-   PERSPECTIVE
+   BOARD PERSPECTIVE
 ========================================================= */
 
 function boardPerspective() {
 
   return (
 
-    mode() === "online"
+    mode() ===
+    "online"
 
-    && onlineColor === "b"
+    && onlineColor ===
+    "b"
 
       ? "b"
 
@@ -3716,7 +3813,8 @@ function fileOrder() {
 
   return (
 
-    boardPerspective() === "w"
+    boardPerspective() ===
+    "w"
 
       ? FILES
 
@@ -3732,7 +3830,8 @@ function rankOrder() {
 
   return (
 
-    boardPerspective() === "w"
+    boardPerspective() ===
+    "w"
 
       ? [
         8,
@@ -3813,7 +3912,8 @@ function renderBoard() {
 
       square.classList.add(
 
-        (row + col) % 2 === 0
+        (row + col) % 2 ===
+        0
 
           ? "light"
 
@@ -3970,7 +4070,8 @@ function renderCapturedPieces() {
     [];
 
 
-  let history;
+  let history =
+    [];
 
 
   try {
@@ -4084,11 +4185,13 @@ function renderCapturedPieces() {
           (piece) => {
 
             return `
+
               <span
                 class="captured-piece-black"
               >
                 ${PIECES[`b${piece}`]}
               </span>
+
             `;
 
           }
@@ -4115,11 +4218,13 @@ function renderCapturedPieces() {
           (piece) => {
 
             return `
+
               <span
                 class="captured-piece-white"
               >
                 ${PIECES[`w${piece}`]}
               </span>
+
             `;
 
           }
@@ -4164,7 +4269,7 @@ boardEl
 
 
 /* =========================================================
-   HAND LOOP
+   HAND TRACKING LOOP
 ========================================================= */
 
 function handTrackingLoop() {
@@ -4227,7 +4332,7 @@ function handTrackingLoop() {
 
 
 /* =========================================================
-   HAND PROCESSING
+   PROCESS HAND
 ========================================================= */
 
 function processHand(
@@ -4484,9 +4589,9 @@ function processHand(
 
 
   /*
-    Finger is travelling.
+    Still travelling.
 
-    DO NOT start timer.
+    Do not activate anything.
   */
 
   if (
@@ -4572,13 +4677,40 @@ function processHand(
   }
 
 
-  const requiredTime =
+  /*
+    NEW:
 
+    Switching to another friendly piece
+    uses the fast selection delay.
+
+    Actual moves still use 200 ms.
+  */
+
+  let requiredTime;
+
+
+  if (
+    isPieceSwitch(
+      square
+    )
+  ) {
+
+    requiredTime =
+      SWITCH_DWELL_MS;
+
+  } else if (
     selectedSquare
+  ) {
 
-      ? MOVE_DWELL_MS
+    requiredTime =
+      MOVE_DWELL_MS;
 
-      : SELECT_DWELL_MS;
+  } else {
+
+    requiredTime =
+      SELECT_DWELL_MS;
+
+  }
 
 
   const progress =
@@ -4690,7 +4822,7 @@ function updateHandColor() {
 
 
 /* =========================================================
-   POINT -> SQUARE
+   CURSOR -> BOARD SQUARE
 ========================================================= */
 
 function squareFromPoint(
@@ -4721,24 +4853,17 @@ function squareFromPoint(
 
 
   /*
-    NEW BOTTOM-RANK ASSIST.
+    Allow a little space below the board
+    for easier bottom-row interaction.
 
-    You can point slightly underneath
-    the visible board and Ghost Board
-    will still map it to the bottom rank.
-
-    This is especially useful for
-    pieces on Rank 1.
+    This now works whether or not another
+    piece is already selected.
   */
 
   const extraBottom =
 
-    !selectedSquare
-
-      ? squareHeight
-        * BOTTOM_EDGE_ASSIST
-
-      : 0;
+    squareHeight
+    * BOTTOM_EDGE_ASSIST;
 
 
   if (
@@ -4834,9 +4959,9 @@ function squareFromPoint(
 
 
   /*
-    SOURCE SELECTION
+    No piece currently selected.
 
-    No magnetism.
+    No magnetic source snapping.
   */
 
   if (
@@ -4860,13 +4985,6 @@ function squareFromPoint(
 
     }
 
-
-    /*
-      If pointer is actually below board,
-      do not require central margin.
-
-      This makes bottom pieces much easier.
-    */
 
     if (
       clientY >
@@ -4899,12 +5017,14 @@ function squareFromPoint(
 
 
     if (
-      localX < margin
+      localX <
+      margin
 
       || localX >
       1 - margin
 
-      || localY < margin
+      || localY <
+      margin
 
       || localY >
       1 - margin
@@ -4921,7 +5041,31 @@ function squareFromPoint(
 
 
   /*
-    Exact legal square first.
+    IMPORTANT AUTO-SWITCH LOGIC
+
+    If your finger is physically inside
+    another friendly piece's square,
+    return that exact piece.
+
+    We do not magnetically attract toward
+    friendly pieces, so this only happens
+    when you genuinely point at one.
+  */
+
+  if (
+    isOwnTurnPiece(
+      rawSquare
+    )
+  ) {
+
+    return rawSquare;
+
+  }
+
+
+  /*
+    Exact selected square,
+    legal move or castling target.
   */
 
   if (
@@ -4936,7 +5080,11 @@ function squareFromPoint(
 
 
   /*
-    Mild move magnetism.
+    Mild magnetism for MOVE DESTINATIONS
+    only.
+
+    Friendly pieces are deliberately not
+    included here.
   */
 
   let nearestSquare =
@@ -5091,6 +5239,16 @@ function getMagneticTargets() {
   }
 
 
+  /*
+    IMPORTANT:
+
+    Other friendly pieces are NOT put
+    in this magnetic target list.
+
+    They can only switch selection if
+    the user actually points at them.
+  */
+
   const targets =
 
     new Set([
@@ -5107,6 +5265,11 @@ function getMagneticTargets() {
       selectedSquare
     );
 
+
+  /*
+    Castling rook remains an intentional
+    magnetic target.
+  */
 
   if (
     selectedPiece
@@ -5230,6 +5393,10 @@ function getCastlingMove(
     null;
 
 
+  /*
+    King -> Rook
+  */
+
   if (
     first?.type ===
     "k"
@@ -5255,6 +5422,10 @@ function getCastlingMove(
   }
 
 
+  /*
+    Rook -> King
+  */
+
   else if (
     first?.type ===
     "r"
@@ -5279,6 +5450,10 @@ function getCastlingMove(
 
   }
 
+
+  /*
+    King -> g/c square
+  */
 
   else if (
     first?.type ===
@@ -5494,7 +5669,7 @@ function getCastlingMove(
 
 
 /* =========================================================
-   ACTIONABLE
+   ACTIONABLE SQUARE
 ========================================================= */
 
 function isActionableSquare(
@@ -5511,27 +5686,25 @@ function isActionableSquare(
   }
 
 
-  const piece =
-    game.get(
-      square
-    );
-
+  /*
+    Nothing selected:
+    current player's pieces.
+  */
 
   if (
     !selectedSquare
   ) {
 
-    return Boolean(
-
-      piece
-
-      && piece.color ===
-      game.turn()
-
+    return isOwnTurnPiece(
+      square
     );
 
   }
 
+
+  /*
+    Current selected piece.
+  */
 
   if (
     square ===
@@ -5542,6 +5715,11 @@ function isActionableSquare(
 
   }
 
+
+  /*
+    Castling comes BEFORE normal
+    friendly-piece switching.
+  */
 
   if (
     getCastlingMove(
@@ -5558,6 +5736,29 @@ function isActionableSquare(
   }
 
 
+  /*
+    NEW:
+
+    Other friendly piece is actionable
+    because it can immediately replace
+    the current selection.
+  */
+
+  if (
+    isOwnTurnPiece(
+      square
+    )
+  ) {
+
+    return true;
+
+  }
+
+
+  /*
+    Otherwise it must be a legal move.
+  */
+
   return legalTargets
     .includes(
       square
@@ -5567,7 +5768,7 @@ function isActionableSquare(
 
 
 /* =========================================================
-   INPUT
+   HANDLE SQUARE INPUT
 ========================================================= */
 
 function handleSquareInput(
@@ -5583,6 +5784,10 @@ function handleSquareInput(
   }
 
 
+  /*
+    No piece selected yet.
+  */
+
   if (
     !selectedSquare
   ) {
@@ -5596,6 +5801,16 @@ function handleSquareInput(
 
   }
 
+
+  /*
+    IMPORTANT:
+
+    Castling must be checked before
+    friendly-piece switching.
+
+    Otherwise selecting King → Rook
+    would only switch to the rook.
+  */
 
   const castle =
 
@@ -5626,6 +5841,11 @@ function handleSquareInput(
   }
 
 
+  /*
+    Point at currently selected piece:
+    cancel selection.
+  */
+
   if (
     square ===
     selectedSquare
@@ -5638,6 +5858,36 @@ function handleSquareInput(
 
   }
 
+
+  /*
+    NEW AUTO-SWITCH:
+
+    If player points at another friendly
+    piece, immediately replace current
+    selection with that piece.
+
+    No manual deselection required.
+  */
+
+  if (
+    isOwnTurnPiece(
+      square
+    )
+  ) {
+
+    selectSquare(
+      square
+    );
+
+
+    return;
+
+  }
+
+
+  /*
+    Normal legal move.
+  */
 
   if (
     legalTargets.includes(
@@ -5653,36 +5903,13 @@ function handleSquareInput(
 
     );
 
-
-    return;
-
-  }
-
-
-  const clickedPiece =
-    game.get(
-      square
-    );
-
-
-  if (
-    clickedPiece
-
-    && clickedPiece.color ===
-    game.turn()
-  ) {
-
-    selectSquare(
-      square
-    );
-
   }
 
 }
 
 
 /* =========================================================
-   SELECT
+   SELECT PIECE
 ========================================================= */
 
 function selectSquare(
@@ -5706,6 +5933,10 @@ function selectSquare(
 
   }
 
+
+  /*
+    Replace old selection.
+  */
 
   selectedSquare =
     square;
@@ -5732,6 +5963,12 @@ function selectSquare(
       );
 
 
+  /*
+    Reset hover so the newly selected
+    piece doesn't instantly trigger
+    something else.
+  */
+
   resetHoverProgress();
 
 
@@ -5746,7 +5983,7 @@ function selectSquare(
 
 
 /* =========================================================
-   CLEAR
+   CLEAR SELECTION
 ========================================================= */
 
 function clearSelection() {
@@ -6740,7 +6977,7 @@ function getOnlineClockMs(
 
 
 /* =========================================================
-   FORMAT CLOCK
+   CLOCK FORMAT
 ========================================================= */
 
 function formatClock(
@@ -7101,7 +7338,7 @@ function updateStatus() {
 
 
 /* =========================================================
-   ONLINE STATUS TEXT
+   ONLINE RESULT TEXT
 ========================================================= */
 
 function describeOnlineStatus(
@@ -7445,11 +7682,6 @@ function showLocalResult(
   reason
 ) {
 
-  /*
-    VS AI:
-    player is White.
-  */
-
   if (
     settings.mode ===
     "ai"
@@ -7516,10 +7748,6 @@ function showLocalResult(
 
   }
 
-
-  /*
-    Local two player.
-  */
 
   if (
     winnerColor
@@ -7775,16 +8003,6 @@ function fitBoardToCamera() {
   }
 
 
-  /*
-    IMPORTANT RANK-1 FIX.
-
-    Old board reached too close to
-    bottom of camera.
-
-    New board is slightly smaller,
-    giving your hand more room.
-  */
-
   const size =
 
     Math.min(
@@ -7805,10 +8023,6 @@ function fitBoardToCamera() {
   boardEl.style.height =
     `${size}px`;
 
-
-  /*
-    Move board upward slightly.
-  */
 
   boardEl.style.top =
     "47.5%";
