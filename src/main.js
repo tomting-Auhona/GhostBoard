@@ -12,7 +12,14 @@ import {
 
 /* =========================================================
    GHOST BOARD
-   Hover controls — NO PINCH
+   FULL MAIN.JS
+
+   Controls:
+   - Index finger = cursor
+   - Hover 0.10 sec = activate
+   - No pinch
+   - Magnetic square targeting
+   - Castling assist
 ========================================================= */
 
 document.title = "Ghost Board";
@@ -25,7 +32,9 @@ document.title = "Ghost Board";
 const $ = (selector) =>
   document.querySelector(selector);
 
-const app = $("#app");
+
+const app =
+  $("#app");
 
 const setupScreen =
   $("#setupScreen");
@@ -134,108 +143,225 @@ const newGameBtn =
 
 
 /* =========================================================
-   UPDATE OLD AIRCHESS TEXT AUTOMATICALLY
+   BRANDING
 ========================================================= */
 
-const mainHeading =
-  document.querySelector(".logo h1")
-  || document.querySelector(".brand h1")
-  || document.querySelector("h1");
+const heading =
+  document.querySelector(
+    ".logo h1, .brand h1, h1"
+  );
 
-if (mainHeading) {
-  mainHeading.textContent =
+
+if (heading) {
+
+  heading.textContent =
     "Ghost Board";
 }
 
+
 const smallBrand =
-  document.querySelector(".brand-small")
-  || document.querySelector(".mini-brand");
+  document.querySelector(
+    ".brand-small, .mini-brand"
+  );
+
 
 if (smallBrand) {
+
   smallBrand.textContent =
     "👻 Ghost Board";
 }
 
+
 if (startGameBtn) {
+
   startGameBtn.textContent =
     "START GHOST BOARD";
 }
 
 
 /* =========================================================
-   VISUAL PATCH
-
-   This fixes:
-   - board being too large/cropped
-   - transparency making pieces hard to see
-   - inconsistent white/black piece appearance
-   - hover feedback
-   - circular hover timer
+   REMOVE OLD INSTRUCTIONS
+   + ADD COMPACT INSTRUCTIONS BELOW CAMERA
 ========================================================= */
 
-const stylePatch =
-  document.createElement("style");
+let belowCameraHint =
+  document.querySelector(
+    "#belowCameraHint"
+  );
 
-stylePatch.id =
-  "ghostboard-hover-patch";
 
-stylePatch.textContent = `
+if (
+  cameraStage
+  && !belowCameraHint
+) {
 
-  /* Board is positioned/sized by JavaScript */
-  #board.chessboard {
-    position: absolute !important;
+  belowCameraHint =
+    document.createElement(
+      "div"
+    );
 
-    left: 50% !important;
-    top: 50% !important;
 
-    transform:
-      translate(-50%, -50%) !important;
+  belowCameraHint.id =
+    "belowCameraHint";
 
-    display: grid !important;
 
-    grid-template-columns:
-      repeat(8, 1fr) !important;
+  belowCameraHint.innerHTML = `
+    <b>☝ Air controls:</b>
+    hover over a piece to select •
+    hover over a highlighted square to move
+  `;
 
-    grid-template-rows:
-      repeat(8, 1fr) !important;
 
-    border-radius: 12px !important;
+  cameraStage.insertAdjacentElement(
+    "afterend",
+    belowCameraHint
+  );
+}
 
-    overflow: hidden !important;
+
+/*
+  Remove hint inside camera.
+*/
+
+if (gestureHint) {
+
+  gestureHint.style.display =
+    "none";
+}
+
+
+/*
+  Remove big instructions box
+  on the right.
+*/
+
+document
+  .querySelectorAll(
+    ".hand-info, .instructions"
+  )
+  .forEach(
+    (element) => {
+
+      element.style.display =
+        "none";
+    }
+  );
+
+
+/* =========================================================
+   VISUAL FIXES
+========================================================= */
+
+const ghostStyle =
+  document.createElement(
+    "style"
+  );
+
+
+ghostStyle.textContent = `
+
+  #belowCameraHint {
+
+    margin:
+      10px 4px 3px;
+
+    padding:
+      10px 14px;
 
     border:
-      4px solid rgba(12, 12, 18, 0.92) !important;
+      1px solid
+      rgba(255,255,255,.10);
+
+    border-radius:
+      12px;
+
+    background:
+      rgba(15,15,20,.88);
+
+    color:
+      #aaaab5;
+
+    font-size:
+      12px;
+
+    text-align:
+      center;
+  }
+
+
+  #belowCameraHint b {
+
+    color:
+      white;
+  }
+
+
+  #board.chessboard {
+
+    position:
+      absolute !important;
+
+    left:
+      50% !important;
+
+    top:
+      50% !important;
+
+    transform:
+      translate(-50%, -50%)
+      !important;
+
+    display:
+      grid !important;
+
+    grid-template-columns:
+      repeat(8, 1fr)
+      !important;
+
+    grid-template-rows:
+      repeat(8, 1fr)
+      !important;
+
+    overflow:
+      hidden !important;
+
+    border-radius:
+      12px !important;
+
+    border:
+      4px solid
+      rgba(10,10,15,.94)
+      !important;
 
     outline:
-      1px solid rgba(255, 255, 255, 0.28);
+      1px solid
+      rgba(255,255,255,.25);
 
     box-shadow:
-      0 20px 55px rgba(0, 0, 0, 0.58),
-      0 0 35px rgba(120, 80, 220, 0.14) !important;
-  }
-
-
-  /* Remove transparent-looking board squares */
-  #board .square.light {
-    background:
-      var(--light-square) !important;
-  }
-
-  #board .square.dark {
-    background:
-      var(--dark-square) !important;
+      0 20px 55px
+      rgba(0,0,0,.58),
+      0 0 32px
+      rgba(120,80,220,.16)
+      !important;
   }
 
 
   #board .square {
-    position: relative;
 
-    display: flex;
+    position:
+      relative;
 
-    align-items: center;
-    justify-content: center;
+    display:
+      flex;
 
-    overflow: hidden;
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    overflow:
+      hidden;
 
     font-family:
       "Segoe UI Symbol",
@@ -244,73 +370,110 @@ stylePatch.textContent = `
   }
 
 
-  /* Finger currently above this square */
-  #board .square.ghost-hover {
-    box-shadow:
-      inset 0 0 0 100px
-      rgba(255, 255, 255, 0.17);
-  }
-
-
-  /* Currently selected piece */
-  #board .square.selected {
-    box-shadow:
-      inset 0 0 0 5px
-      var(--selected) !important;
-  }
-
-
-  /* Last move */
-  #board .square.last-move {
-    box-shadow:
-      inset 0 0 0 100px
-      rgba(255, 220, 60, 0.19) !important;
-  }
-
-
-  /* Legal empty destination */
-  #board .square.legal::after {
-    content: "";
-
-    width: 22%;
-    aspect-ratio: 1;
-
-    position: absolute;
-
-    border-radius: 50%;
+  #board .square.light {
 
     background:
-      rgba(255, 255, 255, 0.72) !important;
-
-    box-shadow:
-      0 0 12px
-      rgba(255, 255, 255, 0.30);
+      var(--light-square)
+      !important;
   }
 
 
-  /* Legal capture */
-  #board .square.legal.has-piece::after {
-    width: 72%;
-    height: 72%;
+  #board .square.dark {
+
+    background:
+      var(--dark-square)
+      !important;
+  }
+
+
+  #board .square.ghost-hover {
+
+    box-shadow:
+      inset 0 0 0 100px
+      rgba(255,255,255,.19)
+      !important;
+  }
+
+
+  #board .square.selected {
+
+    box-shadow:
+      inset 0 0 0 5px
+      var(--selected)
+      !important;
+  }
+
+
+  #board .square.last-move {
+
+    box-shadow:
+      inset 0 0 0 100px
+      rgba(255,220,60,.20)
+      !important;
+  }
+
+
+  #board .square.legal::after {
+
+    content:
+      "";
+
+    width:
+      22%;
+
+    aspect-ratio:
+      1;
+
+    position:
+      absolute;
+
+    border-radius:
+      50%;
+
+    background:
+      rgba(255,255,255,.74)
+      !important;
+
+    box-shadow:
+      0 0 14px
+      rgba(255,255,255,.32);
+  }
+
+
+  #board
+  .square.legal.has-piece::after {
+
+    width:
+      72%;
+
+    height:
+      72%;
 
     background:
       transparent !important;
 
     border:
       4px solid
-      rgba(255, 255, 255, 0.70);
+      rgba(255,255,255,.72);
 
-    border-radius: 50%;
+    border-radius:
+      50%;
   }
 
 
-  /* Filled pieces for BOTH sides */
   #board .piece {
-    z-index: 2;
 
-    line-height: 1;
+    position:
+      relative;
 
-    pointer-events: none;
+    z-index:
+      3;
+
+    line-height:
+      1;
+
+    pointer-events:
+      none;
 
     transform:
       translateY(-1px);
@@ -318,37 +481,47 @@ stylePatch.textContent = `
     filter:
       drop-shadow(
         0 3px 2px
-        rgba(0, 0, 0, 0.50)
-      ) !important;
+        rgba(0,0,0,.48)
+      );
   }
 
 
   #board .white-piece {
+
     color:
-      #f7f7fa !important;
+      #f8f8fa
+      !important;
 
     text-shadow:
       0 1px 1px black,
-      0 0 2px black !important;
+      0 0 2px black
+      !important;
   }
 
 
   #board .black-piece {
+
     color:
-      #0d0d12 !important;
+      #0d0d12
+      !important;
 
     text-shadow:
       0 1px 1px
-      rgba(255, 255, 255, 0.22) !important;
+      rgba(255,255,255,.23)
+      !important;
   }
 
 
-  /* Cursor */
   #handCursor {
-    --ghost-progress: 0deg;
 
-    width: 48px !important;
-    height: 48px !important;
+    --ghost-progress:
+      0deg;
+
+    width:
+      44px !important;
+
+    height:
+      44px !important;
 
     pointer-events:
       none !important;
@@ -359,9 +532,12 @@ stylePatch.textContent = `
 
 
   #handCursor .cursor-ring {
-    position: absolute;
 
-    inset: 0;
+    position:
+      absolute;
+
+    inset:
+      0;
 
     border:
       none !important;
@@ -370,17 +546,22 @@ stylePatch.textContent = `
       50%;
 
     background:
+
       conic-gradient(
+
         var(--accent)
         var(--ghost-progress),
 
-        rgba(255,255,255,0.20)
+        rgba(255,255,255,.20)
         0deg
       );
 
     -webkit-mask:
+
       radial-gradient(
+
         farthest-side,
+
         transparent
         calc(100% - 4px),
 
@@ -388,8 +569,11 @@ stylePatch.textContent = `
       );
 
     mask:
+
       radial-gradient(
+
         farthest-side,
+
         transparent
         calc(100% - 4px),
 
@@ -399,70 +583,92 @@ stylePatch.textContent = `
 
 
   #handCursor .cursor-dot {
-    width: 11px !important;
-    height: 11px !important;
+
+    width:
+      11px !important;
+
+    height:
+      11px !important;
 
     background:
       white !important;
 
     box-shadow:
-      0 0 14px white !important;
+      0 0 14px white
+      !important;
   }
 
 
   #handCursor.ghost-ready
   .cursor-dot {
+
     background:
-      var(--accent) !important;
+      var(--accent)
+      !important;
 
     box-shadow:
       0 0 22px
-      var(--accent) !important;
+      var(--accent)
+      !important;
   }
 
 
-  /* Slightly clearer camera */
   #cameraStage .camera-shade,
   #cameraStage .camera-tint {
+
     background:
+
       linear-gradient(
+
         to bottom,
-        rgba(0, 0, 0, 0.04),
-        rgba(0, 0, 0, 0.17)
-      ) !important;
+
+        rgba(0,0,0,.03),
+
+        rgba(0,0,0,.16)
+      )
+
+      !important;
   }
 
 `;
 
+
 document.head.appendChild(
-  stylePatch
+  ghostStyle
 );
 
 
 /* =========================================================
-   CHESS
+   GAME STATE
 ========================================================= */
 
 let game =
   new Chess();
 
+
 let settings =
   null;
+
 
 let selectedSquare =
   null;
 
+
 let legalTargets =
   [];
+
 
 let lastMove =
   null;
 
+
 let hoveredSquare =
   null;
 
+
 let gameActive =
   false;
+
 
 let aiBusy =
   false;
@@ -470,9 +676,6 @@ let aiBusy =
 
 /* =========================================================
    PIECES
-
-   Using the FILLED symbols for both sides.
-   CSS changes the color.
 ========================================================= */
 
 const PIECES = {
@@ -494,6 +697,7 @@ const PIECES = {
 
 
 const FILES = [
+
   "a",
   "b",
   "c",
@@ -506,28 +710,53 @@ const FILES = [
 
 
 /* =========================================================
-   HOVER CONTROL
-
-   No pinch.
-
-   Hold over a square for this long
-   to activate it.
+   AIR CONTROL SETTINGS
 ========================================================= */
 
+/*
+  0.10 seconds.
+*/
+
 const HOVER_TIME_MS =
-  520;
+  100;
 
 
 /*
-  Hand smoothing.
+  Higher = faster cursor.
 
-  Higher = faster but shakier.
-  Lower = smoother but slower.
+  Still slightly smoothed,
+  so it doesn't shake badly.
 */
 
 const SMOOTHING =
-  0.34;
+  0.58;
 
+
+/*
+  Magnetic targeting.
+
+  Makes it easier to hit
+  squares without perfect accuracy.
+*/
+
+const MAGNET_RADIUS =
+  0.78;
+
+
+/*
+  King gets slightly stronger
+  magnetic assistance.
+*/
+
+const KING_MAGNET_RADIUS =
+  0.95;
+
+
+/*
+  Prevent a single square from
+  activating repeatedly while
+  the finger remains there.
+*/
 
 let currentHoverSquare =
   null;
@@ -537,6 +766,7 @@ let hoverStartTime =
 
 let lastActivatedSquare =
   null;
+
 
 let smoothX =
   null;
@@ -566,7 +796,7 @@ let clockTimer =
 
 
 /* =========================================================
-   CAMERA / HAND TRACKING
+   CAMERA
 ========================================================= */
 
 let cameraStream =
@@ -591,13 +821,15 @@ let audioContext =
 
 
 /* =========================================================
-   SETUP SCREEN
+   SETUP UI
 ========================================================= */
 
 function updateModeUI() {
 
   const aiMode =
-    gameModeInput.value === "ai";
+    gameModeInput.value
+    === "ai";
+
 
   difficultyField
     ?.classList
@@ -605,6 +837,7 @@ function updateModeUI() {
       "hidden",
       !aiMode
     );
+
 
   player2Field
     ?.classList
@@ -633,7 +866,9 @@ timeControlInput
       customTime
         ?.classList
         .toggle(
+
           "hidden",
+
           timeControlInput.value
           !== "custom"
         );
@@ -648,6 +883,7 @@ boardThemeInput
 
       app.dataset.theme =
         boardThemeInput.value;
+
 
       if (liveTheme) {
 
@@ -666,8 +902,11 @@ liveTheme
       app.dataset.theme =
         liveTheme.value;
 
+
       localStorage.setItem(
+
         "ghostboard-theme",
+
         liveTheme.value
       );
     }
@@ -675,7 +914,7 @@ liveTheme
 
 
 /* =========================================================
-   EMOJI / STICKERS
+   STICKERS
 ========================================================= */
 
 document
@@ -690,9 +929,13 @@ document
         () => {
 
           const emoji =
-            button.textContent.trim();
+            button
+              .textContent
+              .trim();
+
 
           player1NameInput.value =
+
             `${player1NameInput.value.trim()} ${emoji}`.trim();
         }
       );
@@ -701,13 +944,14 @@ document
 
 
 /* =========================================================
-   LOAD SAVED USER
+   SAVED SETTINGS
 ========================================================= */
 
 const savedName =
   localStorage.getItem(
     "ghostboard-name"
   );
+
 
 const savedTheme =
   localStorage.getItem(
@@ -730,11 +974,13 @@ if (savedTheme) {
       savedTheme;
   }
 
+
   if (liveTheme) {
 
     liveTheme.value =
       savedTheme;
   }
+
 
   app.dataset.theme =
     savedTheme;
@@ -748,6 +994,7 @@ if (savedTheme) {
 function collectSettings() {
 
   let minutes;
+
   let increment;
 
 
@@ -758,15 +1005,20 @@ function collectSettings() {
 
     minutes =
       Math.max(
+
         1,
+
         Number(
           customMinutes.value
         ) || 1
       );
 
+
     increment =
       Math.max(
+
         0,
+
         Number(
           customIncrement.value
         ) || 0
@@ -778,6 +1030,7 @@ function collectSettings() {
       minutes,
       increment
     ] =
+
       timeControlInput
         .value
         .split(",")
@@ -790,34 +1043,45 @@ function collectSettings() {
     mode:
       gameModeInput.value,
 
+
     whiteName:
+
       player1NameInput
         .value
         .trim()
+
       || "Player",
 
+
     blackName:
+
       gameModeInput.value
       === "ai"
 
         ? "Nova AI 🤖"
 
         : (
-          player2NameInput
-            ?.value
-            .trim()
-          || "Player 2"
-        ),
+            player2NameInput
+              ?.value
+              .trim()
+
+            || "Player 2"
+          ),
+
 
     difficulty:
       difficultyInput.value,
 
+
     minutes,
+
 
     increment,
 
+
     theme:
       boardThemeInput.value,
+
 
     sound:
       soundToggle.checked
@@ -826,7 +1090,7 @@ function collectSettings() {
 
 
 /* =========================================================
-   START GAME
+   START
 ========================================================= */
 
 startGameBtn
@@ -837,6 +1101,7 @@ startGameBtn
       startGameBtn.disabled =
         true;
 
+
       setupMessage.textContent =
         "Starting camera and hand tracking...";
 
@@ -846,8 +1111,10 @@ startGameBtn
         settings =
           collectSettings();
 
+
         soundEnabled =
           settings.sound;
+
 
         app.dataset.theme =
           settings.theme;
@@ -861,43 +1128,46 @@ startGameBtn
 
 
         localStorage.setItem(
+
           "ghostboard-name",
+
           settings.whiteName
         );
 
+
         localStorage.setItem(
+
           "ghostboard-theme",
+
           settings.theme
         );
 
 
         await startCamera();
 
+
         await initHandTracking();
 
 
-        setupScreen.classList.add(
-          "hidden"
-        );
+        setupScreen
+          .classList
+          .add(
+            "hidden"
+          );
 
-        gameScreen.classList.remove(
-          "hidden"
-        );
+
+        gameScreen
+          .classList
+          .remove(
+            "hidden"
+          );
 
 
         initializeGame();
 
 
-        /*
-          Wait for layout,
-          then correctly fit board.
-        */
-
         requestAnimationFrame(
-          () => {
-
-            fitBoardToCamera();
-          }
+          fitBoardToCamera
         );
 
 
@@ -905,6 +1175,7 @@ startGameBtn
 
           handLoopStarted =
             true;
+
 
           requestAnimationFrame(
             handTrackingLoop
@@ -917,8 +1188,9 @@ startGameBtn
           error
         );
 
+
         setupMessage.textContent =
-          "Could not start Ghost Board. Allow camera permission and try again.";
+          "Could not start Ghost Board. Allow camera access and try again.";
 
       } finally {
 
@@ -930,12 +1202,7 @@ startGameBtn
 
 
 /* =========================================================
-   BOARD SIZE FIX
-
-   Board size is calculated from BOTH camera width
-   and camera height.
-
-   This prevents the board from being cut off.
+   BOARD SIZE
 ========================================================= */
 
 function fitBoardToCamera() {
@@ -944,6 +1211,7 @@ function fitBoardToCamera() {
     !cameraStage
     || !boardEl
   ) {
+
     return;
   }
 
@@ -957,6 +1225,7 @@ function fitBoardToCamera() {
     rect.width === 0
     || rect.height === 0
   ) {
+
     return;
   }
 
@@ -966,26 +1235,20 @@ function fitBoardToCamera() {
 
       rect.width * 0.70,
 
-      rect.height * 0.88
+      rect.height * 0.86
     );
 
 
   boardEl.style.width =
     `${size}px`;
 
+
   boardEl.style.height =
     `${size}px`;
 
 
-  /*
-    Piece size based on square size.
-  */
-
   const pieceSize =
     size / 8 * 0.72;
-
-  boardEl.style.fontSize =
-    `${pieceSize}px`;
 
 
   boardEl
@@ -1015,6 +1278,7 @@ window.addEventListener(
 async function startCamera() {
 
   if (cameraStream) {
+
     return;
   }
 
@@ -1032,6 +1296,7 @@ async function startCamera() {
 
 
   cameraStream =
+
     await navigator
       .mediaDevices
       .getUserMedia({
@@ -1064,7 +1329,7 @@ async function startCamera() {
 
 
 /* =========================================================
-   MEDIAPIPE HAND TRACKER
+   MEDIAPIPE
 ========================================================= */
 
 async function createLandmarker(
@@ -1080,6 +1345,7 @@ async function createLandmarker(
         baseOptions: {
 
           modelAssetPath:
+
             "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
 
           delegate
@@ -1107,11 +1373,13 @@ async function createLandmarker(
 async function initHandTracking() {
 
   if (handLandmarker) {
+
     return;
   }
 
 
   const vision =
+
     await FilesetResolver
       .forVisionTasks(
 
@@ -1119,30 +1387,31 @@ async function initHandTracking() {
       );
 
 
-  /*
-    Try GPU first.
-    Fall back to CPU.
-  */
-
   try {
 
     handLandmarker =
+
       await createLandmarker(
+
         vision,
+
         "GPU"
       );
 
-  } catch (gpuError) {
+  } catch (error) {
 
     console.warn(
-      "GPU tracking failed. Using CPU.",
-      gpuError
+      "GPU unavailable. Using CPU.",
+      error
     );
 
 
     handLandmarker =
+
       await createLandmarker(
+
         vision,
+
         "CPU"
       );
   }
@@ -1150,10 +1419,30 @@ async function initHandTracking() {
 
 
 /* =========================================================
-   HAND TRACKING LOOP
+   HAND LOOP
 ========================================================= */
 
 function handTrackingLoop() {
+
+  /*
+    Setup screen currently visible.
+  */
+
+  if (
+    gameScreen
+      .classList
+      .contains(
+        "hidden"
+      )
+  ) {
+
+    requestAnimationFrame(
+      handTrackingLoop
+    );
+
+    return;
+  }
+
 
   if (
     !handLandmarker
@@ -1175,6 +1464,7 @@ function handTrackingLoop() {
   try {
 
     const result =
+
       handLandmarker
         .detectForVideo(
           webcam,
@@ -1203,11 +1493,7 @@ function handTrackingLoop() {
 
 
 /* =========================================================
-   PROCESS HAND
-
-   NO PINCH.
-
-   INDEX TIP = CURSOR
+   HAND CONTROL
 ========================================================= */
 
 function processHand(
@@ -1220,21 +1506,28 @@ function processHand(
     || result.landmarks.length === 0
   ) {
 
-    handCursor.classList.add(
-      "hidden"
-    );
+    handCursor
+      .classList
+      .add(
+        "hidden"
+      );
+
 
     resetHover();
+
 
     setHoveredSquare(
       null
     );
 
+
     smoothX =
       null;
 
+
     smoothY =
       null;
+
 
     return;
   }
@@ -1254,35 +1547,39 @@ function processHand(
 
 
   const stageRect =
+
     cameraStage
       .getBoundingClientRect();
 
 
   /*
-    Camera is mirrored,
-    so X is mirrored too.
+    Mirror horizontal coordinate,
+    matching mirrored webcam.
   */
 
   const rawX =
+
     (1 - indexTip.x)
     * stageRect.width;
 
+
   const rawY =
+
     indexTip.y
     * stageRect.height;
 
 
   /*
-    Smooth cursor.
-
-    Makes the hand pointer much
-    less shaky.
+    Smooth cursor slightly.
   */
 
-  if (smoothX === null) {
+  if (
+    smoothX === null
+  ) {
 
     smoothX =
       rawX;
+
 
     smoothY =
       rawY;
@@ -1290,34 +1587,47 @@ function processHand(
   } else {
 
     smoothX +=
+
       (
         rawX
         - smoothX
       )
+
       * SMOOTHING;
 
+
     smoothY +=
+
       (
         rawY
         - smoothY
       )
+
       * SMOOTHING;
   }
 
 
-  handCursor.classList.remove(
-    "hidden"
-  );
+  handCursor
+    .classList
+    .remove(
+      "hidden"
+    );
 
 
   handCursor.style.left =
     `${smoothX}px`;
 
+
   handCursor.style.top =
     `${smoothY}px`;
 
 
+  /*
+    Magnetic square detection.
+  */
+
   const square =
+
     squareFromPoint(
 
       stageRect.left
@@ -1333,10 +1643,6 @@ function processHand(
   );
 
 
-  /*
-    Nothing to activate.
-  */
-
   if (
     !square
     || !gameActive
@@ -1350,8 +1656,7 @@ function processHand(
 
 
   /*
-    Human only controls White
-    in AI mode.
+    Human controls White in AI mode.
   */
 
   if (
@@ -1366,15 +1671,14 @@ function processHand(
 
 
   /*
-    User moved away from the square
-    that was previously activated.
-
-    It may now be activated again later.
+    Once finger moves off a previously
+    activated square, unlock it.
   */
 
   if (
     lastActivatedSquare
-    && square !== lastActivatedSquare
+    && square
+    !== lastActivatedSquare
   ) {
 
     lastActivatedSquare =
@@ -1383,12 +1687,12 @@ function processHand(
 
 
   /*
-    Don't keep activating a square
-    while the finger stays there.
+    Don't repeatedly activate same square.
   */
 
   if (
-    lastActivatedSquare === square
+    lastActivatedSquare
+    === square
   ) {
 
     setCursorProgress(
@@ -1400,13 +1704,7 @@ function processHand(
 
 
   /*
-    IMPORTANT UX improvement:
-
-    Only fill the hover timer if the
-    square actually has a useful action.
-
-    This prevents random accidental
-    illegal-move sounds.
+    Only actionable squares activate.
   */
 
   if (
@@ -1422,7 +1720,7 @@ function processHand(
 
 
   /*
-    Finger arrived on a new square.
+    New hover square.
   */
 
   if (
@@ -1433,29 +1731,32 @@ function processHand(
     currentHoverSquare =
       square;
 
+
     hoverStartTime =
       now;
+
 
     setCursorProgress(
       0
     );
 
+
     return;
   }
 
 
-  /*
-    Finger stayed over same square.
-  */
-
   const elapsed =
+
     now
     - hoverStartTime;
 
 
   const progress =
+
     Math.min(
+
       1,
+
       elapsed
       / HOVER_TIME_MS
     );
@@ -1467,7 +1768,7 @@ function processHand(
 
 
   /*
-    Hover complete.
+    0.10 second complete.
   */
 
   if (
@@ -1486,6 +1787,7 @@ function processHand(
     currentHoverSquare =
       null;
 
+
     hoverStartTime =
       0;
 
@@ -1495,9 +1797,11 @@ function processHand(
     );
 
 
-    handCursor.classList.add(
-      "ghost-ready"
-    );
+    handCursor
+      .classList
+      .add(
+        "ghost-ready"
+      );
 
 
     setTimeout(
@@ -1510,18 +1814,605 @@ function processHand(
           );
       },
 
-      150
+      90
     );
   }
 }
 
 
 /* =========================================================
-   ACTIONABLE SQUARE
+   MAGNETIC SQUARE TARGETING
+========================================================= */
 
-   This is what makes hover controls
-   much easier than simply activating
-   every square.
+function squareFromPoint(
+  clientX,
+  clientY
+) {
+
+  const rect =
+
+    boardEl
+      .getBoundingClientRect();
+
+
+  if (
+    clientX < rect.left
+    || clientX > rect.right
+    || clientY < rect.top
+    || clientY > rect.bottom
+  ) {
+
+    return null;
+  }
+
+
+  const squareWidth =
+    rect.width / 8;
+
+
+  const squareHeight =
+    rect.height / 8;
+
+
+  const boardX =
+    clientX
+    - rect.left;
+
+
+  const boardY =
+    clientY
+    - rect.top;
+
+
+  /*
+    Square directly underneath cursor.
+  */
+
+  const rawCol =
+
+    Math.min(
+
+      7,
+
+      Math.max(
+
+        0,
+
+        Math.floor(
+          boardX
+          / squareWidth
+        )
+      )
+    );
+
+
+  const rawRow =
+
+    Math.min(
+
+      7,
+
+      Math.max(
+
+        0,
+
+        Math.floor(
+          boardY
+          / squareHeight
+        )
+      )
+    );
+
+
+  const rawSquare =
+
+    `${FILES[rawCol]}${8 - rawRow}`;
+
+
+  /*
+    Useful targets only.
+  */
+
+  const targets =
+    getMagneticTargets();
+
+
+  let nearestSquare =
+    null;
+
+
+  let nearestDistance =
+    Infinity;
+
+
+  let nearestLimit =
+    MAGNET_RADIUS;
+
+
+  for (
+    const square
+    of targets
+  ) {
+
+    const fileIndex =
+
+      FILES.indexOf(
+        square[0]
+      );
+
+
+    const rank =
+
+      Number(
+        square[1]
+      );
+
+
+    const row =
+      8 - rank;
+
+
+    const centerX =
+
+      (
+        fileIndex
+        + 0.5
+      )
+
+      * squareWidth;
+
+
+    const centerY =
+
+      (
+        row
+        + 0.5
+      )
+
+      * squareHeight;
+
+
+    const dx =
+
+      (
+        boardX
+        - centerX
+      )
+
+      / squareWidth;
+
+
+    const dy =
+
+      (
+        boardY
+        - centerY
+      )
+
+      / squareHeight;
+
+
+    const distance =
+
+      Math.hypot(
+        dx,
+        dy
+      );
+
+
+    const piece =
+      game.get(
+        square
+      );
+
+
+    /*
+      Stronger magnet for kings.
+    */
+
+    const limit =
+
+      piece?.type === "k"
+
+        ? KING_MAGNET_RADIUS
+
+        : MAGNET_RADIUS;
+
+
+    if (
+      distance
+      < nearestDistance
+    ) {
+
+      nearestDistance =
+        distance;
+
+
+      nearestSquare =
+        square;
+
+
+      nearestLimit =
+        limit;
+    }
+  }
+
+
+  if (
+    nearestSquare
+    && nearestDistance
+    <= nearestLimit
+  ) {
+
+    return nearestSquare;
+  }
+
+
+  return rawSquare;
+}
+
+
+/* =========================================================
+   MAGNET TARGET LIST
+========================================================= */
+
+function getMagneticTargets() {
+
+  const targets =
+    new Set();
+
+
+  /*
+    Before selection:
+
+    All pieces belonging to
+    current player.
+  */
+
+  if (!selectedSquare) {
+
+    for (
+      let row = 0;
+      row < 8;
+      row++
+    ) {
+
+      for (
+        let col = 0;
+        col < 8;
+        col++
+      ) {
+
+        const square =
+          `${FILES[col]}${8 - row}`;
+
+
+        const piece =
+          game.get(
+            square
+          );
+
+
+        if (
+          piece
+          && piece.color
+          === game.turn()
+        ) {
+
+          targets.add(
+            square
+          );
+        }
+      }
+    }
+
+
+    return [
+      ...targets
+    ];
+  }
+
+
+  /*
+    Selected square.
+  */
+
+  targets.add(
+    selectedSquare
+  );
+
+
+  /*
+    Normal legal destinations.
+  */
+
+  legalTargets
+    .forEach(
+      (square) => {
+
+        targets.add(
+          square
+        );
+      }
+    );
+
+
+  /*
+    Other own pieces.
+  */
+
+  for (
+    let row = 0;
+    row < 8;
+    row++
+  ) {
+
+    for (
+      let col = 0;
+      col < 8;
+      col++
+    ) {
+
+      const square =
+        `${FILES[col]}${8 - row}`;
+
+
+      const piece =
+        game.get(
+          square
+        );
+
+
+      if (
+        piece
+        && piece.color
+        === game.turn()
+      ) {
+
+        targets.add(
+          square
+        );
+      }
+    }
+  }
+
+
+  /*
+    Add castling rook squares
+    as valid air targets.
+  */
+
+  addCastlingMagnetTargets(
+    targets
+  );
+
+
+  return [
+    ...targets
+  ];
+}
+
+
+/* =========================================================
+   CASTLING TARGETS
+========================================================= */
+
+function addCastlingMagnetTargets(
+  targets
+) {
+
+  if (!selectedSquare) {
+
+    return;
+  }
+
+
+  const selectedPiece =
+    game.get(
+      selectedSquare
+    );
+
+
+  if (
+    !selectedPiece
+    || selectedPiece.type
+    !== "k"
+  ) {
+
+    return;
+  }
+
+
+  /*
+    White.
+  */
+
+  if (
+    selectedSquare === "e1"
+  ) {
+
+    if (
+      legalTargets.includes(
+        "g1"
+      )
+    ) {
+
+      targets.add(
+        "h1"
+      );
+    }
+
+
+    if (
+      legalTargets.includes(
+        "c1"
+      )
+    ) {
+
+      targets.add(
+        "a1"
+      );
+    }
+  }
+
+
+  /*
+    Black.
+  */
+
+  if (
+    selectedSquare === "e8"
+  ) {
+
+    if (
+      legalTargets.includes(
+        "g8"
+      )
+    ) {
+
+      targets.add(
+        "h8"
+      );
+    }
+
+
+    if (
+      legalTargets.includes(
+        "c8"
+      )
+    ) {
+
+      targets.add(
+        "a8"
+      );
+    }
+  }
+}
+
+
+/* =========================================================
+   CASTLING ASSIST
+
+   After selecting king:
+
+   e1 → hover g1 OR h1
+   = O-O
+
+   e1 → hover c1 OR a1
+   = O-O-O
+========================================================= */
+
+function getCastlingDestination(
+  selected,
+  target
+) {
+
+  if (!selected) {
+
+    return null;
+  }
+
+
+  const piece =
+    game.get(
+      selected
+    );
+
+
+  if (
+    !piece
+    || piece.type
+    !== "k"
+  ) {
+
+    return null;
+  }
+
+
+  /*
+    WHITE KING
+  */
+
+  if (
+    selected === "e1"
+  ) {
+
+    if (
+      (
+        target === "g1"
+        || target === "h1"
+      )
+
+      && legalTargets.includes(
+        "g1"
+      )
+    ) {
+
+      return "g1";
+    }
+
+
+    if (
+      (
+        target === "c1"
+        || target === "a1"
+      )
+
+      && legalTargets.includes(
+        "c1"
+      )
+    ) {
+
+      return "c1";
+    }
+  }
+
+
+  /*
+    BLACK KING
+  */
+
+  if (
+    selected === "e8"
+  ) {
+
+    if (
+      (
+        target === "g8"
+        || target === "h8"
+      )
+
+      && legalTargets.includes(
+        "g8"
+      )
+    ) {
+
+      return "g8";
+    }
+
+
+    if (
+      (
+        target === "c8"
+        || target === "a8"
+      )
+
+      && legalTargets.includes(
+        "c8"
+      )
+    ) {
+
+      return "c8";
+    }
+  }
+
+
+  return null;
+}
+
+
+/* =========================================================
+   ACTIONABLE SQUARE
 ========================================================= */
 
 function isActionableSquare(
@@ -1535,15 +2426,16 @@ function isActionableSquare(
 
 
   /*
-    Nothing selected yet:
-
-    Only allow your own pieces.
+    Nothing selected:
+    only own pieces.
   */
 
   if (!selectedSquare) {
 
-    return (
+    return Boolean(
+
       piece
+
       && piece.color
       === game.turn()
     );
@@ -1551,13 +2443,12 @@ function isActionableSquare(
 
 
   /*
-    Hover selected piece again:
-    allow cancellation.
+    Selected square = cancel.
   */
 
   if (
-    square
-    === selectedSquare
+    square ===
+    selectedSquare
   ) {
 
     return true;
@@ -1565,10 +2456,24 @@ function isActionableSquare(
 
 
   /*
-    Another piece belonging
-    to the current player:
+    Castling rook shortcut.
+  */
 
-    allow switching selection.
+  if (
+    getCastlingDestination(
+
+      selectedSquare,
+
+      square
+    )
+  ) {
+
+    return true;
+  }
+
+
+  /*
+    Switch own piece.
   */
 
   if (
@@ -1582,8 +2487,7 @@ function isActionableSquare(
 
 
   /*
-    Otherwise only allow
-    legal destinations.
+    Normal legal move.
   */
 
   return legalTargets
@@ -1602,11 +2506,14 @@ function resetHover() {
   currentHoverSquare =
     null;
 
+
   hoverStartTime =
     0;
 
+
   lastActivatedSquare =
     null;
+
 
   setCursorProgress(
     0
@@ -1619,8 +2526,10 @@ function resetHoverProgress() {
   currentHoverSquare =
     null;
 
+
   hoverStartTime =
     0;
+
 
   setCursorProgress(
     0
@@ -1633,21 +2542,25 @@ function setCursorProgress(
 ) {
 
   const degrees =
+
     Math.round(
-      progress * 360
+      progress
+      * 360
     );
 
 
   handCursor.style
     .setProperty(
+
       "--ghost-progress",
+
       `${degrees}deg`
     );
 }
 
 
 /* =========================================================
-   HOVERED BOARD SQUARE
+   HOVER VISUAL
 ========================================================= */
 
 function setHoveredSquare(
@@ -1655,8 +2568,8 @@ function setHoveredSquare(
 ) {
 
   if (
-    hoveredSquare
-    === square
+    hoveredSquare ===
+    square
   ) {
 
     return;
@@ -1666,13 +2579,6 @@ function setHoveredSquare(
   hoveredSquare =
     square;
 
-
-  /*
-    Avoid rebuilding entire board
-    every camera frame.
-
-    Just toggle hover classes.
-  */
 
   boardEl
     .querySelectorAll(
@@ -1696,77 +2602,6 @@ function setHoveredSquare(
 
 
 /* =========================================================
-   CURSOR → CHESS SQUARE
-========================================================= */
-
-function squareFromPoint(
-  clientX,
-  clientY
-) {
-
-  const rect =
-    boardEl
-      .getBoundingClientRect();
-
-
-  if (
-    clientX < rect.left
-    || clientX > rect.right
-    || clientY < rect.top
-    || clientY > rect.bottom
-  ) {
-
-    return null;
-  }
-
-
-  const relativeX =
-    (
-      clientX
-      - rect.left
-    )
-    / rect.width;
-
-
-  const relativeY =
-    (
-      clientY
-      - rect.top
-    )
-    / rect.height;
-
-
-  const col =
-    Math.min(
-      7,
-      Math.max(
-        0,
-        Math.floor(
-          relativeX * 8
-        )
-      )
-    );
-
-
-  const row =
-    Math.min(
-      7,
-      Math.max(
-        0,
-        Math.floor(
-          relativeY * 8
-        )
-      )
-    );
-
-
-  return (
-    `${FILES[col]}${8 - row}`
-  );
-}
-
-
-/* =========================================================
    INITIALIZE GAME
 ========================================================= */
 
@@ -1779,17 +2614,22 @@ function initializeGame() {
   selectedSquare =
     null;
 
+
   legalTargets =
     [];
+
 
   lastMove =
     null;
 
+
   hoveredSquare =
     null;
 
+
   gameActive =
     true;
+
 
   aiBusy =
     false;
@@ -1799,18 +2639,21 @@ function initializeGame() {
 
 
   whiteTimeMs =
+
     settings.minutes
     * 60
     * 1000;
 
 
   blackTimeMs =
+
     settings.minutes
     * 60
     * 1000;
 
 
   incrementMs =
+
     settings.increment
     * 1000;
 
@@ -1823,18 +2666,24 @@ function initializeGame() {
     settings.blackName;
 
 
-  aiThinking.classList.add(
-    "hidden"
-  );
+  aiThinking
+    .classList
+    .add(
+      "hidden"
+    );
 
 
   renderBoard();
 
+
   renderHistory();
+
 
   updateStatus();
 
-  updateGestureHint();
+
+  updateBelowCameraHint();
+
 
   startClock();
 
@@ -1846,7 +2695,7 @@ function initializeGame() {
 
 
 /* =========================================================
-   RENDER BOARD
+   BOARD
 ========================================================= */
 
 function renderBoard() {
@@ -1868,10 +2717,12 @@ function renderBoard() {
     ) {
 
       const squareName =
+
         `${FILES[col]}${8 - row}`;
 
 
       const square =
+
         document.createElement(
           "div"
         );
@@ -1896,8 +2747,8 @@ function renderBoard() {
 
 
       if (
-        hoveredSquare
-        === squareName
+        hoveredSquare ===
+        squareName
       ) {
 
         square.classList.add(
@@ -1907,8 +2758,8 @@ function renderBoard() {
 
 
       if (
-        selectedSquare
-        === squareName
+        selectedSquare ===
+        squareName
       ) {
 
         square.classList.add(
@@ -1918,10 +2769,9 @@ function renderBoard() {
 
 
       if (
-        legalTargets
-          .includes(
-            squareName
-          )
+        legalTargets.includes(
+          squareName
+        )
       ) {
 
         square.classList.add(
@@ -1932,14 +2782,15 @@ function renderBoard() {
 
       if (
         lastMove
+
         && (
-          lastMove.from
-          === squareName
+          lastMove.from ===
+          squareName
 
           ||
 
-          lastMove.to
-          === squareName
+          lastMove.to ===
+          squareName
         )
       ) {
 
@@ -1950,6 +2801,7 @@ function renderBoard() {
 
 
       const piece =
+
         game.get(
           squareName
         );
@@ -1963,12 +2815,14 @@ function renderBoard() {
 
 
         const pieceElement =
+
           document.createElement(
             "span"
           );
 
 
         pieceElement.className =
+
           `piece ${
             piece.color === "w"
 
@@ -1979,6 +2833,7 @@ function renderBoard() {
 
 
         pieceElement.textContent =
+
           PIECES[
             `${piece.color}${piece.type}`
           ];
@@ -1997,11 +2852,6 @@ function renderBoard() {
   }
 
 
-  /*
-    Recalculate piece size after
-    rendering.
-  */
-
   requestAnimationFrame(
     fitBoardToCamera
   );
@@ -2010,8 +2860,6 @@ function renderBoard() {
 
 /* =========================================================
    MOUSE FALLBACK
-
-   Keep this for debugging.
 ========================================================= */
 
 boardEl.addEventListener(
@@ -2019,6 +2867,7 @@ boardEl.addEventListener(
   (event) => {
 
     const square =
+
       event.target
         .closest(
           ".square"
@@ -2036,7 +2885,7 @@ boardEl.addEventListener(
 
 
 /* =========================================================
-   HANDLE SQUARE
+   INPUT
 ========================================================= */
 
 function handleSquareInput(
@@ -2062,7 +2911,7 @@ function handleSquareInput(
 
 
   /*
-    No piece selected.
+    Nothing selected yet.
   */
 
   if (!selectedSquare) {
@@ -2076,13 +2925,42 @@ function handleSquareInput(
 
 
   /*
-    Hover selected piece again =
-    cancel.
+    Castling comes BEFORE own-piece
+    switching, because rook is also
+    your own piece.
+  */
+
+  const castleDestination =
+
+    getCastlingDestination(
+
+      selectedSquare,
+
+      square
+    );
+
+
+  if (castleDestination) {
+
+    tryMove(
+
+      selectedSquare,
+
+      castleDestination
+    );
+
+
+    return;
+  }
+
+
+  /*
+    Cancel.
   */
 
   if (
-    square
-    === selectedSquare
+    square ===
+    selectedSquare
   ) {
 
     clearSelection();
@@ -2092,18 +2970,19 @@ function handleSquareInput(
 
 
   const clickedPiece =
+
     game.get(
       square
     );
 
 
   /*
-    Hover another own piece =
-    switch selection.
+    Switch selected piece.
   */
 
   if (
     clickedPiece
+
     && clickedPiece.color
     === game.turn()
   ) {
@@ -2117,18 +2996,19 @@ function handleSquareInput(
 
 
   /*
-    Only attempt legal destination.
+    Normal move.
   */
 
   if (
-    legalTargets
-      .includes(
-        square
-      )
+    legalTargets.includes(
+      square
+    )
   ) {
 
     tryMove(
+
       selectedSquare,
+
       square
     );
   }
@@ -2136,7 +3016,7 @@ function handleSquareInput(
 
 
 /* =========================================================
-   SELECT PIECE
+   SELECT
 ========================================================= */
 
 function selectSquare(
@@ -2144,6 +3024,7 @@ function selectSquare(
 ) {
 
   const piece =
+
     game.get(
       square
     );
@@ -2164,6 +3045,7 @@ function selectSquare(
 
 
   legalTargets =
+
     game
       .moves({
 
@@ -2172,6 +3054,7 @@ function selectSquare(
         verbose:
           true
       })
+
       .map(
         (move) =>
           move.to
@@ -2180,16 +3063,18 @@ function selectSquare(
 
   renderBoard();
 
+
   playUiTone(
     "select"
   );
 
-  updateGestureHint();
+
+  updateBelowCameraHint();
 }
 
 
 /* =========================================================
-   CLEAR SELECTION
+   CLEAR
 ========================================================= */
 
 function clearSelection() {
@@ -2197,30 +3082,35 @@ function clearSelection() {
   selectedSquare =
     null;
 
+
   legalTargets =
     [];
 
+
   renderBoard();
 
-  updateGestureHint();
+
+  updateBelowCameraHint();
 }
 
 
 /* =========================================================
-   HINT
+   BELOW CAMERA MESSAGE
 ========================================================= */
 
-function updateGestureHint() {
+function updateBelowCameraHint() {
 
-  if (!gestureHint) {
+  if (!belowCameraHint) {
+
     return;
   }
 
 
   if (aiBusy) {
 
-    gestureHint.textContent =
-      "🤖 AI is thinking...";
+    belowCameraHint.innerHTML =
+
+      `<b>🤖 Nova AI is thinking...</b>`;
 
     return;
   }
@@ -2228,19 +3118,45 @@ function updateGestureHint() {
 
   if (!selectedSquare) {
 
-    gestureHint.textContent =
-      "☝ Hover over one of your pieces to select it";
+    belowCameraHint.innerHTML = `
+
+      <b>☝ Air controls:</b>
+
+      hover over one of your pieces
+      to select it
+    `;
 
   } else {
 
-    gestureHint.textContent =
-      `☝ ${selectedSquare} selected • hover over a highlighted square to move`;
+    const piece =
+
+      game.get(
+        selectedSquare
+      );
+
+
+    const castleText =
+
+      piece?.type === "k"
+
+        ? " • hover the rook to castle"
+
+        : "";
+
+
+    belowCameraHint.innerHTML = `
+
+      <b>${selectedSquare} selected</b>
+
+      • hover a highlighted square
+      to move${castleText}
+    `;
   }
 }
 
 
 /* =========================================================
-   MAKE MOVE
+   MOVE
 ========================================================= */
 
 function tryMove(
@@ -2258,6 +3174,7 @@ function tryMove(
   try {
 
     move =
+
       game.move({
 
         from,
@@ -2279,6 +3196,7 @@ function tryMove(
 
     lastClockTick =
       performance.now();
+
 
     return;
   }
@@ -2306,8 +3224,12 @@ function tryMove(
   selectedSquare =
     null;
 
+
   legalTargets =
     [];
+
+
+  resetHover();
 
 
   playMoveSound(
@@ -2317,15 +3239,18 @@ function tryMove(
 
   renderBoard();
 
+
   renderHistory();
+
 
   updateStatus();
 
-  updateGestureHint();
+
+  updateBelowCameraHint();
 
 
   if (
-    checkEnd()
+    checkGameEnd()
   ) {
 
     return;
@@ -2334,6 +3259,7 @@ function tryMove(
 
   if (
     settings.mode === "ai"
+
     && game.turn() === "b"
   ) {
 
@@ -2359,7 +3285,7 @@ function scheduleAiMove() {
     );
 
 
-  updateGestureHint();
+  updateBelowCameraHint();
 
 
   setTimeout(
@@ -2374,14 +3300,15 @@ function scheduleAiMove() {
 
 
       makeAiMove();
+
     },
 
-    settings.difficulty
-    === "expert"
+    settings.difficulty ===
+    "expert"
 
       ? 420
 
-      : 280
+      : 250
   );
 }
 
@@ -2399,7 +3326,7 @@ function finishAiThinking() {
     );
 
 
-  updateGestureHint();
+  updateBelowCameraHint();
 }
 
 
@@ -2416,13 +3343,16 @@ function makeAiMove() {
 
     finishAiThinking();
 
-    checkEnd();
+
+    checkGameEnd();
+
 
     return;
   }
 
 
   const result =
+
     game.move({
 
       from:
@@ -2466,21 +3396,25 @@ function makeAiMove() {
 
   renderBoard();
 
+
   renderHistory();
+
 
   updateStatus();
 
-  checkEnd();
+
+  checkGameEnd();
 }
 
 
 /* =========================================================
-   SIMPLE BUILT-IN AI
+   BASIC AI
 ========================================================= */
 
 function chooseAiMove() {
 
   const moves =
+
     game.moves({
       verbose: true
     });
@@ -2492,17 +3426,11 @@ function chooseAiMove() {
   }
 
 
-  /*
-    Easy:
-    often random.
-  */
-
   if (
-    settings.difficulty
-    === "easy"
+    settings.difficulty ===
+    "easy"
 
-    && Math.random()
-    < 0.68
+    && Math.random() < 0.68
   ) {
 
     return moves[
@@ -2547,6 +3475,7 @@ function chooseAiMove() {
   ) {
 
     const clone =
+
       new Chess(
         game.fen()
       );
@@ -2567,6 +3496,7 @@ function chooseAiMove() {
 
 
     const score =
+
       minimax(
 
         clone,
@@ -2582,17 +3512,20 @@ function chooseAiMove() {
 
 
     if (
-      score > bestScore
+      score >
+      bestScore
     ) {
 
       bestScore =
         score;
 
+
       bestMoves =
         [move];
 
     } else if (
-      score === bestScore
+      score ===
+      bestScore
     ) {
 
       bestMoves.push(
@@ -2635,6 +3568,7 @@ function minimax(
 
 
   const moves =
+
     chess.moves({
       verbose: true
     });
@@ -2652,6 +3586,7 @@ function minimax(
     ) {
 
       const child =
+
         new Chess(
           chess.fen()
         );
@@ -2672,6 +3607,7 @@ function minimax(
 
 
       best =
+
         Math.max(
 
           best,
@@ -2692,6 +3628,7 @@ function minimax(
 
 
       alpha =
+
         Math.max(
           alpha,
           best
@@ -2721,6 +3658,7 @@ function minimax(
   ) {
 
     const child =
+
       new Chess(
         chess.fen()
       );
@@ -2741,6 +3679,7 @@ function minimax(
 
 
     best =
+
       Math.min(
 
         best,
@@ -2761,6 +3700,7 @@ function minimax(
 
 
     beta =
+
       Math.min(
         beta,
         best
@@ -2793,7 +3733,9 @@ function evaluate(
   ) {
 
     return (
-      chess.turn() === "w"
+
+      chess.turn()
+      === "w"
 
         ? 100000
 
@@ -2839,14 +3781,14 @@ function evaluate(
     ) {
 
       if (!piece) {
+
         continue;
       }
 
 
       score +=
 
-        piece.color
-        === "b"
+        piece.color === "b"
 
           ? values[
               piece.type
@@ -2859,43 +3801,37 @@ function evaluate(
   }
 
 
-  /*
-    Tiny center bonus.
-  */
+  return score;
+}
 
-  for (
-    const square
-    of [
-      "d4",
-      "e4",
-      "d5",
-      "e5"
-    ]
+
+/* =========================================================
+   CHECK HELPER
+========================================================= */
+
+function isInCheck(
+  chess
+) {
+
+  if (
+    typeof chess.isCheck
+    === "function"
   ) {
 
-    const piece =
-      chess.get(
-        square
-      );
-
-
-    if (!piece) {
-      continue;
-    }
-
-
-    score +=
-
-      piece.color
-      === "b"
-
-        ? 12
-
-        : -12;
+    return chess.isCheck();
   }
 
 
-  return score;
+  if (
+    typeof chess.inCheck
+    === "function"
+  ) {
+
+    return chess.inCheck();
+  }
+
+
+  return false;
 }
 
 
@@ -2918,6 +3854,7 @@ function startClock() {
 
 
   clockTimer =
+
     setInterval(
       () => {
 
@@ -2929,11 +3866,13 @@ function startClock() {
 
         updateClock();
 
+
         renderClocks();
 
 
         if (
           whiteTimeMs <= 0
+
           || blackTimeMs <= 0
         ) {
 
@@ -2950,6 +3889,7 @@ function startClock() {
 function updateClock() {
 
   if (!gameActive) {
+
     return;
   }
 
@@ -2959,6 +3899,7 @@ function updateClock() {
 
 
   const elapsed =
+
     now
     - lastClockTick;
 
@@ -2968,8 +3909,7 @@ function updateClock() {
 
 
   if (
-    game.turn()
-    === "w"
+    game.turn() === "w"
   ) {
 
     whiteTimeMs -=
@@ -2983,6 +3923,7 @@ function updateClock() {
 
 
   whiteTimeMs =
+
     Math.max(
       0,
       whiteTimeMs
@@ -2990,6 +3931,7 @@ function updateClock() {
 
 
   blackTimeMs =
+
     Math.max(
       0,
       blackTimeMs
@@ -3021,25 +3963,26 @@ function formatClock(
 ) {
 
   const totalSeconds =
+
     Math.ceil(
-      milliseconds
-      / 1000
+      milliseconds / 1000
     );
 
 
   const minutes =
+
     Math.floor(
-      totalSeconds
-      / 60
+      totalSeconds / 60
     );
 
 
   const seconds =
-    totalSeconds
-    % 60;
+
+    totalSeconds % 60;
 
 
   return (
+
     `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
   );
 }
@@ -3048,12 +3991,14 @@ function formatClock(
 function renderClocks() {
 
   whiteClockEl.textContent =
+
     formatClock(
       whiteTimeMs
     );
 
 
   blackClockEl.textContent =
+
     formatClock(
       blackTimeMs
     );
@@ -3065,8 +4010,8 @@ function renderClocks() {
 
       "low-time",
 
-      whiteTimeMs
-      <= 10000
+      whiteTimeMs <=
+      10000
     );
 
 
@@ -3076,8 +4021,8 @@ function renderClocks() {
 
       "low-time",
 
-      blackTimeMs
-      <= 10000
+      blackTimeMs <=
+      10000
     );
 
 
@@ -3133,6 +4078,7 @@ function endOnTime() {
 
 
   gameStatus.textContent =
+
     `⏱ ${winner} wins on time`;
 
 
@@ -3156,26 +4102,20 @@ function updateStatus() {
 
   const side =
 
-    game.turn()
-    === "w"
+    game.turn() === "w"
 
       ? "White"
 
       : "Black";
 
 
-  if (
-    game.inCheck()
-  ) {
+  gameStatus.textContent =
 
-    gameStatus.textContent =
-      `⚠ ${side} is in check`;
+    isInCheck(game)
 
-  } else {
+      ? `⚠ ${side} is in check`
 
-    gameStatus.textContent =
-      `${side} to move`;
-  }
+      : `${side} to move`;
 
 
   renderClocks();
@@ -3186,7 +4126,7 @@ function updateStatus() {
    GAME END
 ========================================================= */
 
-function checkEnd() {
+function checkGameEnd() {
 
   if (
     !game.isGameOver()
@@ -3211,8 +4151,7 @@ function checkEnd() {
 
     const winner =
 
-      game.turn()
-      === "w"
+      game.turn() === "w"
 
         ? settings.blackName
 
@@ -3220,6 +4159,7 @@ function checkEnd() {
 
 
     gameStatus.textContent =
+
       `♛ Checkmate — ${winner} wins`;
 
   } else if (
@@ -3267,7 +4207,7 @@ function checkEnd() {
 
 
 /* =========================================================
-   MOVE HISTORY
+   HISTORY
 ========================================================= */
 
 function renderHistory() {
@@ -3276,12 +4216,12 @@ function renderHistory() {
     game.history();
 
 
-  if (
-    history.length === 0
-  ) {
+  if (!history.length) {
 
     moveHistoryEl.innerHTML =
+
       '<div class="empty-history">Moves will appear here.</div>';
+
 
     return;
   }
@@ -3292,12 +4232,13 @@ function renderHistory() {
 
 
   for (
-    let index = 0;
-    index < history.length;
-    index += 2
+    let i = 0;
+    i < history.length;
+    i += 2
   ) {
 
     const row =
+
       document.createElement(
         "div"
       );
@@ -3308,6 +4249,7 @@ function renderHistory() {
 
 
     const number =
+
       document.createElement(
         "span"
       );
@@ -3318,34 +4260,39 @@ function renderHistory() {
 
 
     number.textContent =
-      `${Math.floor(index / 2) + 1}.`;
+
+      `${Math.floor(i / 2) + 1}.`;
 
 
     const white =
+
       document.createElement(
         "span"
       );
 
 
     white.textContent =
-      history[index]
-      || "";
+      history[i] || "";
 
 
     const black =
+
       document.createElement(
         "span"
       );
 
 
     black.textContent =
-      history[index + 1]
+      history[i + 1]
       || "";
 
 
     row.append(
+
       number,
+
       white,
+
       black
     );
 
@@ -3358,12 +4305,13 @@ function renderHistory() {
 
 
   moveHistoryEl.scrollTop =
+
     moveHistoryEl.scrollHeight;
 }
 
 
 /* =========================================================
-   AUDIO
+   SOUND
 ========================================================= */
 
 function ensureAudio() {
@@ -3371,16 +4319,19 @@ function ensureAudio() {
   if (!audioContext) {
 
     audioContext =
+
       new (
+
         window.AudioContext
+
         || window.webkitAudioContext
       )();
   }
 
 
   if (
-    audioContext.state
-    === "suspended"
+    audioContext.state ===
+    "suspended"
   ) {
 
     audioContext.resume();
@@ -3406,16 +4357,19 @@ function beep(
 
 
   const start =
+
     audioContext.currentTime
     + delay;
 
 
   const oscillator =
+
     audioContext
       .createOscillator();
 
 
   const amplifier =
+
     audioContext
       .createGain();
 
@@ -3426,14 +4380,18 @@ function beep(
 
   oscillator.frequency
     .setValueAtTime(
+
       frequency,
+
       start
     );
 
 
   amplifier.gain
     .setValueAtTime(
+
       gain,
+
       start
     );
 
@@ -3485,32 +4443,14 @@ function playUiTone(
   ) {
 
     beep(
+
       700,
-      0.05,
+
+      0.045,
+
       "sine",
+
       0.025
-    );
-  }
-
-
-  if (
-    type === "error"
-  ) {
-
-    beep(
-      180,
-      0.06,
-      "square",
-      0.025
-    );
-
-
-    beep(
-      135,
-      0.08,
-      "square",
-      0.02,
-      0.065
     );
   }
 
@@ -3520,36 +4460,46 @@ function playUiTone(
   ) {
 
     beep(
+
       440,
+
       0.09,
+
       "sine",
+
       0.035
     );
 
 
     beep(
+
       554,
+
       0.09,
+
       "sine",
+
       0.035,
+
       0.11
     );
 
 
     beep(
+
       659,
+
       0.18,
+
       "sine",
+
       0.04,
+
       0.22
     );
   }
 }
 
-
-/* =========================================================
-   PIECE MOVE SOUNDS
-========================================================= */
 
 function playMoveSound(
   move
@@ -3561,7 +4511,7 @@ function playMoveSound(
   }
 
 
-  const baseFrequency = {
+  const base = {
 
     p:
       330,
@@ -3587,9 +4537,13 @@ function playMoveSound(
 
 
   beep(
-    baseFrequency,
+
+    base,
+
     0.055,
+
     "triangle",
+
     0.03
   );
 
@@ -3599,10 +4553,15 @@ function playMoveSound(
   ) {
 
     beep(
+
       120,
+
       0.09,
+
       "square",
+
       0.022,
+
       0.055
     );
   }
@@ -3614,10 +4573,15 @@ function playMoveSound(
   ) {
 
     beep(
+
       820,
+
       0.08,
+
       "sine",
+
       0.025,
+
       0.11
     );
   }
@@ -3683,8 +4647,7 @@ resignBtn
 
       const loser =
 
-        game.turn()
-        === "w"
+        game.turn() === "w"
 
           ? settings.whiteName
 
@@ -3693,8 +4656,7 @@ resignBtn
 
       const winner =
 
-        game.turn()
-        === "w"
+        game.turn() === "w"
 
           ? settings.blackName
 
@@ -3702,6 +4664,7 @@ resignBtn
 
 
       gameStatus.textContent =
+
         `${loser} resigned — ${winner} wins`;
 
 
@@ -3726,17 +4689,29 @@ newGameBtn
       );
 
 
-      gameScreen.classList.add(
-        "hidden"
-      );
+      gameScreen
+        .classList
+        .add(
+          "hidden"
+        );
 
 
-      setupScreen.classList.remove(
-        "hidden"
-      );
+      setupScreen
+        .classList
+        .remove(
+          "hidden"
+        );
+
+
+      handCursor
+        .classList
+        .add(
+          "hidden"
+        );
 
 
       setupMessage.textContent =
+
         "Camera frames are processed locally in your browser for hand tracking.";
     }
   );
