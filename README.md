@@ -33,7 +33,7 @@ Allow camera access.
 
 ## GitHub Pages
 
-Upload all files to a GitHub repository named `AirChess`.
+Upload all files to a GitHub repository named `GhostBoard`.
 
 Then:
 
