@@ -1,5 +1,5 @@
 export const firebaseConfig = {
-  apiKey: "AIzaSyC-DDQIIxoDEckr77UcVR-uYuPkCzYoIZk",
+  apiKey: "AIzaSyC-DDQTIxoDFckr7ZUcVR-uYuPkCzYoIZk",
 
   authDomain:
     "ghost-board-df3e9.firebaseapp.com",
