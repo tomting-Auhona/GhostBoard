@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#07070a" />
+  <meta name="description" content="Ghost Board — camera chess with AI, local and online multiplayer." />
+  <title>Ghost Board</title>
+</head>
+<body>
+  <div id="app" data-theme="galaxy">
+    <section id="setupScreen" class="screen setup-screen">
+      <div class="setup-card">
+        <div class="brand">
+          <div class="brand-piece">♞</div>
+          <div>
+            <h1>Ghost Board</h1>
+            <p>Play chess with hand tracking — solo, local, or online.</p>
+          </div>
+        </div>
+
+        <div class="setup-grid">
+          <label class="field">
+            <span>Your username</span>
+            <input id="player1Name" maxlength="28" value="Player 👻♞" />
+          </label>
+
+          <label class="field">
+            <span>Game mode</span>
+            <select id="gameMode">
+              <option value="ai">🤖 Play vs AI</option>
+              <option value="local">👥 Local 2 Player</option>
+              <option value="online">🌍 Online Multiplayer</option>
+            </select>
+          </label>
+
+          <label id="player2Field" class="field hidden">
+            <span>Player 2 username</span>
+            <input id="player2Name" maxlength="28" value="Player 2 ♛" />
+          </label>
+
+          <label id="difficultyField" class="field">
+            <span>AI strength</span>
+            <select id="difficulty">
+              <option value="easy">🌱 Easy</option>
+              <option value="medium" selected>♟ Medium</option>
+              <option value="hard">🔥 Hard</option>
+              <option value="expert">👑 Expert</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Time control</span>
+            <select id="timeControl">
+              <optgroup label="Bullet">
+                <option value="1,0">1 + 0</option>
+                <option value="1,1">1 + 1</option>
+              </optgroup>
+              <optgroup label="Blitz">
+                <option value="3,0">3 + 0</option>
+                <option value="3,2">3 + 2</option>
+                <option value="5,0" selected>5 + 0</option>
+                <option value="5,3">5 + 3</option>
+              </optgroup>
+              <optgroup label="Rapid">
+                <option value="10,0">10 + 0</option>
+                <option value="10,5">10 + 5</option>
+                <option value="15,10">15 + 10</option>
+              </optgroup>
+              <optgroup label="Classical">
+                <option value="30,0">30 + 0</option>
+                <option value="30,20">30 + 20</option>
+              </optgroup>
+              <option value="custom">Custom...</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Board theme</span>
+            <select id="boardTheme">
+              <option value="classic">♟ Classic</option>
+              <option value="crimson">🟥 Crimson</option>
+              <option value="cyber">⚡ Cyber</option>
+              <option value="galaxy" selected>🌌 Galaxy</option>
+              <option value="forest">🌿 Forest</option>
+              <option value="minimal">🤍 Minimal</option>
+            </select>
+          </label>
+
+          <div id="customTime" class="custom-time hidden">
+            <label class="field">
+              <span>Minutes</span>
+              <input id="customMinutes" type="number" min="1" max="180" value="7" />
+            </label>
+            <label class="field">
+              <span>Increment (seconds)</span>
+              <input id="customIncrement" type="number" min="0" max="60" value="3" />
+            </label>
+          </div>
+
+          <label class="toggle-row">
+            <span>Game sounds</span>
+            <input id="soundToggle" type="checkbox" checked />
+            <span class="switch"></span>
+          </label>
+        </div>
+
+        <div id="onlineFields" class="online-box hidden">
+          <div class="online-title">🌍 Online Multiplayer</div>
+          <div class="online-grid">
+            <label class="field">
+              <span>Online action</span>
+              <select id="onlineAction">
+                <option value="create">Create private room</option>
+                <option value="join">Join room</option>
+              </select>
+            </label>
+
+            <label id="roomCodeField" class="field hidden">
+              <span>Room code</span>
+              <input id="roomCodeInput" maxlength="10" placeholder="GHOST-7K29" autocomplete="off" />
+            </label>
+          </div>
+          <p id="onlineNote">Create a room and send the code to someone on another device.</p>
+        </div>
+
+        <div class="stickers">
+          <span>Quick stickers</span>
+          <div class="sticker-row">
+            <button type="button" class="sticker">👻</button>
+            <button type="button" class="sticker">♞</button>
+            <button type="button" class="sticker">♛</button>
+            <button type="button" class="sticker">🔥</button>
+            <button type="button" class="sticker">⚡</button>
+            <button type="button" class="sticker">🌙</button>
+            <button type="button" class="sticker">👑</button>
+            <button type="button" class="sticker">🐉</button>
+            <button type="button" class="sticker">⭐</button>
+            <button type="button" class="sticker">🪐</button>
+          </div>
+        </div>
+
+        <div id="setupMessage" class="setup-message">
+          Camera frames stay in your browser; online games sync chess data only.
+        </div>
+
+        <button id="startGameBtn" class="primary-btn">START VS AI</button>
+      </div>
+    </section>
+
+    <section id="gameScreen" class="screen game-screen hidden">
+      <header class="game-header">
+        <div class="mini-brand">👻 Ghost Board</div>
+        <div class="header-actions">
+          <div id="onlineRoomBar" class="room-bar hidden">
+            <span id="roomCodeLabel">GHOST-0000</span>
+            <button id="copyRoomBtn" type="button">Copy</button>
+            <span id="connectionLabel" class="connection-label">Connecting…</span>
+          </div>
+
+          <select id="liveTheme" aria-label="Board theme">
+            <option value="classic">Classic</option>
+            <option value="crimson">Crimson</option>
+            <option value="cyber">Cyber</option>
+            <option value="galaxy">Galaxy</option>
+            <option value="forest">Forest</option>
+            <option value="minimal">Minimal</option>
+          </select>
+          <button id="muteBtn" title="Toggle sound">🔊</button>
+          <button id="restartBtn" title="Restart game">↻</button>
+        </div>
+      </header>
+
+      <main class="game-layout">
+        <section class="play-column">
+          <div id="blackPlayer" class="player-card player-black">
+            <div>
+              <div id="blackName" class="player-name">Nova AI 🤖</div>
+              <div class="player-side">BLACK</div>
+            </div>
+            <div id="blackClock" class="clock">05:00</div>
+          </div>
+
+          <div id="cameraStage" class="camera-stage" data-hand-color="w">
+            <video id="webcam" autoplay muted playsinline></video>
+            <div class="camera-tint"></div>
+            <div id="board" class="chessboard"></div>
+
+            <div id="handCursor" class="hand-cursor hidden">
+              <div class="cursor-ring"></div>
+              <div class="cursor-dot"></div>
+            </div>
+
+            <div class="live-badge"><span></span> LIVE</div>
+            <div id="aiThinking" class="ai-thinking hidden"><span></span> AI THINKING</div>
+
+            <div id="waitingOverlay" class="waiting-overlay hidden">
+              <div class="waiting-card">
+                <div class="waiting-icon">🌍</div>
+                <h2>Waiting for opponent</h2>
+                <p id="waitingText">Share your room code.</p>
+                <div id="waitingCode" class="waiting-code">GHOST-0000</div>
+                <button id="copyWaitingCodeBtn" type="button">Copy room code</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="whitePlayer" class="player-card player-white active-player">
+            <div>
+              <div id="whiteName" class="player-name">Player 👻♞</div>
+              <div class="player-side">WHITE</div>
+            </div>
+            <div id="whiteClock" class="clock">05:00</div>
+          </div>
+        </section>
+
+        <aside class="side-panel">
+          <div class="panel-card">
+            <div class="panel-title">GAME STATUS</div>
+            <div id="gameStatus" class="game-status">White to move</div>
+          </div>
+
+          <div class="panel-card moves-card">
+            <div class="panel-title">MOVES</div>
+            <div id="moveHistory" class="move-history">
+              <div class="empty-history">Moves will appear here.</div>
+            </div>
+          </div>
+
+          <div class="panel-card two-buttons">
+            <button id="resignBtn" class="danger-btn">Resign</button>
+            <button id="newGameBtn" class="secondary-btn">New game</button>
+          </div>
+        </aside>
+      </main>
+    </section>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

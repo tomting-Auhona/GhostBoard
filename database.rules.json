@@ -1,0 +1,12 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "rooms": {
+      "$roomId": {
+        ".read": "auth !== null",
+        ".write": "auth !== null && ((!data.exists() && newData.child('players/white/uid').val() === auth.uid) || (data.exists() && !data.child('players/black/uid').exists() && newData.child('players/black/uid').val() === auth.uid && newData.child('players/white/uid').val() === data.child('players/white/uid').val()) || data.child('players/white/uid').val() === auth.uid || data.child('players/black/uid').val() === auth.uid)"
+      }
+    }
+  }
+}
