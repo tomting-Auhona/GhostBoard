@@ -1,19 +1,9 @@
 import "./style.css";
 
-import {
-  FilesetResolver,
-  HandLandmarker
-} from "@mediapipe/tasks-vision";
-
+import { FilesetResolver, HandLandmarker } from "@mediapipe/tasks-vision";
 import { Chess } from "chess.js";
-
 import { initializeApp } from "firebase/app";
-
-import {
-  getAuth,
-  signInAnonymously
-} from "firebase/auth";
-
+import { getAuth, signInAnonymously } from "firebase/auth";
 import {
   getDatabase,
   ref,
@@ -24,16 +14,9 @@ import {
   runTransaction,
   onDisconnect
 } from "firebase/database";
-
 import { firebaseConfig } from "./firebase-config.js";
 
-
-/* =========================================================
-   GHOST BOARD
-========================================================= */
-
-const BUILD_VERSION =
-  "GHOSTBOARD-AI-FAIR-CLOCK-8";
+const BUILD_VERSION = "GHOSTBOARD-ELO-9";
 
 console.log(`Ghost Board ${BUILD_VERSION}`);
 
@@ -47,79 +30,146 @@ const $ = (selector) =>
    DOM
 ========================================================= */
 
-const app = $("#app");
+const app =
+  $("#app");
 
-const setupScreen = $("#setupScreen");
-const gameScreen = $("#gameScreen");
+const setupScreen =
+  $("#setupScreen");
 
-const startGameBtn = $("#startGameBtn");
-const gameModeInput = $("#gameMode");
+const gameScreen =
+  $("#gameScreen");
 
-const player1NameInput = $("#player1Name");
-const player2NameInput = $("#player2Name");
+const startGameBtn =
+  $("#startGameBtn");
 
-const player2Field = $("#player2Field");
+const gameModeInput =
+  $("#gameMode");
 
-const difficultyField = $("#difficultyField");
-const difficultyInput = $("#difficulty");
+const player1NameInput =
+  $("#player1Name");
 
-const timeControlInput = $("#timeControl");
+const player2NameInput =
+  $("#player2Name");
 
-const customTime = $("#customTime");
-const customMinutes = $("#customMinutes");
-const customIncrement = $("#customIncrement");
+const player2Field =
+  $("#player2Field");
 
-const boardThemeInput = $("#boardTheme");
-const liveTheme = $("#liveTheme");
+const difficultyField =
+  $("#difficultyField");
 
-const soundToggle = $("#soundToggle");
-const setupMessage = $("#setupMessage");
+const difficultyInput =
+  $("#difficulty");
 
-const onlineFields = $("#onlineFields");
-const onlineAction = $("#onlineAction");
+const timeControlInput =
+  $("#timeControl");
 
-const roomCodeField = $("#roomCodeField");
-const roomCodeInput = $("#roomCodeInput");
+const customTime =
+  $("#customTime");
 
-const onlineNote = $("#onlineNote");
+const customMinutes =
+  $("#customMinutes");
 
+const customIncrement =
+  $("#customIncrement");
 
-const webcam = $("#webcam");
-const cameraStage = $("#cameraStage");
+const boardThemeInput =
+  $("#boardTheme");
 
-const boardEl = $("#board");
-const handCursor = $("#handCursor");
+const liveTheme =
+  $("#liveTheme");
 
-const gameStatus = $("#gameStatus");
-const moveHistoryEl = $("#moveHistory");
+const soundToggle =
+  $("#soundToggle");
 
-const whiteNameEl = $("#whiteName");
-const blackNameEl = $("#blackName");
+const setupMessage =
+  $("#setupMessage");
 
-const whiteClockEl = $("#whiteClock");
-const blackClockEl = $("#blackClock");
+const onlineFields =
+  $("#onlineFields");
 
-const whitePlayer = $("#whitePlayer");
-const blackPlayer = $("#blackPlayer");
+const onlineAction =
+  $("#onlineAction");
 
-const aiThinking = $("#aiThinking");
+const roomCodeField =
+  $("#roomCodeField");
 
-const muteBtn = $("#muteBtn");
+const roomCodeInput =
+  $("#roomCodeInput");
 
-const restartBtn = $("#restartBtn");
-const resignBtn = $("#resignBtn");
-const newGameBtn = $("#newGameBtn");
+const onlineNote =
+  $("#onlineNote");
 
-const onlineRoomBar = $("#onlineRoomBar");
+const webcam =
+  $("#webcam");
 
-const roomCodeLabel = $("#roomCodeLabel");
-const copyRoomBtn = $("#copyRoomBtn");
+const cameraStage =
+  $("#cameraStage");
 
-const connectionLabel = $("#connectionLabel");
+const boardEl =
+  $("#board");
 
-const waitingOverlay = $("#waitingOverlay");
-const waitingText = $("#waitingText");
-const waitingCode = $("#waitingCode");
+const handCursor =
+  $("#handCursor");
+
+const gameStatus =
+  $("#gameStatus");
+
+const moveHistoryEl =
+  $("#moveHistory");
+
+const whiteNameEl =
+  $("#whiteName");
+
+const blackNameEl =
+  $("#blackName");
+
+const whiteClockEl =
+  $("#whiteClock");
+
+const blackClockEl =
+  $("#blackClock");
+
+const whitePlayer =
+  $("#whitePlayer");
+
+const blackPlayer =
+  $("#blackPlayer");
+
+const aiThinking =
+  $("#aiThinking");
+
+const muteBtn =
+  $("#muteBtn");
+
+const restartBtn =
+  $("#restartBtn");
+
+const resignBtn =
+  $("#resignBtn");
+
+const newGameBtn =
+  $("#newGameBtn");
+
+const onlineRoomBar =
+  $("#onlineRoomBar");
+
+const roomCodeLabel =
+  $("#roomCodeLabel");
+
+const copyRoomBtn =
+  $("#copyRoomBtn");
+
+const connectionLabel =
+  $("#connectionLabel");
+
+const waitingOverlay =
+  $("#waitingOverlay");
+
+const waitingText =
+  $("#waitingText");
+
+const waitingCode =
+  $("#waitingCode");
 
 const copyWaitingCodeBtn =
   $("#copyWaitingCodeBtn");
@@ -133,22 +183,33 @@ document
   .querySelectorAll(
     "#gestureHint, #belowCameraHint, .instructions, .hand-info"
   )
-  .forEach((element) => {
-    element.remove();
-  });
+  .forEach(
+    (element) => {
+
+      element.remove();
+
+    }
+  );
 
 
 /* =========================================================
-   CHESS CONSTANTS
+   CHESS
 ========================================================= */
 
 const FILES = [
-  "a", "b", "c", "d",
-  "e", "f", "g", "h"
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "f",
+  "g",
+  "h"
 ];
 
 
 const PIECES = {
+
   wp: "♟",
   wn: "♞",
   wb: "♝",
@@ -162,90 +223,64 @@ const PIECES = {
   br: "♜",
   bq: "♛",
   bk: "♚"
+
 };
 
 
 /* =========================================================
-   AIR CONTROL SETTINGS
+   AIR CONTROL
 ========================================================= */
 
-const SELECT_DWELL_MS = 120;
-
-const MOVE_DWELL_MS = 200;
-
-const SWITCH_DWELL_MS = 120;
+const SELECT_DWELL_MS =
+  120;
 
 
-/*
-  Cursor responsiveness.
-*/
-const SMOOTHING = 0.88;
+const MOVE_DWELL_MS =
+  200;
 
 
-/*
-  Source-piece hit area.
-*/
-const SELECTION_CORE_MARGIN = 0.11;
+const SWITCH_DWELL_MS =
+  120;
 
 
-/*
-  Destination magnetism.
-*/
-const MAGNET_RADIUS = 0.50;
-
-const KING_MAGNET_RADIUS = 0.66;
+const SMOOTHING =
+  0.88;
 
 
-/*
-  Fly-over protection.
-
-  Prevents d2 → d4 becoming d3.
-*/
-const STABLE_MOTION_FRACTION = 0.055;
-
-const REQUIRED_STABLE_FRAMES = 2;
+const SELECTION_CORE_MARGIN =
+  0.11;
 
 
-/*
-  Bottom-row assistance.
-*/
-const BOTTOM_EDGE_ASSIST = 0.42;
+const MAGNET_RADIUS =
+  0.50;
+
+
+const KING_MAGNET_RADIUS =
+  0.66;
+
+
+const STABLE_MOTION_FRACTION =
+  0.055;
+
+
+const REQUIRED_STABLE_FRAMES =
+  2;
+
+
+const BOTTOM_EDGE_ASSIST =
+  0.42;
 
 
 /* =========================================================
-   AI CLOCK FAIRNESS
+   AI FAIR CLOCK
 ========================================================= */
 
-/*
-  Human air-control refund.
-
-  IMPORTANT:
-  Ghost Board never adds a free 700 ms.
-
-  It only refunds up to 700 ms of time
-  that ACTUALLY passed during your turn.
-
-  Example:
-
-  Turn took 4.2 seconds
-  → refund 0.7 s
-  → clock loses 3.5 s
-
-  Turn took 0.4 seconds
-  → refund only 0.4 s
-  → clock loses ~0 s
-*/
-const HUMAN_AIR_REFUND_MS = 700;
+const HUMAN_AIR_REFUND_MS =
+  700;
 
 
-/*
-  Nova's minimum thinking delay.
-
-  The AI clock keeps ticking for the
-  ENTIRE delay, plus however long its
-  minimax calculation actually takes.
-*/
 const AI_THINK_RANGES = {
+
   easy: {
     min: 1400,
     max: 1800
@@ -265,41 +300,625 @@ const AI_THINK_RANGES = {
     min: 800,
     max: 1100
   }
+
 };
 
 
 /* =========================================================
-   EXTRA UI
-   CAPTURED PIECES + RESULT
+   ELO SYSTEM
 ========================================================= */
 
-let capturedPanel = null;
+const STARTING_RATING =
+  1500;
 
-let capturedByWhiteEl = null;
-let capturedByBlackEl = null;
 
-let resultOverlay = null;
-let resultTitle = null;
-let resultSubtitle = null;
+/*
+  This value represents the NORMAL
+  gain from beating somebody with
+  exactly the same rating.
 
-let lastResultSignature = null;
+  0–6 games:
+      +200 against equal opponent
 
+  7–49:
+      +100
+
+  50–99:
+      +50
+
+  100–199:
+      +30
+
+  200–399:
+      +20
+
+  400–799:
+      +12
+
+  800+:
+      +8
+*/
+
+function getNormalRatingGain(
+  gamesPlayed
+) {
+
+  if (
+    gamesPlayed < 7
+  ) {
+
+    return 200;
+
+  }
+
+
+  if (
+    gamesPlayed < 50
+  ) {
+
+    return 100;
+
+  }
+
+
+  if (
+    gamesPlayed < 100
+  ) {
+
+    return 50;
+
+  }
+
+
+  if (
+    gamesPlayed < 200
+  ) {
+
+    return 30;
+
+  }
+
+
+  if (
+    gamesPlayed < 400
+  ) {
+
+    return 20;
+
+  }
+
+
+  if (
+    gamesPlayed < 800
+  ) {
+
+    return 12;
+
+  }
+
+
+  return 8;
+
+}
+
+
+/* =========================================================
+   EXPECTED SCORE
+========================================================= */
+
+function expectedScore(
+  myRating,
+  opponentRating
+) {
+
+  return (
+
+    1 /
+
+    (
+      1 +
+
+      Math.pow(
+
+        10,
+
+        (
+          opponentRating
+          - myRating
+        )
+
+        / 400
+
+      )
+    )
+
+  );
+
+}
+
+
+/* =========================================================
+   RATING CHANGE
+========================================================= */
+
+function calculateRatingChange(
+  myRating,
+  opponentRating,
+  gamesPlayed,
+  score
+) {
+
+  const normalGain =
+
+    getNormalRatingGain(
+      gamesPlayed
+    );
+
+
+  /*
+    Against an equal opponent:
+
+    expected = 0.5
+
+    K × (1 - 0.5)
+
+    To make the result equal
+    normalGain:
+
+    K = normalGain × 2
+  */
+
+  const k =
+    normalGain * 2;
+
+
+  const expected =
+
+    expectedScore(
+
+      myRating,
+
+      opponentRating
+
+    );
+
+
+  let change =
+
+    Math.round(
+
+      k
+
+      * (
+        score
+        - expected
+      )
+
+    );
+
+
+  /*
+    A decisive game should never
+    somehow become +0 / -0.
+  */
+
+  if (
+    score === 1
+
+    && change < 1
+  ) {
+
+    change =
+      1;
+
+  }
+
+
+  if (
+    score === 0
+
+    && change > -1
+  ) {
+
+    change =
+      -1;
+
+  }
+
+
+  /*
+    Equal rating + draw:
+    absolutely no movement.
+  */
+
+  if (
+    score === 0.5
+
+    && myRating ===
+    opponentRating
+  ) {
+
+    change =
+      0;
+
+  }
+
+
+  return {
+
+    change,
+
+    expected,
+
+    normalGain,
+
+    k
+
+  };
+
+}
+
+
+/* =========================================================
+   BUILD MATCH RATING RESULT
+========================================================= */
+
+function buildRatingResult(
+  room,
+  winner,
+  reason
+) {
+
+  /*
+    If result already exists,
+    DO NOT calculate it again.
+  */
+
+  if (
+    room.ratingResult
+      ?.applied
+  ) {
+
+    return room.ratingResult;
+
+  }
+
+
+  const whiteRating =
+
+    Number(
+
+      room.players
+        ?.white
+        ?.rating
+
+      ?? STARTING_RATING
+
+    );
+
+
+  const blackRating =
+
+    Number(
+
+      room.players
+        ?.black
+        ?.rating
+
+      ?? STARTING_RATING
+
+    );
+
+
+  const whiteGames =
+
+    Number(
+
+      room.players
+        ?.white
+        ?.gamesPlayed
+
+      ?? 0
+
+    );
+
+
+  const blackGames =
+
+    Number(
+
+      room.players
+        ?.black
+        ?.gamesPlayed
+
+      ?? 0
+
+    );
+
+
+  let whiteScore;
+
+
+  if (
+    winner === "w"
+  ) {
+
+    whiteScore =
+      1;
+
+  } else if (
+    winner === "b"
+  ) {
+
+    whiteScore =
+      0;
+
+  } else {
+
+    whiteScore =
+      0.5;
+
+  }
+
+
+  const blackScore =
+    1 - whiteScore;
+
+
+  const whiteCalculation =
+
+    calculateRatingChange(
+
+      whiteRating,
+
+      blackRating,
+
+      whiteGames,
+
+      whiteScore
+
+    );
+
+
+  const blackCalculation =
+
+    calculateRatingChange(
+
+      blackRating,
+
+      whiteRating,
+
+      blackGames,
+
+      blackScore
+
+    );
+
+
+  return {
+
+    applied:
+      true,
+
+
+    system:
+      "ghost-elo-v1",
+
+
+    reason,
+
+
+    winner:
+      winner ?? null,
+
+
+    calculatedAt:
+      serverNow(),
+
+
+    white: {
+
+      old:
+        whiteRating,
+
+
+      change:
+        whiteCalculation.change,
+
+
+      new:
+
+        whiteRating
+
+        + whiteCalculation.change,
+
+
+      gamesBefore:
+        whiteGames,
+
+
+      gamesAfter:
+        whiteGames + 1,
+
+
+      expected:
+
+        Number(
+
+          whiteCalculation
+            .expected
+            .toFixed(4)
+
+        )
+
+    },
+
+
+    black: {
+
+      old:
+        blackRating,
+
+
+      change:
+        blackCalculation.change,
+
+
+      new:
+
+        blackRating
+
+        + blackCalculation.change,
+
+
+      gamesBefore:
+        blackGames,
+
+
+      gamesAfter:
+        blackGames + 1,
+
+
+      expected:
+
+        Number(
+
+          blackCalculation
+            .expected
+            .toFixed(4)
+
+        )
+
+    }
+
+  };
+
+}
+
+
+/* =========================================================
+   ELO DISPLAY HELPERS
+========================================================= */
+
+function signedNumber(
+  value
+) {
+
+  const number =
+    Number(
+      value || 0
+    );
+
+
+  return (
+
+    number > 0
+
+      ? `+${number}`
+
+      : `${number}`
+
+  );
+
+}
+
+
+function playerLabel(
+  name,
+  rating
+) {
+
+  const safeName =
+    name || "Player";
+
+
+  const ratingNumber =
+    Number(
+      rating
+    );
+
+
+  const safeRating =
+
+    Number.isFinite(
+      ratingNumber
+    )
+
+      ? Math.round(
+          ratingNumber
+        )
+
+      : STARTING_RATING;
+
+
+  return (
+
+    `${safeName} • ${safeRating}`
+
+  );
+
+}
+
+
+/* =========================================================
+   EXTRA GAME UI
+========================================================= */
+
+let capturedPanel =
+  null;
+
+
+let capturedByWhiteEl =
+  null;
+
+
+let capturedByBlackEl =
+  null;
+
+
+let resultOverlay =
+  null;
+
+
+let resultTitle =
+  null;
+
+
+let resultSubtitle =
+  null;
+
+
+let lastResultSignature =
+  null;
+
+
+/* =========================================================
+   CREATE EXTRA UI
+========================================================= */
 
 function createExtraGameUI() {
 
   if (
-    cameraStage &&
-    !$("#capturedPanel")
+    cameraStage
+
+    && !$("#capturedPanel")
   ) {
 
     capturedPanel =
-      document.createElement("div");
+
+      document.createElement(
+        "div"
+      );
+
 
     capturedPanel.id =
       "capturedPanel";
 
+
     capturedPanel.innerHTML = `
+
       <div class="captured-line">
+
         <span class="captured-label">
           White captured
         </span>
@@ -310,9 +929,12 @@ function createExtraGameUI() {
         >
           —
         </span>
+
       </div>
 
+
       <div class="captured-line">
+
         <span class="captured-label">
           Black captured
         </span>
@@ -323,59 +945,94 @@ function createExtraGameUI() {
         >
           —
         </span>
+
       </div>
+
     `;
 
-    cameraStage.insertAdjacentElement(
-      "afterend",
-      capturedPanel
-    );
+
+    cameraStage
+      .insertAdjacentElement(
+
+        "afterend",
+
+        capturedPanel
+
+      );
+
   }
 
 
   capturedPanel =
     $("#capturedPanel");
 
+
   capturedByWhiteEl =
     $("#capturedByWhite");
+
 
   capturedByBlackEl =
     $("#capturedByBlack");
 
 
   if (
-    cameraStage &&
-    !$("#ghostResultOverlay")
+    cameraStage
+
+    && !$("#ghostResultOverlay")
   ) {
 
     resultOverlay =
-      document.createElement("div");
+
+      document.createElement(
+        "div"
+      );
+
 
     resultOverlay.id =
       "ghostResultOverlay";
 
+
     resultOverlay.className =
       "ghost-result-overlay hidden";
 
+
     const stars =
+
       Array.from(
-        { length: 20 },
+
+        {
+          length:
+            20
+        },
+
         (_, index) => {
+
           return `
-            <span style="--i:${index}">
+
+            <span
+              style="--i:${index}"
+            >
               ✦
             </span>
+
           `;
+
         }
+
       ).join("");
 
 
     resultOverlay.innerHTML = `
+
       <div class="result-confetti">
+
         ${stars}
+
       </div>
 
+
       <div class="ghost-result-card">
+
         <div
           id="ghostResultTitle"
           class="ghost-result-title"
@@ -389,23 +1046,31 @@ function createExtraGameUI() {
         >
           Checkmate
         </div>
+
       </div>
+
     `;
 
-    cameraStage.appendChild(
-      resultOverlay
-    );
+
+    cameraStage
+      .appendChild(
+        resultOverlay
+      );
+
   }
 
 
   resultOverlay =
     $("#ghostResultOverlay");
 
+
   resultTitle =
     $("#ghostResultTitle");
 
+
   resultSubtitle =
     $("#ghostResultSubtitle");
+
 }
 
 
@@ -413,126 +1078,181 @@ createExtraGameUI();
 
 
 /* =========================================================
-   EXTRA UI CSS
+   EXTRA CSS
 ========================================================= */
 
 const runtimeStyle =
-  document.createElement("style");
+
+  document.createElement(
+    "style"
+  );
 
 
 runtimeStyle.textContent = `
 
   #capturedPanel {
+
     width: 100%;
+
     margin-top: 10px;
-    padding: 10px 14px;
+
+    padding:
+      10px 14px;
 
     border:
       1px solid
       rgba(255,255,255,.10);
 
-    border-radius: 13px;
+    border-radius:
+      13px;
 
     background:
       rgba(12,12,18,.88);
 
     display: grid;
+
     gap: 6px;
+
   }
 
 
   .captured-line {
-    min-height: 28px;
 
-    display: flex;
-    align-items: center;
+    min-height:
+      28px;
 
-    gap: 10px;
+    display:
+      flex;
+
+    align-items:
+      center;
+
+    gap:
+      10px;
+
   }
 
 
   .captured-label {
-    min-width: 105px;
+
+    min-width:
+      105px;
 
     color:
       rgba(255,255,255,.58);
 
-    font-size: 11px;
-    font-weight: 700;
+    font-size:
+      11px;
 
-    text-transform: uppercase;
+    font-weight:
+      700;
 
-    letter-spacing: .08em;
+    text-transform:
+      uppercase;
+
+    letter-spacing:
+      .08em;
+
   }
 
 
   .captured-pieces {
-    display: flex;
 
-    align-items: center;
+    display:
+      flex;
 
-    flex-wrap: wrap;
+    align-items:
+      center;
 
-    gap: 2px;
+    flex-wrap:
+      wrap;
+
+    gap:
+      2px;
 
     font-family:
       "Segoe UI Symbol",
       serif;
 
-    font-size: 23px;
+    font-size:
+      23px;
 
-    line-height: 1;
+    line-height:
+      1;
+
   }
 
 
   .captured-piece-white {
-    color: #f6f6fa;
+
+    color:
+      #f6f6fa;
 
     text-shadow:
       0 1px 2px #000;
+
   }
 
 
   .captured-piece-black {
-    color: #737381;
+
+    color:
+      #737381;
 
     text-shadow:
       0 1px 1px
       rgba(255,255,255,.18);
+
   }
 
 
   #ghostResultOverlay {
-    position: absolute;
 
-    inset: 0;
+    position:
+      absolute;
 
-    z-index: 500;
+    inset:
+      0;
 
-    display: flex;
+    z-index:
+      500;
 
-    align-items: center;
-    justify-content: center;
+    display:
+      flex;
 
-    overflow: hidden;
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    overflow:
+      hidden;
 
     background:
       rgba(5,5,10,.34);
 
     backdrop-filter:
       blur(3px);
+
   }
 
 
   #ghostResultOverlay.hidden {
-    display: none !important;
+
+    display:
+      none !important;
+
   }
 
 
   .ghost-result-card {
-    position: relative;
 
-    z-index: 5;
+    position:
+      relative;
+
+    z-index:
+      5;
 
     min-width:
       min(
@@ -543,13 +1263,15 @@ runtimeStyle.textContent = `
     padding:
       25px 26px;
 
-    text-align: center;
+    text-align:
+      center;
 
     border:
       1px solid
       rgba(255,255,255,.22);
 
-    border-radius: 22px;
+    border-radius:
+      22px;
 
     background:
       rgba(15,13,24,.94);
@@ -567,10 +1289,12 @@ runtimeStyle.textContent = `
         .3,
         1
       );
+
   }
 
 
   .ghost-result-title {
+
     font-size:
       clamp(
         24px,
@@ -578,45 +1302,63 @@ runtimeStyle.textContent = `
         42px
       );
 
-    font-weight: 900;
+    font-weight:
+      900;
 
     letter-spacing:
       -.035em;
 
-    color: white;
+    color:
+      white;
 
     animation:
       ghostTitlePulse
       1.1s
       ease-in-out
       infinite alternate;
+
   }
 
 
   .ghost-result-subtitle {
-    margin-top: 7px;
+
+    margin-top:
+      7px;
 
     color:
-      rgba(255,255,255,.60);
+      rgba(255,255,255,.70);
 
-    font-size: 13px;
+    font-size:
+      13px;
 
-    font-weight: 600;
+    font-weight:
+      650;
+
+    line-height:
+      1.5;
+
   }
 
 
   .result-confetti {
-    position: absolute;
 
-    inset: 0;
+    position:
+      absolute;
 
-    overflow: hidden;
+    inset:
+      0;
 
-    pointer-events: none;
+    overflow:
+      hidden;
+
+    pointer-events:
+      none;
+
   }
 
 
   .result-confetti span {
+
     --column:
       calc(
         (
@@ -624,11 +1366,14 @@ runtimeStyle.textContent = `
         ) * 4.76%
       );
 
-    position: absolute;
+    position:
+      absolute;
 
-    left: var(--column);
+    left:
+      var(--column);
 
-    top: -12%;
+    top:
+      -12%;
 
     font-size:
       calc(
@@ -638,7 +1383,8 @@ runtimeStyle.textContent = `
         ) * 3px
       );
 
-    opacity: .9;
+    opacity:
+      .9;
 
     animation:
       ghostConfettiFall
@@ -657,84 +1403,115 @@ runtimeStyle.textContent = `
           var(--i) % 8
         ) * -.21s
       );
+
   }
 
 
   .result-confetti span:nth-child(3n) {
-    color: #ffd454;
+
+    color:
+      #ffd454;
+
   }
 
 
   .result-confetti span:nth-child(3n + 1) {
-    color: #ba83ff;
+
+    color:
+      #ba83ff;
+
   }
 
 
   .result-confetti span:nth-child(3n + 2) {
-    color: #67dcff;
+
+    color:
+      #67dcff;
+
   }
 
 
   @keyframes ghostResultPop {
 
     from {
-      opacity: 0;
+
+      opacity:
+        0;
 
       transform:
         scale(.72)
         translateY(18px);
+
     }
 
     to {
-      opacity: 1;
+
+      opacity:
+        1;
 
       transform:
         scale(1)
         translateY(0);
+
     }
+
   }
 
 
   @keyframes ghostTitlePulse {
 
     from {
+
       transform:
         scale(1);
+
     }
 
     to {
+
       transform:
         scale(1.035);
+
     }
+
   }
 
 
   @keyframes ghostConfettiFall {
 
     from {
+
       transform:
         translateY(-10%)
         rotate(0deg);
+
     }
 
     to {
+
       transform:
         translateY(700px)
         rotate(520deg);
+
     }
+
   }
 
 
   #cameraStage {
-    position: relative;
+
+    position:
+      relative;
+
   }
 
 `;
 
 
-document.head.appendChild(
-  runtimeStyle
-);
+document.head
+  .appendChild(
+    runtimeStyle
+  );
 
 
 /* =========================================================
@@ -744,23 +1521,30 @@ document.head.appendChild(
 let game =
   new Chess();
 
+
 let settings =
   null;
+
 
 let selectedSquare =
   null;
 
+
 let legalTargets =
   [];
+
 
 let lastMove =
   null;
 
+
 let hoveredSquare =
   null;
 
+
 let gameActive =
   false;
+
 
 let aiBusy =
   false;
@@ -773,23 +1557,30 @@ let aiBusy =
 let currentHoverSquare =
   null;
 
+
 let hoverStartTime =
   0;
+
 
 let lastActivatedSquare =
   null;
 
+
 let smoothX =
   null;
+
 
 let smoothY =
   null;
 
+
 let previousPointerX =
   null;
 
+
 let previousPointerY =
   null;
+
 
 let stableFrames =
   0;
@@ -802,215 +1593,302 @@ let stableFrames =
 let whiteTimeMs =
   300000;
 
+
 let blackTimeMs =
   300000;
+
 
 let incrementMs =
   0;
 
+
 let lastClockTick =
   0;
+
 
 let clockTimer =
   null;
 
 
-/*
-  Used specifically for fair AI-mode
-  air-control refund.
-
-  This marks when the CURRENT local
-  chess turn began.
-*/
 let localTurnStartedAt =
   0;
 
 
 /* =========================================================
-   CAMERA STATE
+   CAMERA
 ========================================================= */
 
 let cameraStream =
   null;
 
+
 let handLandmarker =
   null;
+
 
 let handLoopStarted =
   false;
 
 
 /* =========================================================
-   AUDIO STATE
+   SOUND
 ========================================================= */
 
 let soundEnabled =
   true;
+
 
 let audioContext =
   null;
 
 
 /* =========================================================
-   FIREBASE STATE
+   FIREBASE
 ========================================================= */
 
 let firebaseApp =
   null;
 
+
 let auth =
   null;
+
 
 let db =
   null;
 
+
 let firebaseUser =
   null;
+
+
+let currentProfile =
+  null;
+
 
 let serverTimeOffset =
   0;
 
+
 let currentRoomCode =
   null;
+
 
 let currentRoomRef =
   null;
 
+
 let roomUnsubscribe =
   null;
+
 
 let onlineRoomState =
   null;
 
+
 let onlineColor =
   null;
+
 
 let onlineMovePending =
   false;
 
 
+let ratingApplyInFlight =
+  false;
+
+
 /* =========================================================
-   GENERAL HELPERS
+   HELPERS
 ========================================================= */
 
 function mode() {
 
   return (
-    settings?.mode ||
-    gameModeInput?.value ||
-    "ai"
+
+    settings?.mode
+
+    || gameModeInput
+      ?.value
+
+    || "ai"
+
   );
+
 }
 
 
-function colorKey(color) {
+function colorKey(
+  color
+) {
 
   return (
+
     color === "w"
+
       ? "white"
+
       : "black"
+
   );
+
 }
 
 
-function otherColor(color) {
+function otherColor(
+  color
+) {
 
   return (
+
     color === "w"
+
       ? "b"
+
       : "w"
+
   );
+
 }
 
 
 function serverNow() {
 
   return (
-    Date.now() +
-    serverTimeOffset
+
+    Date.now()
+
+    + serverTimeOffset
+
   );
+
 }
 
 
-function normalizeArray(value) {
+function normalizeArray(
+  value
+) {
 
   if (
-    Array.isArray(value)
+    Array.isArray(
+      value
+    )
   ) {
 
     return value;
+
   }
 
 
   if (
-    !value ||
-    typeof value !== "object"
+    !value
+
+    || typeof value !==
+    "object"
   ) {
 
     return [];
+
   }
 
 
   return Object
     .keys(value)
     .sort(
-      (a, b) =>
-        Number(a) - Number(b)
+      (a, b) => {
+
+        return (
+
+          Number(a)
+
+          - Number(b)
+
+        );
+
+      }
     )
     .map(
-      (key) =>
-        value[key]
+      (key) => {
+
+        return value[key];
+
+      }
     );
+
 }
 
 
 /* =========================================================
-   PIECE SWITCH HELPERS
+   OWN PIECE HELPERS
 ========================================================= */
 
-function isOwnTurnPiece(square) {
+function isOwnTurnPiece(
+  square
+) {
 
-  if (!square) {
+  if (
+    !square
+  ) {
+
     return false;
+
   }
 
 
   const piece =
-    game.get(square);
+
+    game.get(
+      square
+    );
 
 
   return Boolean(
-    piece &&
-    piece.color === game.turn()
+
+    piece
+
+    && piece.color ===
+    game.turn()
+
   );
+
 }
 
 
-function isPieceSwitch(square) {
+function isPieceSwitch(
+  square
+) {
 
   if (
-    !selectedSquare ||
-    square === selectedSquare
+    !selectedSquare
+
+    || square ===
+    selectedSquare
   ) {
 
     return false;
+
   }
 
 
   if (
     getCastlingMove(
+
       selectedSquare,
+
       square
+
     )
   ) {
 
     return false;
+
   }
 
 
   return isOwnTurnPiece(
     square
   );
+
 }
 
 
@@ -1021,23 +1899,421 @@ function isPieceSwitch(square) {
 function isFirebaseConfigured() {
 
   return [
+
     firebaseConfig.apiKey,
+
     firebaseConfig.authDomain,
+
     firebaseConfig.databaseURL,
+
     firebaseConfig.projectId,
+
     firebaseConfig.appId
+
   ].every(
     (value) => {
 
       return (
-        value &&
-        !String(value)
-          .includes("PASTE_")
+
+        value
+
+        && !String(value)
+          .includes(
+            "PASTE_"
+          )
+
       );
+
     }
   );
+
 }
 
+
+/* =========================================================
+   PROFILE NORMALIZER
+========================================================= */
+
+function normalizeProfile(
+  profile,
+  fallbackName = "Player"
+) {
+
+  return {
+
+    name:
+
+      String(
+
+        profile?.name
+
+        || fallbackName
+
+        || "Player"
+
+      ),
+
+
+    rating:
+
+      Number(
+
+        profile?.rating
+
+        ?? STARTING_RATING
+
+      ),
+
+
+    gamesPlayed:
+
+      Number(
+
+        profile?.gamesPlayed
+
+        ?? 0
+
+      ),
+
+
+    wins:
+
+      Number(
+
+        profile?.wins
+
+        ?? 0
+
+      ),
+
+
+    losses:
+
+      Number(
+
+        profile?.losses
+
+        ?? 0
+
+      ),
+
+
+    draws:
+
+      Number(
+
+        profile?.draws
+
+        ?? 0
+
+      ),
+
+
+    ratedRooms:
+
+      profile?.ratedRooms
+
+      && typeof profile.ratedRooms ===
+      "object"
+
+        ? profile.ratedRooms
+
+        : {},
+
+
+    createdAt:
+
+      Number(
+
+        profile?.createdAt
+
+        ?? serverNow()
+
+      ),
+
+
+    updatedAt:
+
+      Number(
+
+        profile?.updatedAt
+
+        ?? serverNow()
+
+      )
+
+  };
+
+}
+
+
+/* =========================================================
+   CREATE / LOAD PROFILE
+========================================================= */
+
+async function ensureMyProfile(
+  name
+) {
+
+  const profileRef =
+
+    ref(
+
+      db,
+
+      `profiles/${firebaseUser.uid}`
+
+    );
+
+
+  const result =
+
+    await runTransaction(
+
+      profileRef,
+
+      (existing) => {
+
+        const base =
+
+          normalizeProfile(
+
+            existing,
+
+            name
+
+          );
+
+
+        /*
+          Completely new user.
+        */
+
+        if (
+          !existing
+        ) {
+
+          return {
+
+            ...base,
+
+
+            name,
+
+
+            rating:
+              STARTING_RATING,
+
+
+            gamesPlayed:
+              0,
+
+
+            wins:
+              0,
+
+
+            losses:
+              0,
+
+
+            draws:
+              0,
+
+
+            ratedRooms:
+              {},
+
+
+            createdAt:
+              serverNow(),
+
+
+            updatedAt:
+              serverNow()
+
+          };
+
+        }
+
+
+        /*
+          Existing player.
+
+          Preserve Elo and statistics.
+          Only update display name and
+          missing old fields.
+        */
+
+        return {
+
+          ...existing,
+
+
+          name:
+
+            name
+
+            || base.name,
+
+
+          rating:
+
+            Number(
+
+              existing.rating
+
+              ?? STARTING_RATING
+
+            ),
+
+
+          gamesPlayed:
+
+            Number(
+
+              existing.gamesPlayed
+
+              ?? 0
+
+            ),
+
+
+          wins:
+
+            Number(
+
+              existing.wins
+
+              ?? 0
+
+            ),
+
+
+          losses:
+
+            Number(
+
+              existing.losses
+
+              ?? 0
+
+            ),
+
+
+          draws:
+
+            Number(
+
+              existing.draws
+
+              ?? 0
+
+            ),
+
+
+          ratedRooms:
+
+            existing.ratedRooms
+
+            && typeof existing.ratedRooms ===
+            "object"
+
+              ? existing.ratedRooms
+
+              : {},
+
+
+          updatedAt:
+            serverNow()
+
+        };
+
+      },
+
+      {
+        applyLocally:
+          false
+      }
+
+    );
+
+
+  currentProfile =
+
+    normalizeProfile(
+
+      result.snapshot.val(),
+
+      name
+
+    );
+
+
+  return currentProfile;
+
+}
+
+
+/* =========================================================
+   REFRESH PROFILE
+========================================================= */
+
+async function refreshMyProfile() {
+
+  if (
+    !db
+
+    || !firebaseUser
+  ) {
+
+    return currentProfile;
+
+  }
+
+
+  const snapshot =
+
+    await get(
+
+      ref(
+
+        db,
+
+        `profiles/${firebaseUser.uid}`
+
+      )
+
+    );
+
+
+  if (
+    snapshot.exists()
+  ) {
+
+    currentProfile =
+
+      normalizeProfile(
+
+        snapshot.val(),
+
+        settings?.whiteName
+
+        || "Player"
+
+      );
+
+  }
+
+
+  return currentProfile;
+
+}
+
+
+/* =========================================================
+   INITIALIZE ONLINE
+========================================================= */
 
 async function initOnlineBackend() {
 
@@ -1048,64 +2324,390 @@ async function initOnlineBackend() {
     throw new Error(
       "Firebase is not configured correctly."
     );
+
   }
 
 
-  if (!firebaseApp) {
+  if (
+    !firebaseApp
+  ) {
 
     firebaseApp =
+
       initializeApp(
         firebaseConfig
       );
 
 
     auth =
+
       getAuth(
         firebaseApp
       );
 
 
     db =
+
       getDatabase(
         firebaseApp
       );
 
 
+    const credential =
+
+      await signInAnonymously(
+        auth
+      );
+
+
     firebaseUser =
-      (
-        await signInAnonymously(
-          auth
-        )
-      ).user;
+      credential.user;
 
 
     onValue(
+
       ref(
+
         db,
+
         ".info/serverTimeOffset"
+
       ),
 
       (snapshot) => {
 
         serverTimeOffset =
-          snapshot.val() || 0;
+
+          snapshot.val()
+
+          || 0;
+
       }
+
     );
 
-  } else if (!firebaseUser) {
+  } else if (
+    !firebaseUser
+  ) {
+
+    const credential =
+
+      await signInAnonymously(
+        auth
+      );
+
 
     firebaseUser =
-      (
-        await signInAnonymously(
-          auth
-        )
-      ).user;
+      credential.user;
+
   }
+
+
+  await ensureMyProfile(
+
+    settings?.whiteName
+
+    || "Player"
+
+  );
+
 }
 
 
 /* =========================================================
-   ROOM CODES
+   APPLY RATING TO MY PROFILE
+
+   Each device modifies ONLY its own
+   profile.
+
+   ratedRooms prevents the same room
+   from counting twice.
+========================================================= */
+
+async function applyMyOnlineRating(
+  room
+) {
+
+  if (
+    ratingApplyInFlight
+
+    || !db
+
+    || !firebaseUser
+
+    || !currentRoomCode
+
+    || !room
+      ?.ratingResult
+      ?.applied
+
+    || !onlineColor
+  ) {
+
+    return;
+
+  }
+
+
+  const myKey =
+    colorKey(
+      onlineColor
+    );
+
+
+  const myResult =
+
+    room.ratingResult
+      ?.[myKey];
+
+
+  if (
+    !myResult
+  ) {
+
+    return;
+
+  }
+
+
+  ratingApplyInFlight =
+    true;
+
+
+  try {
+
+    const profileRef =
+
+      ref(
+
+        db,
+
+        `profiles/${firebaseUser.uid}`
+
+      );
+
+
+    const transaction =
+
+      await runTransaction(
+
+        profileRef,
+
+        (profile) => {
+
+          const current =
+
+            normalizeProfile(
+
+              profile,
+
+              settings?.whiteName
+
+              || "Player"
+
+            );
+
+
+          const ratedRooms = {
+
+            ...(
+              current.ratedRooms
+
+              || {}
+            )
+
+          };
+
+
+          /*
+            Already counted this game.
+          */
+
+          if (
+            ratedRooms[
+              currentRoomCode
+            ]
+          ) {
+
+            return (
+
+              profile
+
+              || current
+
+            );
+
+          }
+
+
+          ratedRooms[
+            currentRoomCode
+          ] =
+            true;
+
+
+          const winner =
+
+            room.ratingResult
+              .winner;
+
+
+          const didWin =
+
+            winner ===
+            onlineColor;
+
+
+          const didLose =
+
+            winner
+
+            && winner !==
+            onlineColor;
+
+
+          const didDraw =
+
+            !winner;
+
+
+          return {
+
+            ...profile,
+
+
+            name:
+
+              settings?.whiteName
+
+              || current.name,
+
+
+            /*
+              Add the calculated delta
+              to current profile rating.
+
+              This is safer than blindly
+              overwriting the profile with
+              myResult.new.
+            */
+
+            rating:
+
+              Number(
+                current.rating
+              )
+
+              + Number(
+                myResult.change
+                || 0
+              ),
+
+
+            gamesPlayed:
+
+              Number(
+                current.gamesPlayed
+              )
+
+              + 1,
+
+
+            wins:
+
+              Number(
+                current.wins
+              )
+
+              + (
+                didWin
+                  ? 1
+                  : 0
+              ),
+
+
+            losses:
+
+              Number(
+                current.losses
+              )
+
+              + (
+                didLose
+                  ? 1
+                  : 0
+              ),
+
+
+            draws:
+
+              Number(
+                current.draws
+              )
+
+              + (
+                didDraw
+                  ? 1
+                  : 0
+              ),
+
+
+            ratedRooms,
+
+
+            createdAt:
+              current.createdAt,
+
+
+            updatedAt:
+              serverNow()
+
+          };
+
+        },
+
+        {
+          applyLocally:
+            false
+        }
+
+      );
+
+
+    currentProfile =
+
+      normalizeProfile(
+
+        transaction.snapshot.val(),
+
+        settings?.whiteName
+
+        || "Player"
+
+      );
+
+  } catch (error) {
+
+    console.error(
+
+      "Could not apply Elo to profile:",
+
+      error
+
+    );
+
+  } finally {
+
+    ratingApplyInFlight =
+      false;
+
+  }
+
+}
+
+
+/* =========================================================
+   ROOM CODE
 ========================================================= */
 
 function generateRoomCode() {
@@ -1125,20 +2727,34 @@ function generateRoomCode() {
   ) {
 
     suffix +=
+
       chars[
+
         Math.floor(
-          Math.random() *
-          chars.length
+
+          Math.random()
+
+          * chars.length
+
         )
+
       ];
+
   }
 
 
-  return `GHOST-${suffix}`;
+  return (
+
+    `GHOST-${suffix}`
+
+  );
+
 }
 
 
-function normalizeRoomCode(code) {
+function normalizeRoomCode(
+  code
+) {
 
   return String(
     code || ""
@@ -1149,6 +2765,7 @@ function normalizeRoomCode(code) {
       /\s+/g,
       ""
     );
+
 }
 
 
@@ -1159,150 +2776,218 @@ function normalizeRoomCode(code) {
 function updateModeUI() {
 
   const selectedMode =
-    gameModeInput?.value;
+    gameModeInput
+      ?.value;
 
 
   difficultyField
     ?.classList
     .toggle(
+
       "hidden",
-      selectedMode !== "ai"
+
+      selectedMode !==
+      "ai"
+
     );
 
 
   player2Field
     ?.classList
     .toggle(
+
       "hidden",
-      selectedMode !== "local"
+
+      selectedMode !==
+      "local"
+
     );
 
 
   onlineFields
     ?.classList
     .toggle(
+
       "hidden",
-      selectedMode !== "online"
+
+      selectedMode !==
+      "online"
+
     );
 
 
-  if (!startGameBtn) {
+  if (
+    !startGameBtn
+  ) {
+
     return;
+
   }
 
 
   if (
-    selectedMode === "ai"
+    selectedMode ===
+    "ai"
   ) {
 
     startGameBtn.textContent =
       "START VS AI";
+
   }
 
 
   if (
-    selectedMode === "local"
+    selectedMode ===
+    "local"
   ) {
 
     startGameBtn.textContent =
       "START LOCAL GAME";
+
   }
 
 
   if (
-    selectedMode === "online"
+    selectedMode ===
+    "online"
   ) {
 
     updateOnlineActionUI();
+
   }
+
 }
 
+
+/* =========================================================
+   ONLINE ACTION UI
+========================================================= */
 
 function updateOnlineActionUI() {
 
   const joining =
-    onlineAction?.value ===
+
+    onlineAction
+      ?.value ===
     "join";
 
 
   roomCodeField
     ?.classList
     .toggle(
+
       "hidden",
+
       !joining
+
     );
 
 
-  if (startGameBtn) {
+  if (
+    startGameBtn
+  ) {
 
     startGameBtn.textContent =
+
       joining
+
         ? "JOIN ONLINE GAME"
+
         : "CREATE ONLINE GAME";
+
   }
 
 
-  if (onlineNote) {
+  if (
+    onlineNote
+  ) {
 
     onlineNote.textContent =
+
       joining
+
         ? "Enter the room code from the other player."
+
         : "Create a room and share the code with another device.";
+
   }
+
 }
 
 
 gameModeInput
   ?.addEventListener(
+
     "change",
+
     updateModeUI
+
   );
 
 
 onlineAction
   ?.addEventListener(
+
     "change",
+
     updateOnlineActionUI
+
   );
 
 
 timeControlInput
   ?.addEventListener(
+
     "change",
+
     () => {
 
       customTime
         ?.classList
         .toggle(
+
           "hidden",
+
           timeControlInput.value !==
           "custom"
+
         );
+
     }
+
   );
 
 
 boardThemeInput
   ?.addEventListener(
+
     "change",
+
     () => {
 
       app.dataset.theme =
         boardThemeInput.value;
 
 
-      if (liveTheme) {
+      if (
+        liveTheme
+      ) {
 
         liveTheme.value =
           boardThemeInput.value;
+
       }
+
     }
+
   );
 
 
 liveTheme
   ?.addEventListener(
+
     "change",
+
     () => {
 
       app.dataset.theme =
@@ -1310,31 +2995,42 @@ liveTheme
 
 
       localStorage.setItem(
+
         "ghostboard-theme",
+
         liveTheme.value
+
       );
+
     }
+
   );
 
 
-/* =========================================================
-   STICKERS
-========================================================= */
-
 document
-  .querySelectorAll(".sticker")
+  .querySelectorAll(
+    ".sticker"
+  )
   .forEach(
     (button) => {
 
-      button.addEventListener(
-        "click",
-        () => {
+      button
+        .addEventListener(
 
-          player1NameInput.value =
-            `${player1NameInput.value.trim()} ${button.textContent.trim()}`.trim();
-        }
-      );
+          "click",
+
+          () => {
+
+            player1NameInput.value =
+
+              `${player1NameInput.value.trim()} ${button.textContent.trim()}`.trim();
+
+          }
+
+        );
+
     }
+
   );
 
 
@@ -1343,44 +3039,58 @@ document
 ========================================================= */
 
 const savedName =
+
   localStorage.getItem(
     "ghostboard-name"
   );
 
+
 const savedTheme =
+
   localStorage.getItem(
     "ghostboard-theme"
   );
 
 
 if (
-  savedName &&
-  player1NameInput
+  savedName
+
+  && player1NameInput
 ) {
 
   player1NameInput.value =
     savedName;
+
 }
 
 
-if (savedTheme) {
+if (
+  savedTheme
+) {
 
-  if (boardThemeInput) {
+  if (
+    boardThemeInput
+  ) {
 
     boardThemeInput.value =
       savedTheme;
+
   }
 
 
-  if (liveTheme) {
+  if (
+    liveTheme
+  ) {
 
     liveTheme.value =
       savedTheme;
+
   }
 
 
   app.dataset.theme =
     savedTheme;
+
 }
 
 
@@ -1388,12 +3098,13 @@ updateModeUI();
 
 
 /* =========================================================
-   SETTINGS
+   COLLECT SETTINGS
 ========================================================= */
 
 function collectSettings() {
 
   let minutes;
+
   let increment;
 
 
@@ -1403,20 +3114,32 @@ function collectSettings() {
   ) {
 
     minutes =
+
       Math.max(
+
         1,
+
         Number(
           customMinutes.value
-        ) || 1
+        )
+
+        || 1
+
       );
 
 
     increment =
+
       Math.max(
+
         0,
+
         Number(
           customIncrement.value
-        ) || 0
+        )
+
+        || 0
+
       );
 
   } else {
@@ -1425,10 +3148,12 @@ function collectSettings() {
       minutes,
       increment
     ] =
+
       timeControlInput
         .value
         .split(",")
         .map(Number);
+
   }
 
 
@@ -1439,32 +3164,41 @@ function collectSettings() {
 
 
     whiteName:
+
       player1NameInput
         .value
         .trim()
+
       || "Player",
 
 
     blackName:
+
       gameModeInput.value ===
       "ai"
 
         ? "Nova AI 🤖"
 
         : (
-          player2NameInput
-            ?.value
-            .trim()
-          || "Player 2"
-        ),
+            player2NameInput
+              ?.value
+              .trim()
+
+            || "Player 2"
+          ),
 
 
     difficulty:
-      difficultyInput?.value
+
+      difficultyInput
+        ?.value
+
       || "medium",
 
 
     minutes,
+
+
     increment,
 
 
@@ -1473,19 +3207,26 @@ function collectSettings() {
 
 
     sound:
-      soundToggle?.checked
+
+      soundToggle
+        ?.checked
+
       ?? true
+
   };
+
 }
 
 
 /* =========================================================
-   START GAME
+   START BUTTON
 ========================================================= */
 
 startGameBtn
   ?.addEventListener(
+
     "click",
+
     async () => {
 
       startGameBtn.disabled =
@@ -1513,32 +3254,43 @@ startGameBtn
           settings.theme;
 
 
-        if (liveTheme) {
+        if (
+          liveTheme
+        ) {
 
           liveTheme.value =
             settings.theme;
+
         }
 
 
         localStorage.setItem(
+
           "ghostboard-name",
+
           settings.whiteName
+
         );
 
 
         localStorage.setItem(
+
           "ghostboard-theme",
+
           settings.theme
+
         );
 
 
         await startCamera();
 
+
         await initHandTracking();
 
 
         if (
-          settings.mode === "online"
+          settings.mode ===
+          "online"
         ) {
 
           await initOnlineBackend();
@@ -1554,10 +3306,13 @@ startGameBtn
           } else {
 
             await joinOnlineRoom(
+
               normalizeRoomCode(
                 roomCodeInput.value
               )
+
             );
+
           }
 
         } else {
@@ -1569,11 +3324,15 @@ startGameBtn
 
           openGameScreen();
 
+
           initializeLocalGame();
+
         }
 
 
-        if (!handLoopStarted) {
+        if (
+          !handLoopStarted
+        ) {
 
           handLoopStarted =
             true;
@@ -1582,41 +3341,58 @@ startGameBtn
           requestAnimationFrame(
             handTrackingLoop
           );
+
         }
 
       } catch (error) {
 
-        console.error(error);
+        console.error(
+          error
+        );
 
 
         setupMessage.textContent =
-          error?.message ||
-          "Could not start Ghost Board.";
+
+          error?.message
+
+          || "Could not start Ghost Board.";
 
       } finally {
 
         startGameBtn.disabled =
           false;
+
       }
+
     }
+
   );
 
+
+/* =========================================================
+   OPEN GAME
+========================================================= */
 
 function openGameScreen() {
 
   setupScreen
     ?.classList
-    .add("hidden");
+    .add(
+      "hidden"
+    );
 
 
   gameScreen
     ?.classList
-    .remove("hidden");
+    .remove(
+      "hidden"
+    );
 
 
   requestAnimationFrame(
     fitBoardToCamera
   );
+
 }
 
 
@@ -1626,8 +3402,12 @@ function openGameScreen() {
 
 async function startCamera() {
 
-  if (cameraStream) {
+  if (
+    cameraStream
+  ) {
+
     return;
+
   }
 
 
@@ -1640,27 +3420,36 @@ async function startCamera() {
     throw new Error(
       "Camera unavailable. Use HTTPS or localhost."
     );
+
   }
 
 
   cameraStream =
+
     await navigator
       .mediaDevices
       .getUserMedia({
 
         video: {
-          facingMode: "user",
+
+          facingMode:
+            "user",
 
           width: {
-            ideal: 1280
+            ideal:
+              1280
           },
 
           height: {
-            ideal: 720
+            ideal:
+              720
           }
+
         },
 
-        audio: false
+        audio:
+          false
+
       });
 
 
@@ -1669,6 +3458,7 @@ async function startCamera() {
 
 
   await webcam.play();
+
 }
 
 
@@ -1683,51 +3473,73 @@ async function createLandmarker(
 
   return HandLandmarker
     .createFromOptions(
+
       vision,
+
       {
 
         baseOptions: {
 
           modelAssetPath:
+
             "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
 
           delegate
+
         },
 
-        runningMode: "VIDEO",
 
-        numHands: 1,
+        runningMode:
+          "VIDEO",
+
+
+        numHands:
+          1,
+
 
         minHandDetectionConfidence:
           0.55,
 
+
         minHandPresenceConfidence:
           0.55,
 
+
         minTrackingConfidence:
           0.50
+
       }
+
     );
+
 }
 
 
 async function initHandTracking() {
 
-  if (handLandmarker) {
+  if (
+    handLandmarker
+  ) {
+
     return;
+
   }
 
 
   const vision =
+
     await FilesetResolver
       .forVisionTasks(
+
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.0.1/wasm"
+
       );
 
 
   try {
 
     handLandmarker =
+
       await createLandmarker(
         vision,
         "GPU"
@@ -1736,17 +3548,23 @@ async function initHandTracking() {
   } catch (error) {
 
     console.warn(
+
       "GPU unavailable. Using CPU.",
+
       error
+
     );
 
 
     handLandmarker =
+
       await createLandmarker(
         vision,
         "CPU"
       );
+
   }
+
 }
 
 
@@ -1763,20 +3581,26 @@ function initializeLocalGame() {
   selectedSquare =
     null;
 
+
   legalTargets =
     [];
+
 
   lastMove =
     null;
 
+
   hoveredSquare =
     null;
+
 
   gameActive =
     true;
 
+
   aiBusy =
     false;
+
 
   onlineColor =
     null;
@@ -1788,24 +3612,33 @@ function initializeLocalGame() {
 
   hideResultOverlay();
 
+
   resetHover();
 
 
   whiteTimeMs =
-    settings.minutes *
-    60 *
-    1000;
+
+    settings.minutes
+
+    * 60
+
+    * 1000;
 
 
   blackTimeMs =
-    settings.minutes *
-    60 *
-    1000;
+
+    settings.minutes
+
+    * 60
+
+    * 1000;
 
 
   incrementMs =
-    settings.increment *
-    1000;
+
+    settings.increment
+
+    * 1000;
 
 
   const now =
@@ -1825,66 +3658,95 @@ function initializeLocalGame() {
 
 
   blackNameEl.textContent =
-    settings.mode === "ai"
+
+    settings.mode ===
+    "ai"
+
       ? "Nova AI 🤖"
+
       : settings.blackName;
 
 
   onlineRoomBar
     ?.classList
-    .add("hidden");
+    .add(
+      "hidden"
+    );
 
 
   waitingOverlay
     ?.classList
-    .add("hidden");
+    .add(
+      "hidden"
+    );
 
 
   restartBtn
     ?.classList
-    .remove("hidden");
+    .remove(
+      "hidden"
+    );
 
 
   whitePlayer
     ?.classList
-    .remove("my-player");
+    .remove(
+      "my-player"
+    );
 
 
   blackPlayer
     ?.classList
-    .remove("my-player");
+    .remove(
+      "my-player"
+    );
 
 
   renderBoard();
 
+
   renderHistory();
+
 
   updateStatus();
 
+
   startClock();
+
 }
 
 
 /* =========================================================
-   ONLINE ROOM CREATE
+   CREATE ONLINE ROOM
 ========================================================= */
 
 async function createOnlineRoom() {
 
+  await refreshMyProfile();
+
+
   const initialMs =
-    settings.minutes *
-    60 *
-    1000;
+
+    settings.minutes
+
+    * 60
+
+    * 1000;
 
 
   const incMs =
-    settings.increment *
-    1000;
+
+    settings.increment
+
+    * 1000;
 
 
-  let code = null;
+  let code =
+    null;
 
-  let roomReference = null;
+
+  let roomReference =
+    null;
 
 
   for (
@@ -1898,19 +3760,26 @@ async function createOnlineRoom() {
 
 
     const candidateRef =
+
       ref(
+
         db,
+
         `rooms/${candidate}`
+
       );
 
 
     const snapshot =
+
       await get(
         candidateRef
       );
 
 
-    if (!snapshot.exists()) {
+    if (
+      !snapshot.exists()
+    ) {
 
       code =
         candidate;
@@ -1921,15 +3790,20 @@ async function createOnlineRoom() {
 
 
       break;
+
     }
+
   }
 
 
-  if (!code) {
+  if (
+    !code
+  ) {
 
     throw new Error(
       "Could not generate a room. Try again."
     );
+
   }
 
 
@@ -1950,46 +3824,82 @@ async function createOnlineRoom() {
 
 
   await set(
+
     currentRoomRef,
+
     {
 
-      version: 8,
+      version:
+        9,
 
-      status: "waiting",
+
+      rated:
+        true,
+
+
+      ratingSystem:
+        "ghost-elo-v1",
+
+
+      status:
+        "waiting",
+
 
       createdAt:
         serverNow(),
 
+
       hostUid:
         firebaseUser.uid,
+
 
       fen:
         initialGame.fen(),
 
-      turn: "w",
 
-      ply: 0,
+      turn:
+        "w",
+
+
+      ply:
+        0,
+
 
       initialTimeMs:
         initialMs,
 
+
       incrementMs:
         incMs,
+
 
       whiteTimeMs:
         initialMs,
 
+
       blackTimeMs:
         initialMs,
+
 
       turnStartedAt:
         null,
 
-      history: [],
 
-      moves: [],
+      history:
+        [],
 
-      lastMove: null,
+
+      moves:
+        [],
+
+
+      lastMove:
+        null,
+
+
+      ratingResult:
+        null,
+
 
       players: {
 
@@ -1998,36 +3908,84 @@ async function createOnlineRoom() {
           uid:
             firebaseUser.uid,
 
+
           name:
             settings.whiteName,
 
+
           connected:
-            true
+            true,
+
+
+          /*
+            Frozen rating at start
+            of this game.
+          */
+
+          rating:
+
+            Number(
+
+              currentProfile
+                ?.rating
+
+              ?? STARTING_RATING
+
+            ),
+
+
+          gamesPlayed:
+
+            Number(
+
+              currentProfile
+                ?.gamesPlayed
+
+              ?? 0
+
+            )
+
         }
+
       }
+
     }
+
   );
 
 
   await onDisconnect(
+
     ref(
+
       db,
+
       `rooms/${code}/players/white/connected`
+
     )
-  ).set(false);
+
+  ).set(
+    false
+  );
 
 
   openGameScreen();
 
-  subscribeToRoom(code);
+
+  subscribeToRoom(
+    code
+  );
+
 }
 
 
 /* =========================================================
-   ONLINE ROOM JOIN
+   JOIN ONLINE ROOM
 ========================================================= */
 
-async function joinOnlineRoom(code) {
+async function joinOnlineRoom(
+  code
+) {
 
   if (
     !/^GHOST-[A-Z0-9]{4}$/.test(
@@ -2038,27 +3996,39 @@ async function joinOnlineRoom(code) {
     throw new Error(
       "Enter a code like GHOST-7K29."
     );
+
   }
 
 
+  await refreshMyProfile();
+
+
   const roomReference =
+
     ref(
+
       db,
+
       `rooms/${code}`
+
     );
 
 
   const snapshot =
+
     await get(
       roomReference
     );
 
 
-  if (!snapshot.exists()) {
+  if (
+    !snapshot.exists()
+  ) {
 
     throw new Error(
       "Room not found."
     );
+
   }
 
 
@@ -2074,6 +4044,7 @@ async function joinOnlineRoom(code) {
     throw new Error(
       "That room is no longer waiting."
     );
+
   }
 
 
@@ -2086,27 +4057,50 @@ async function joinOnlineRoom(code) {
     throw new Error(
       "That room already has two players."
     );
+
+  }
+
+
+  if (
+    room.players
+      ?.white
+      ?.uid ===
+    firebaseUser.uid
+  ) {
+
+    throw new Error(
+      "You are already the host of this room on this device/account."
+    );
+
   }
 
 
   const blackPlayerRef =
+
     ref(
+
       db,
+
       `rooms/${code}/players/black`
+
     );
 
 
   const claimResult =
+
     await runTransaction(
+
       blackPlayerRef,
 
       (currentBlack) => {
 
         if (
-          currentBlack?.uid
+          currentBlack
+            ?.uid
         ) {
 
           return;
+
         }
 
 
@@ -2115,18 +4109,47 @@ async function joinOnlineRoom(code) {
           uid:
             firebaseUser.uid,
 
+
           name:
             settings.whiteName,
 
+
           connected:
-            true
+            true,
+
+
+          rating:
+
+            Number(
+
+              currentProfile
+                ?.rating
+
+              ?? STARTING_RATING
+
+            ),
+
+
+          gamesPlayed:
+
+            Number(
+
+              currentProfile
+                ?.gamesPlayed
+
+              ?? 0
+
+            )
+
         };
+
       },
 
       {
         applyLocally:
           false
       }
+
     );
 
 
@@ -2137,13 +4160,16 @@ async function joinOnlineRoom(code) {
     throw new Error(
       "That room already has a Black player."
     );
+
   }
 
 
   try {
 
     await update(
+
       roomReference,
+
       {
 
         status:
@@ -2154,7 +4180,9 @@ async function joinOnlineRoom(code) {
 
         turnStartedAt:
           serverNow()
+
       }
+
     );
 
   } catch (error) {
@@ -2162,18 +4190,24 @@ async function joinOnlineRoom(code) {
     try {
 
       await set(
+
         blackPlayerRef,
+
         null
+
       );
 
     } catch {
+
       // Ignore cleanup failure.
+
     }
 
 
     throw new Error(
       "Joined the room, but Firebase blocked the game start."
     );
+
   }
 
 
@@ -2190,16 +4224,27 @@ async function joinOnlineRoom(code) {
 
 
   await onDisconnect(
+
     ref(
+
       db,
+
       `rooms/${code}/players/black/connected`
+
     )
-  ).set(false);
+
+  ).set(
+    false
+  );
 
 
   openGameScreen();
 
-  subscribeToRoom(code);
+
+  subscribeToRoom(
+    code
+  );
+
 }
 
 
@@ -2207,28 +4252,41 @@ async function joinOnlineRoom(code) {
    ROOM LISTENER
 ========================================================= */
 
-function subscribeToRoom(code) {
+function subscribeToRoom(
+  code
+) {
 
-  if (roomUnsubscribe) {
+  if (
+    roomUnsubscribe
+  ) {
 
     roomUnsubscribe();
+
   }
 
 
   currentRoomRef =
+
     ref(
+
       db,
+
       `rooms/${code}`
+
     );
 
 
   roomUnsubscribe =
+
     onValue(
+
       currentRoomRef,
 
       (snapshot) => {
 
-        if (!snapshot.exists()) {
+        if (
+          !snapshot.exists()
+        ) {
 
           gameActive =
             false;
@@ -2239,6 +4297,7 @@ function subscribeToRoom(code) {
 
 
           return;
+
         }
 
 
@@ -2247,22 +4306,28 @@ function subscribeToRoom(code) {
 
 
         syncOnlineRoom();
+
       },
 
       (error) => {
 
-        console.error(error);
+        console.error(
+          error
+        );
 
 
         gameStatus.textContent =
           "Firebase connection error.";
+
       }
+
     );
+
 }
 
 
 /* =========================================================
-   ONLINE SYNC
+   SYNC ONLINE ROOM
 ========================================================= */
 
 function syncOnlineRoom() {
@@ -2271,13 +4336,18 @@ function syncOnlineRoom() {
     onlineRoomState;
 
 
-  if (!room) {
+  if (
+    !room
+  ) {
+
     return;
+
   }
 
 
   const uid =
-    firebaseUser?.uid;
+    firebaseUser
+      ?.uid;
 
 
   if (
@@ -2297,10 +4367,12 @@ function syncOnlineRoom() {
 
     onlineColor =
       "b";
+
   }
 
 
   const moves =
+
     normalizeArray(
       room.moves
     );
@@ -2313,12 +4385,14 @@ function syncOnlineRoom() {
   try {
 
     for (
-      const move of moves
+      const move
+      of moves
     ) {
 
       rebuilt.move(
         move
       );
+
     }
 
 
@@ -2328,14 +4402,18 @@ function syncOnlineRoom() {
   } catch (error) {
 
     console.error(
+
       "Game reconstruction failed:",
+
       error
+
     );
 
 
     try {
 
       game =
+
         new Chess(
           room.fen
         );
@@ -2344,7 +4422,9 @@ function syncOnlineRoom() {
 
       game =
         new Chess();
+
     }
+
   }
 
 
@@ -2364,74 +4444,153 @@ function syncOnlineRoom() {
 
 
   lastMove =
-    room.lastMove || null;
+
+    room.lastMove
+
+    || null;
 
 
   incrementMs =
-    room.incrementMs || 0;
+
+    room.incrementMs
+
+    || 0;
+
+
+  /*
+    During game:
+    show starting rating.
+
+    After game:
+    show new rating.
+  */
+
+  const whiteDisplayRating =
+
+    room.ratingResult
+      ?.white
+      ?.new
+
+    ?? room.players
+      ?.white
+      ?.rating
+
+    ?? STARTING_RATING;
+
+
+  const blackDisplayRating =
+
+    room.ratingResult
+      ?.black
+      ?.new
+
+    ?? room.players
+      ?.black
+      ?.rating
+
+    ?? STARTING_RATING;
 
 
   whiteNameEl.textContent =
-    room.players
-      ?.white
-      ?.name
-    || "White";
+
+    playerLabel(
+
+      room.players
+        ?.white
+        ?.name
+
+      || "White",
+
+      whiteDisplayRating
+
+    );
 
 
   blackNameEl.textContent =
-    room.players
-      ?.black
-      ?.name
-    || "Waiting…";
+
+    playerLabel(
+
+      room.players
+        ?.black
+        ?.name
+
+      || "Waiting…",
+
+      blackDisplayRating
+
+    );
 
 
   whitePlayer
     ?.classList
     .toggle(
+
       "my-player",
-      onlineColor === "w"
+
+      onlineColor ===
+      "w"
+
     );
 
 
   blackPlayer
     ?.classList
     .toggle(
+
       "my-player",
-      onlineColor === "b"
+
+      onlineColor ===
+      "b"
+
     );
 
 
   onlineRoomBar
     ?.classList
-    .remove("hidden");
+    .remove(
+      "hidden"
+    );
 
 
-  if (roomCodeLabel) {
+  if (
+    roomCodeLabel
+  ) {
 
     roomCodeLabel.textContent =
       currentRoomCode;
+
   }
 
 
-  if (waitingCode) {
+  if (
+    waitingCode
+  ) {
 
     waitingCode.textContent =
       currentRoomCode;
+
   }
 
 
   restartBtn
     ?.classList
-    .add("hidden");
+    .add(
+      "hidden"
+    );
 
 
   const opponentKey =
-    onlineColor === "w"
+
+    onlineColor ===
+    "w"
+
       ? "black"
+
       : "white";
 
 
   const opponent =
+
     room.players
       ?.[opponentKey];
 
@@ -2450,35 +4609,57 @@ function syncOnlineRoom() {
 
     waitingOverlay
       ?.classList
-      .remove("hidden");
+      .remove(
+        "hidden"
+      );
 
 
-    if (waitingText) {
+    if (
+      waitingText
+    ) {
 
       waitingText.textContent =
-        "Share this code with another player.";
+
+        `Share this code with another player. Your Elo: ${Math.round(
+          Number(
+            room.players
+              ?.white
+              ?.rating
+
+            ?? STARTING_RATING
+          )
+        )}`;
+
     }
 
 
-    if (connectionLabel) {
+    if (
+      connectionLabel
+    ) {
 
       connectionLabel.textContent =
         "Waiting for opponent";
+
     }
 
   } else {
 
     waitingOverlay
       ?.classList
-      .add("hidden");
+      .add(
+        "hidden"
+      );
 
 
     gameActive =
+
       room.status ===
       "playing";
 
 
-    if (connectionLabel) {
+    if (
+      connectionLabel
+    ) {
 
       if (
         opponent
@@ -2501,8 +4682,11 @@ function syncOnlineRoom() {
 
         connectionLabel.className =
           "connection-label online";
+
       }
+
     }
+
   }
 
 
@@ -2510,9 +4694,11 @@ function syncOnlineRoom() {
 
 
   renderHistory(
+
     normalizeArray(
       room.history
     )
+
   );
 
 
@@ -2522,6 +4708,13 @@ function syncOnlineRoom() {
   startClock();
 
 
+  /*
+    Game ended.
+
+    Show result and update this
+    player's Firebase profile.
+  */
+
   if (
     room.status ===
     "ended"
@@ -2530,7 +4723,21 @@ function syncOnlineRoom() {
     showOnlineResult(
       room
     );
+
+
+    if (
+      room.ratingResult
+        ?.applied
+    ) {
+
+      applyMyOnlineRating(
+        room
+      );
+
+    }
+
   }
+
 }
 
 
@@ -2544,13 +4751,17 @@ async function submitOnlineMove(
 ) {
 
   if (
-    !currentRoomRef ||
-    onlineMovePending ||
-    !onlineRoomState ||
-    !onlineColor
+    !currentRoomRef
+
+    || onlineMovePending
+
+    || !onlineRoomState
+
+    || !onlineColor
   ) {
 
     return;
+
   }
 
 
@@ -2561,22 +4772,30 @@ async function submitOnlineMove(
   try {
 
     const result =
+
       await runTransaction(
+
         currentRoomRef,
 
         (room) => {
 
           if (
-            !room ||
-            room.status !== "playing" ||
-            room.turn !== onlineColor
+            !room
+
+            || room.status !==
+            "playing"
+
+            || room.turn !==
+            onlineColor
           ) {
 
             return;
+
           }
 
 
           const player =
+
             room.players
               ?.[
                 colorKey(
@@ -2586,16 +4805,19 @@ async function submitOnlineMove(
 
 
           if (
-            !player ||
-            player.uid !==
+            !player
+
+            || player.uid !==
             firebaseUser.uid
           ) {
 
             return;
+
           }
 
 
           const moves =
+
             normalizeArray(
               room.moves
             );
@@ -2608,73 +4830,114 @@ async function submitOnlineMove(
           try {
 
             for (
-              const move of moves
+              const move
+              of moves
             ) {
 
               board.move(
                 move
               );
+
             }
 
           } catch {
 
             return;
+
           }
 
 
           let whiteTime =
+
             Number(
+
               room.whiteTimeMs
+
               ?? room.initialTimeMs
+
               ?? 300000
+
             );
 
 
           let blackTime =
+
             Number(
+
               room.blackTimeMs
+
               ?? room.initialTimeMs
+
               ?? 300000
+
             );
 
 
           const elapsed =
+
             Math.max(
+
               0,
 
-              serverNow() -
-              Number(
-                room.turnStartedAt ||
-                serverNow()
+              serverNow()
+
+              - Number(
+
+                room.turnStartedAt
+
+                || serverNow()
+
               )
+
             );
 
 
           if (
-            onlineColor === "w"
+            onlineColor ===
+            "w"
           ) {
 
             whiteTime =
+
               Math.max(
+
                 0,
-                whiteTime - elapsed
+
+                whiteTime
+                - elapsed
+
               );
 
           } else {
 
             blackTime =
+
               Math.max(
+
                 0,
-                blackTime - elapsed
+
+                blackTime
+                - elapsed
+
               );
+
           }
 
 
           const remaining =
-            onlineColor === "w"
+
+            onlineColor ===
+            "w"
+
               ? whiteTime
+
               : blackTime;
 
+
+          /*
+            Player ran out of time
+            before move completed.
+          */
 
           if (
             remaining <= 0
@@ -2697,6 +4960,7 @@ async function submitOnlineMove(
 
 
             room.winner =
+
               otherColor(
                 onlineColor
               );
@@ -2706,7 +4970,21 @@ async function submitOnlineMove(
               null;
 
 
+            room.ratingResult =
+
+              buildRatingResult(
+
+                room,
+
+                room.winner,
+
+                "time"
+
+              );
+
+
             return room;
+
           }
 
 
@@ -2716,48 +4994,74 @@ async function submitOnlineMove(
           try {
 
             resultMove =
+
               board.move({
 
                 from,
+
                 to,
 
                 promotion:
                   "q"
+
               });
 
           } catch {
 
             return;
-          }
 
-
-          if (!resultMove) {
-            return;
           }
 
 
           if (
-            onlineColor === "w"
+            !resultMove
+          ) {
+
+            return;
+
+          }
+
+
+          /*
+            Normal increment.
+          */
+
+          if (
+            onlineColor ===
+            "w"
           ) {
 
             whiteTime +=
+
               Number(
-                room.incrementMs || 0
+
+                room.incrementMs
+
+                || 0
+
               );
 
           } else {
 
             blackTime +=
+
               Number(
-                room.incrementMs || 0
+
+                room.incrementMs
+
+                || 0
+
               );
+
           }
 
 
           room.moves = [
+
             ...moves,
 
             {
+
               from:
                 resultMove.from,
 
@@ -2767,16 +5071,20 @@ async function submitOnlineMove(
               promotion:
                 resultMove.promotion
                 || "q"
+
             }
+
           ];
 
 
           room.history = [
+
             ...normalizeArray(
               room.history
             ),
 
             resultMove.san
+
           ];
 
 
@@ -2789,9 +5097,16 @@ async function submitOnlineMove(
 
 
           room.ply =
+
             Number(
-              room.ply || 0
-            ) + 1;
+
+              room.ply
+
+              || 0
+
+            )
+
+            + 1;
 
 
           room.whiteTimeMs =
@@ -2811,30 +5126,46 @@ async function submitOnlineMove(
             from:
               resultMove.from,
 
+
             to:
               resultMove.to,
 
+
             piece:
               resultMove.piece,
+
 
             captured:
               resultMove.captured
               || null,
 
+
             san:
               resultMove.san,
+
 
             flags:
               resultMove.flags
               || ""
+
           };
 
+
+          /*
+            Checkmate / draw.
+
+            Rating result is created
+            INSIDE the same transaction,
+            so both phones cannot generate
+            separate results.
+          */
 
           if (
             board.isGameOver()
           ) {
 
             const end =
+
               describeGameEnd(
                 board
               );
@@ -2854,16 +5185,32 @@ async function submitOnlineMove(
 
             room.turnStartedAt =
               null;
+
+
+            room.ratingResult =
+
+              buildRatingResult(
+
+                room,
+
+                end.winner,
+
+                end.reason
+
+              );
+
           }
 
 
           return room;
+
         },
 
         {
           applyLocally:
             false
         }
+
       );
 
 
@@ -2874,13 +5221,17 @@ async function submitOnlineMove(
       playUiTone(
         "error"
       );
+
     }
 
   } catch (error) {
 
     console.error(
+
       "Online move failed:",
+
       error
+
     );
 
 
@@ -2891,7 +5242,9 @@ async function submitOnlineMove(
 
     onlineMovePending =
       false;
+
   }
+
 }
 
 
@@ -2902,30 +5255,38 @@ async function submitOnlineMove(
 async function claimOnlineTimeout() {
 
   if (
-    !currentRoomRef ||
-    !onlineRoomState ||
-    onlineRoomState.status !==
+    !currentRoomRef
+
+    || !onlineRoomState
+
+    || onlineRoomState.status !==
     "playing"
   ) {
 
     return;
+
   }
 
 
   try {
 
     await runTransaction(
+
       currentRoomRef,
 
       (room) => {
 
         if (
-          !room ||
-          room.status !== "playing" ||
-          !room.turnStartedAt
+          !room
+
+          || room.status !==
+          "playing"
+
+          || !room.turnStartedAt
         ) {
 
           return;
+
         }
 
 
@@ -2934,19 +5295,28 @@ async function claimOnlineTimeout() {
 
 
         const remaining =
+
           Number(
-            active === "w"
+
+            active ===
+            "w"
+
               ? room.whiteTimeMs
+
               : room.blackTimeMs
+
           )
 
           - Math.max(
+
               0,
 
-              serverNow() -
-              Number(
-                room.turnStartedAt
-              )
+              serverNow()
+
+              - Number(
+                  room.turnStartedAt
+                )
+
             );
 
 
@@ -2955,11 +5325,13 @@ async function claimOnlineTimeout() {
         ) {
 
           return;
+
         }
 
 
         if (
-          active === "w"
+          active ===
+          "w"
         ) {
 
           room.whiteTimeMs =
@@ -2969,6 +5341,7 @@ async function claimOnlineTimeout() {
 
           room.blackTimeMs =
             0;
+
         }
 
 
@@ -2981,6 +5354,7 @@ async function claimOnlineTimeout() {
 
 
         room.winner =
+
           otherColor(
             active
           );
@@ -2990,30 +5364,52 @@ async function claimOnlineTimeout() {
           null;
 
 
+        room.ratingResult =
+
+          buildRatingResult(
+
+            room,
+
+            room.winner,
+
+            "time"
+
+          );
+
+
         return room;
+
       },
 
       {
         applyLocally:
           false
       }
+
     );
 
   } catch (error) {
 
     console.error(
+
       "Timeout error:",
+
       error
+
     );
+
   }
+
 }
 
 
 /* =========================================================
-   GAME END DESCRIPTION
+   GAME END
 ========================================================= */
 
-function describeGameEnd(board) {
+function describeGameEnd(
+  board
+) {
 
   if (
     board.isCheckmate()
@@ -3025,10 +5421,13 @@ function describeGameEnd(board) {
         "checkmate",
 
       winner:
+
         otherColor(
           board.turn()
         )
+
     };
+
   }
 
 
@@ -3043,7 +5442,9 @@ function describeGameEnd(board) {
 
       winner:
         null
+
     };
+
   }
 
 
@@ -3058,7 +5459,9 @@ function describeGameEnd(board) {
 
       winner:
         null
+
     };
+
   }
 
 
@@ -3073,7 +5476,9 @@ function describeGameEnd(board) {
 
       winner:
         null
+
     };
+
   }
 
 
@@ -3084,7 +5489,9 @@ function describeGameEnd(board) {
 
     winner:
       null
+
   };
+
 }
 
 
@@ -3095,37 +5502,50 @@ function describeGameEnd(board) {
 function canControlTurn() {
 
   if (
-    !gameActive ||
-    aiBusy ||
-    onlineMovePending
+    !gameActive
+
+    || aiBusy
+
+    || onlineMovePending
   ) {
 
     return false;
+
   }
 
 
   if (
-    mode() === "ai"
+    mode() ===
+    "ai"
   ) {
 
     return (
-      game.turn() === "w"
+
+      game.turn() ===
+      "w"
+
     );
+
   }
 
 
   if (
-    mode() === "online"
+    mode() ===
+    "online"
   ) {
 
     return (
+
       onlineColor ===
       game.turn()
+
     );
+
   }
 
 
   return true;
+
 }
 
 
@@ -3136,44 +5556,70 @@ function canControlTurn() {
 function boardPerspective() {
 
   return (
-    mode() === "online" &&
-    onlineColor === "b"
+
+    mode() ===
+    "online"
+
+    && onlineColor ===
+    "b"
 
       ? "b"
 
       : "w"
+
   );
+
 }
 
 
 function fileOrder() {
 
   return (
-    boardPerspective() === "w"
+
+    boardPerspective() ===
+    "w"
 
       ? FILES
 
       : [...FILES]
         .reverse()
+
   );
+
 }
 
 
 function rankOrder() {
 
   return (
-    boardPerspective() === "w"
+
+    boardPerspective() ===
+    "w"
 
       ? [
-        8, 7, 6, 5,
-        4, 3, 2, 1
-      ]
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
 
       : [
-        1, 2, 3, 4,
-        5, 6, 7, 8
-      ]
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ]
+
   );
+
 }
 
 
@@ -3208,10 +5654,12 @@ function renderBoard() {
     ) {
 
       const squareName =
+
         `${files[col]}${ranks[row]}`;
 
 
       const square =
+
         document.createElement(
           "div"
         );
@@ -3226,9 +5674,14 @@ function renderBoard() {
 
 
       square.classList.add(
-        (row + col) % 2 === 0
+
+        (row + col) % 2 ===
+        0
+
           ? "light"
+
           : "dark"
+
       );
 
 
@@ -3240,6 +5693,7 @@ function renderBoard() {
         square.classList.add(
           "ghost-hover"
         );
+
       }
 
 
@@ -3251,6 +5705,7 @@ function renderBoard() {
         square.classList.add(
           "selected"
         );
+
       }
 
 
@@ -3263,15 +5718,19 @@ function renderBoard() {
         square.classList.add(
           "legal"
         );
+
       }
 
 
       if (
-        lastMove &&
-        (
+        lastMove
+
+        && (
           lastMove.from ===
           squareName
+
           ||
+
           lastMove.to ===
           squareName
         )
@@ -3280,16 +5739,20 @@ function renderBoard() {
         square.classList.add(
           "last-move"
         );
+
       }
 
 
       const piece =
+
         game.get(
           squareName
         );
 
 
-      if (piece) {
+      if (
+        piece
+      ) {
 
         square.classList.add(
           "has-piece"
@@ -3297,20 +5760,25 @@ function renderBoard() {
 
 
         const pieceElement =
+
           document.createElement(
             "span"
           );
 
 
         pieceElement.className =
+
           `piece ${
             piece.color === "w"
+
               ? "white-piece"
+
               : "black-piece"
           }`;
 
 
         pieceElement.textContent =
+
           PIECES[
             `${piece.color}${piece.type}`
           ];
@@ -3319,13 +5787,16 @@ function renderBoard() {
         square.appendChild(
           pieceElement
         );
+
       }
 
 
       boardEl.appendChild(
         square
       );
+
     }
+
   }
 
 
@@ -3335,6 +5806,7 @@ function renderBoard() {
   requestAnimationFrame(
     fitBoardToCamera
   );
+
 }
 
 
@@ -3345,11 +5817,13 @@ function renderBoard() {
 function renderCapturedPieces() {
 
   if (
-    !capturedByWhiteEl ||
-    !capturedByBlackEl
+    !capturedByWhiteEl
+
+    || !capturedByBlackEl
   ) {
 
     return;
+
   }
 
 
@@ -3361,24 +5835,32 @@ function renderCapturedPieces() {
     [];
 
 
-  let history = [];
+  let history =
+    [];
 
 
   try {
 
     history =
+
       game.history({
-        verbose: true
+
+        verbose:
+          true
+
       });
 
   } catch {
 
-    history = [];
+    history =
+      [];
+
   }
 
 
   for (
-    const move of history
+    const move
+    of history
   ) {
 
     if (
@@ -3386,11 +5868,13 @@ function renderCapturedPieces() {
     ) {
 
       continue;
+
     }
 
 
     if (
-      move.color === "w"
+      move.color ===
+      "w"
     ) {
 
       capturedByWhite.push(
@@ -3402,74 +5886,115 @@ function renderCapturedPieces() {
       capturedByBlack.push(
         move.captured
       );
+
     }
+
   }
 
 
   const order = {
 
-    q: 1,
-    r: 2,
-    b: 3,
-    n: 4,
-    p: 5
+    q:
+      1,
+
+    r:
+      2,
+
+    b:
+      3,
+
+    n:
+      4,
+
+    p:
+      5
+
   };
 
 
   capturedByWhite.sort(
-    (a, b) =>
-      order[a] - order[b]
+
+    (a, b) => {
+
+      return (
+
+        order[a]
+
+        - order[b]
+
+      );
+
+    }
+
   );
 
 
   capturedByBlack.sort(
-    (a, b) =>
-      order[a] - order[b]
+
+    (a, b) => {
+
+      return (
+
+        order[a]
+
+        - order[b]
+
+      );
+
+    }
+
   );
 
 
-  if (
-    capturedByWhite.length === 0
-  ) {
+  capturedByWhiteEl.innerHTML =
 
-    capturedByWhiteEl.textContent =
-      "—";
+    capturedByWhite.length
 
-  } else {
+      ? capturedByWhite
+          .map(
+            (piece) => {
 
-    capturedByWhiteEl.innerHTML =
-      capturedByWhite
-        .map(
-          (piece) => `
-            <span class="captured-piece-black">
-              ${PIECES[`b${piece}`]}
-            </span>
-          `
-        )
-        .join("");
-  }
+              return `
+
+                <span
+                  class="captured-piece-black"
+                >
+                  ${PIECES[`b${piece}`]}
+                </span>
+
+              `;
+
+            }
+          )
+          .join("")
+
+      : "—";
 
 
-  if (
-    capturedByBlack.length === 0
-  ) {
+  capturedByBlackEl.innerHTML =
 
-    capturedByBlackEl.textContent =
-      "—";
+    capturedByBlack.length
 
-  } else {
+      ? capturedByBlack
+          .map(
+            (piece) => {
 
-    capturedByBlackEl.innerHTML =
-      capturedByBlack
-        .map(
-          (piece) => `
-            <span class="captured-piece-white">
-              ${PIECES[`w${piece}`]}
-            </span>
-          `
-        )
-        .join("");
-  }
+              return `
+
+                <span
+                  class="captured-piece-white"
+                >
+                  ${PIECES[`w${piece}`]}
+                </span>
+
+              `;
+
+            }
+          )
+          .join("")
+
+      : "—";
+
 }
 
 
@@ -3479,10 +6004,13 @@ function renderCapturedPieces() {
 
 boardEl
   ?.addEventListener(
+
     "click",
+
     (event) => {
 
       const square =
+
         event.target
           .closest(
             ".square"
@@ -3490,20 +6018,24 @@ boardEl
 
 
       if (
-        square &&
-        canControlTurn()
+        square
+
+        && canControlTurn()
       ) {
 
         handleSquareInput(
           square.dataset.square
         );
+
       }
+
     }
+
   );
 
 
 /* =========================================================
-   HAND LOOP
+   HAND TRACKING
 ========================================================= */
 
 function handTrackingLoop() {
@@ -3511,15 +6043,13 @@ function handTrackingLoop() {
   if (
     gameScreen
       ?.classList
-      .contains("hidden")
+      .contains(
+        "hidden"
+      )
 
-    ||
+    || !handLandmarker
 
-    !handLandmarker
-
-    ||
-
-    webcam.readyState < 2
+    || webcam.readyState < 2
   ) {
 
     requestAnimationFrame(
@@ -3528,6 +6058,7 @@ function handTrackingLoop() {
 
 
     return;
+
   }
 
 
@@ -3538,27 +6069,37 @@ function handTrackingLoop() {
   try {
 
     processHand(
+
       handLandmarker
         .detectForVideo(
+
           webcam,
+
           now
+
         ),
 
       now
+
     );
 
   } catch (error) {
 
     console.error(
+
       "Hand tracking:",
+
       error
+
     );
+
   }
 
 
   requestAnimationFrame(
     handTrackingLoop
   );
+
 }
 
 
@@ -3581,7 +6122,9 @@ function processHand(
 
     handCursor
       ?.classList
-      .add("hidden");
+      .add(
+        "hidden"
+      );
 
 
     resetHover();
@@ -3609,30 +6152,38 @@ function processHand(
 
 
     return;
+
   }
 
 
   const indexTip =
+
     result.landmarks[0][8];
 
 
   const stageRect =
+
     cameraStage
       .getBoundingClientRect();
 
 
   const rawX =
-    (1 - indexTip.x) *
-    stageRect.width;
+
+    (1 - indexTip.x)
+
+    * stageRect.width;
 
 
   const rawY =
-    indexTip.y *
-    stageRect.height;
+
+    indexTip.y
+
+    * stageRect.height;
 
 
   if (
-    smoothX === null
+    smoothX ===
+    null
   ) {
 
     smoothX =
@@ -3645,23 +6196,32 @@ function processHand(
   } else {
 
     smoothX +=
+
       (
-        rawX - smoothX
-      ) *
-      SMOOTHING;
+        rawX
+        - smoothX
+      )
+
+      * SMOOTHING;
 
 
     smoothY +=
+
       (
-        rawY - smoothY
-      ) *
-      SMOOTHING;
+        rawY
+        - smoothY
+      )
+
+      * SMOOTHING;
+
   }
 
 
   handCursor
     ?.classList
-    .remove("hidden");
+    .remove(
+      "hidden"
+    );
 
 
   handCursor.style.left =
@@ -3673,12 +6233,15 @@ function processHand(
 
 
   const square =
-    squareFromPoint(
-      stageRect.left +
-      smoothX,
 
-      stageRect.top +
-      smoothY
+    squareFromPoint(
+
+      stageRect.left
+      + smoothX,
+
+      stageRect.top
+      + smoothY
+
     );
 
 
@@ -3688,14 +6251,19 @@ function processHand(
 
 
   const boardRect =
+
     boardEl
       .getBoundingClientRect();
 
 
   const squareSize =
+
     Math.min(
+
       boardRect.width / 8,
+
       boardRect.height / 8
+
     );
 
 
@@ -3704,21 +6272,29 @@ function processHand(
 
 
   if (
-    previousPointerX !== null &&
-    previousPointerY !== null &&
-    squareSize > 0
+    previousPointerX !==
+    null
+
+    && previousPointerY !==
+    null
+
+    && squareSize > 0
   ) {
 
     motionFraction =
-      Math.hypot(
-        smoothX -
-        previousPointerX,
 
-        smoothY -
-        previousPointerY
+      Math.hypot(
+
+        smoothX
+        - previousPointerX,
+
+        smoothY
+        - previousPointerY
+
       )
 
       / squareSize;
+
   }
 
 
@@ -3731,25 +6307,29 @@ function processHand(
 
 
   if (
-    !square ||
-    !canControlTurn()
+    !square
+
+    || !canControlTurn()
   ) {
 
     resetHoverProgress();
 
 
     return;
+
   }
 
 
   if (
-    lastActivatedSquare &&
-    square !==
+    lastActivatedSquare
+
+    && square !==
     lastActivatedSquare
   ) {
 
     lastActivatedSquare =
       null;
+
   }
 
 
@@ -3764,6 +6344,7 @@ function processHand(
 
 
     return;
+
   }
 
 
@@ -3777,12 +6358,14 @@ function processHand(
 
 
     return;
+
   }
 
 
   /*
     Fly-over protection.
   */
+
   if (
     motionFraction >
     STABLE_MOTION_FRACTION
@@ -3806,6 +6389,7 @@ function processHand(
 
 
     return;
+
   }
 
 
@@ -3832,6 +6416,7 @@ function processHand(
 
 
     return;
+
   }
 
 
@@ -3850,13 +6435,17 @@ function processHand(
 
 
     return;
+
   }
 
 
-  if (!hoverStartTime) {
+  if (
+    !hoverStartTime
+  ) {
 
     hoverStartTime =
       now;
+
   }
 
 
@@ -3883,19 +6472,23 @@ function processHand(
 
     requiredTime =
       SELECT_DWELL_MS;
+
   }
 
 
   const progress =
+
     Math.min(
+
       1,
 
       (
-        now -
-        hoverStartTime
+        now
+        - hoverStartTime
       )
 
       / requiredTime
+
     );
 
 
@@ -3905,7 +6498,8 @@ function processHand(
 
 
   if (
-    progress >= 1
+    progress >=
+    1
   ) {
 
     handleSquareInput(
@@ -3942,6 +6536,7 @@ function processHand(
 
 
     setTimeout(
+
       () => {
 
         handCursor
@@ -3953,8 +6548,11 @@ function processHand(
       },
 
       70
+
     );
+
   }
+
 }
 
 
@@ -3964,23 +6562,31 @@ function processHand(
 
 function updateHandColor() {
 
-  if (!cameraStage) {
+  if (
+    !cameraStage
+  ) {
+
     return;
+
   }
 
 
   cameraStage.dataset.handColor =
-    mode() === "online" &&
-    onlineColor
+
+    mode() ===
+    "online"
+
+    && onlineColor
 
       ? onlineColor
 
       : game.turn();
+
 }
 
 
 /* =========================================================
-   CURSOR → BOARD
+   CURSOR -> BOARD
 ========================================================= */
 
 function squareFromPoint(
@@ -3989,6 +6595,7 @@ function squareFromPoint(
 ) {
 
   const rect =
+
     boardEl
       .getBoundingClientRect();
 
@@ -4010,97 +6617,144 @@ function squareFromPoint(
 
 
   const extraBottom =
-    squareHeight *
-    BOTTOM_EDGE_ASSIST;
+
+    squareHeight
+
+    * BOTTOM_EDGE_ASSIST;
 
 
   if (
-    clientX < rect.left ||
-    clientX > rect.right ||
-    clientY < rect.top ||
-    clientY > rect.bottom + extraBottom
+    clientX <
+    rect.left
+
+    || clientX >
+    rect.right
+
+    || clientY <
+    rect.top
+
+    || clientY >
+    rect.bottom
+    + extraBottom
   ) {
 
     return null;
+
   }
 
 
   const clampedClientY =
+
     Math.min(
-      rect.bottom - 0.5,
+
+      rect.bottom
+      - 0.5,
 
       Math.max(
+
         rect.top,
+
         clientY
+
       )
+
     );
 
 
   const boardX =
-    clientX -
-    rect.left;
+
+    clientX
+    - rect.left;
 
 
   const boardY =
-    clampedClientY -
-    rect.top;
+
+    clampedClientY
+    - rect.top;
 
 
   const col =
+
     Math.min(
+
       7,
 
       Math.max(
+
         0,
 
         Math.floor(
-          boardX /
-          squareWidth
+
+          boardX
+
+          / squareWidth
+
         )
+
       )
+
     );
 
 
   const row =
+
     Math.min(
+
       7,
 
       Math.max(
+
         0,
 
         Math.floor(
-          boardY /
-          squareHeight
+
+          boardY
+
+          / squareHeight
+
         )
+
       )
+
     );
 
 
   const rawSquare =
+
     `${files[col]}${ranks[row]}`;
 
 
   /*
-    Initial selection.
-    No magnetic snapping.
+    Initial source selection:
+    NEVER magnetic.
   */
-  if (!selectedSquare) {
+
+  if (
+    !selectedSquare
+  ) {
 
     const piece =
+
       game.get(
         rawSquare
       );
 
 
     if (
-      !piece ||
-      piece.color !==
+      !piece
+
+      || piece.color !==
       game.turn()
     ) {
 
       return null;
+
     }
 
+
+    /*
+      Bottom-rank extension.
+    */
 
     if (
       clientY >
@@ -4108,19 +6762,24 @@ function squareFromPoint(
     ) {
 
       return rawSquare;
+
     }
 
 
     const localX =
-      boardX /
-      squareWidth -
-      col;
+
+      boardX
+      / squareWidth
+
+      - col;
 
 
     const localY =
-      boardY /
-      squareHeight -
-      row;
+
+      boardY
+      / squareHeight
+
+      - row;
 
 
     const margin =
@@ -4128,26 +6787,36 @@ function squareFromPoint(
 
 
     if (
-      localX < margin ||
-      localX > 1 - margin ||
-      localY < margin ||
-      localY > 1 - margin
+      localX <
+      margin
+
+      || localX >
+      1 - margin
+
+      || localY <
+      margin
+
+      || localY >
+      1 - margin
     ) {
 
       return null;
+
     }
 
 
     return rawSquare;
+
   }
 
 
   /*
-    AUTO-SWITCH:
+    AUTO SWITCH.
 
-    If the fingertip is truly over another
-    friendly piece, use that piece directly.
+    Friendly piece is only selected
+    if finger is genuinely over it.
   */
+
   if (
     isOwnTurnPiece(
       rawSquare
@@ -4155,12 +6824,14 @@ function squareFromPoint(
   ) {
 
     return rawSquare;
+
   }
 
 
   /*
     Exact legal destination.
   */
+
   if (
     isActionableSquare(
       rawSquare
@@ -4168,11 +6839,12 @@ function squareFromPoint(
   ) {
 
     return rawSquare;
+
   }
 
 
   /*
-    Mild magnetism to legal move targets.
+    Mild destination magnetism.
   */
 
   let nearestSquare =
@@ -4188,74 +6860,96 @@ function squareFromPoint(
 
 
   for (
-    const square of
-    getMagneticTargets()
+    const square
+    of getMagneticTargets()
   ) {
 
     const targetCol =
+
       files.indexOf(
         square[0]
       );
 
 
     const targetRow =
+
       ranks.indexOf(
+
         Number(
           square[1]
         )
+
       );
 
 
     if (
-      targetCol < 0 ||
-      targetRow < 0
+      targetCol < 0
+
+      || targetRow < 0
     ) {
 
       continue;
+
     }
 
 
     const centerX =
+
       (
-        targetCol +
-        0.5
-      ) *
-      squareWidth;
+        targetCol
+        + 0.5
+      )
+
+      * squareWidth;
 
 
     const centerY =
+
       (
-        targetRow +
-        0.5
-      ) *
-      squareHeight;
+        targetRow
+        + 0.5
+      )
+
+      * squareHeight;
 
 
     const distance =
+
       Math.hypot(
-        (
-          boardX -
-          centerX
-        ) /
-        squareWidth,
 
         (
-          boardY -
-          centerY
-        ) /
-        squareHeight
+          boardX
+          - centerX
+        )
+
+        / squareWidth,
+
+
+        (
+          boardY
+          - centerY
+        )
+
+        / squareHeight
+
       );
 
 
     const targetPiece =
+
       game.get(
         square
       );
 
 
     const limit =
-      targetPiece?.type === "k"
+
+      targetPiece
+        ?.type ===
+      "k"
+
         ? KING_MAGNET_RADIUS
+
         : MAGNET_RADIUS;
 
 
@@ -4274,41 +6968,56 @@ function squareFromPoint(
 
       nearestLimit =
         limit;
+
     }
+
   }
 
 
   return (
-    nearestSquare &&
-    nearestDistance <=
+
+    nearestSquare
+
+    && nearestDistance <=
     nearestLimit
 
       ? nearestSquare
 
       : rawSquare
+
   );
+
 }
 
 
 /* =========================================================
-   MAGNET TARGETS
+   MAGNETIC TARGETS
 ========================================================= */
 
 function getMagneticTargets() {
 
-  if (!selectedSquare) {
+  if (
+    !selectedSquare
+  ) {
+
     return [];
+
   }
 
 
   const targets =
+
     new Set([
+
       selectedSquare,
+
       ...legalTargets
+
     ]);
 
 
   const selectedPiece =
+
     game.get(
       selectedSquare
     );
@@ -4317,51 +7026,83 @@ function getMagneticTargets() {
   /*
     Castling assistance.
   */
+
   if (
-    selectedPiece?.type ===
+    selectedPiece
+      ?.type ===
     "k"
   ) {
 
     if (
-      selectedSquare === "e1" &&
-      legalTargets.includes("g1")
+      selectedSquare ===
+      "e1"
+
+      && legalTargets.includes(
+        "g1"
+      )
     ) {
 
-      targets.add("h1");
+      targets.add(
+        "h1"
+      );
+
     }
 
 
     if (
-      selectedSquare === "e1" &&
-      legalTargets.includes("c1")
+      selectedSquare ===
+      "e1"
+
+      && legalTargets.includes(
+        "c1"
+      )
     ) {
 
-      targets.add("a1");
+      targets.add(
+        "a1"
+      );
+
     }
 
 
     if (
-      selectedSquare === "e8" &&
-      legalTargets.includes("g8")
+      selectedSquare ===
+      "e8"
+
+      && legalTargets.includes(
+        "g8"
+      )
     ) {
 
-      targets.add("h8");
+      targets.add(
+        "h8"
+      );
+
     }
 
 
     if (
-      selectedSquare === "e8" &&
-      legalTargets.includes("c8")
+      selectedSquare ===
+      "e8"
+
+      && legalTargets.includes(
+        "c8"
+      )
     ) {
 
-      targets.add("a8");
+      targets.add(
+        "a8"
+      );
+
     }
+
   }
 
 
   return [
     ...targets
   ];
+
 }
 
 
@@ -4375,21 +7116,25 @@ function getCastlingMove(
 ) {
 
   if (
-    !firstSquare ||
-    !secondSquare
+    !firstSquare
+
+    || !secondSquare
   ) {
 
     return null;
+
   }
 
 
   const first =
+
     game.get(
       firstSquare
     );
 
 
   const second =
+
     game.get(
       secondSquare
     );
@@ -4408,12 +7153,17 @@ function getCastlingMove(
 
 
   /*
-    King → Rook
+    King -> Rook
   */
+
   if (
-    first?.type === "k" &&
-    second?.type === "r" &&
-    first.color ===
+    first?.type ===
+    "k"
+
+    && second?.type ===
+    "r"
+
+    && first.color ===
     second.color
   ) {
 
@@ -4427,16 +7177,22 @@ function getCastlingMove(
 
     color =
       first.color;
+
   }
 
 
   /*
-    Rook → King
+    Rook -> King
   */
+
   else if (
-    first?.type === "r" &&
-    second?.type === "k" &&
-    first.color ===
+    first?.type ===
+    "r"
+
+    && second?.type ===
+    "k"
+
+    && first.color ===
     second.color
   ) {
 
@@ -4450,14 +7206,17 @@ function getCastlingMove(
 
     color =
       second.color;
+
   }
 
 
   /*
-    King → castling destination
+    King -> normal castling square
   */
+
   else if (
-    first?.type === "k"
+    first?.type ===
+    "k"
   ) {
 
     kingSquare =
@@ -4469,136 +7228,212 @@ function getCastlingMove(
 
 
     if (
-      firstSquare === "e1" &&
-      secondSquare === "g1"
+      firstSquare ===
+      "e1"
+
+      && secondSquare ===
+      "g1"
     ) {
 
       rookSquare =
         "h1";
+
     }
 
 
     if (
-      firstSquare === "e1" &&
-      secondSquare === "c1"
+      firstSquare ===
+      "e1"
+
+      && secondSquare ===
+      "c1"
     ) {
 
       rookSquare =
         "a1";
+
     }
 
 
     if (
-      firstSquare === "e8" &&
-      secondSquare === "g8"
+      firstSquare ===
+      "e8"
+
+      && secondSquare ===
+      "g8"
     ) {
 
       rookSquare =
         "h8";
+
     }
 
 
     if (
-      firstSquare === "e8" &&
-      secondSquare === "c8"
+      firstSquare ===
+      "e8"
+
+      && secondSquare ===
+      "c8"
     ) {
 
       rookSquare =
         "a8";
+
     }
+
   }
 
 
   if (
-    !kingSquare ||
-    !rookSquare ||
-    !color
+    !kingSquare
+
+    || !rookSquare
+
+    || !color
   ) {
 
     return null;
+
   }
 
 
   const legalKingMoves =
+
     game
       .moves({
+
         square:
           kingSquare,
 
         verbose:
           true
+
       })
+
       .map(
-        (move) =>
-          move.to
+        (move) => {
+
+          return move.to;
+
+        }
       );
 
 
   if (
-    color === "w" &&
-    kingSquare === "e1" &&
-    rookSquare === "h1" &&
-    legalKingMoves.includes(
+    color ===
+    "w"
+
+    && kingSquare ===
+    "e1"
+
+    && rookSquare ===
+    "h1"
+
+    && legalKingMoves.includes(
       "g1"
     )
   ) {
 
     return {
-      from: "e1",
-      to: "g1"
+
+      from:
+        "e1",
+
+      to:
+        "g1"
+
     };
+
   }
 
 
   if (
-    color === "w" &&
-    kingSquare === "e1" &&
-    rookSquare === "a1" &&
-    legalKingMoves.includes(
+    color ===
+    "w"
+
+    && kingSquare ===
+    "e1"
+
+    && rookSquare ===
+    "a1"
+
+    && legalKingMoves.includes(
       "c1"
     )
   ) {
 
     return {
-      from: "e1",
-      to: "c1"
+
+      from:
+        "e1",
+
+      to:
+        "c1"
+
     };
+
   }
 
 
   if (
-    color === "b" &&
-    kingSquare === "e8" &&
-    rookSquare === "h8" &&
-    legalKingMoves.includes(
+    color ===
+    "b"
+
+    && kingSquare ===
+    "e8"
+
+    && rookSquare ===
+    "h8"
+
+    && legalKingMoves.includes(
       "g8"
     )
   ) {
 
     return {
-      from: "e8",
-      to: "g8"
+
+      from:
+        "e8",
+
+      to:
+        "g8"
+
     };
+
   }
 
 
   if (
-    color === "b" &&
-    kingSquare === "e8" &&
-    rookSquare === "a8" &&
-    legalKingMoves.includes(
+    color ===
+    "b"
+
+    && kingSquare ===
+    "e8"
+
+    && rookSquare ===
+    "a8"
+
+    && legalKingMoves.includes(
       "c8"
     )
   ) {
 
     return {
-      from: "e8",
-      to: "c8"
+
+      from:
+        "e8",
+
+      to:
+        "c8"
+
     };
+
   }
 
 
   return null;
+
 }
 
 
@@ -4611,19 +7446,24 @@ function isActionableSquare(
 ) {
 
   if (
-    !square ||
-    !canControlTurn()
+    !square
+
+    || !canControlTurn()
   ) {
 
     return false;
+
   }
 
 
-  if (!selectedSquare) {
+  if (
+    !selectedSquare
+  ) {
 
     return isOwnTurnPiece(
       square
     );
+
   }
 
 
@@ -4633,24 +7473,30 @@ function isActionableSquare(
   ) {
 
     return true;
+
   }
 
 
   if (
     getCastlingMove(
+
       selectedSquare,
+
       square
+
     )
   ) {
 
     return true;
+
   }
 
 
   /*
-    Other friendly pieces can
-    automatically replace selection.
+    Another friendly piece can
+    replace current selection.
   */
+
   if (
     isOwnTurnPiece(
       square
@@ -4658,6 +7504,7 @@ function isActionableSquare(
   ) {
 
     return true;
+
   }
 
 
@@ -4665,6 +7512,7 @@ function isActionableSquare(
     .includes(
       square
     );
+
 }
 
 
@@ -4681,10 +7529,17 @@ function handleSquareInput(
   ) {
 
     return;
+
   }
 
 
-  if (!selectedSquare) {
+  /*
+    Nothing selected.
+  */
+
+  if (
+    !selectedSquare
+  ) {
 
     selectSquare(
       square
@@ -4692,30 +7547,47 @@ function handleSquareInput(
 
 
     return;
+
   }
 
 
   /*
-    Castling before piece-switch.
+    Check castling first.
   */
+
   const castle =
+
     getCastlingMove(
+
       selectedSquare,
+
       square
+
     );
 
 
-  if (castle) {
+  if (
+    castle
+  ) {
 
     submitMove(
+
       castle.from,
+
       castle.to
+
     );
 
 
     return;
+
   }
 
+
+  /*
+    Tap selected piece again:
+    cancel.
+  */
 
   if (
     square ===
@@ -4726,13 +7598,14 @@ function handleSquareInput(
 
 
     return;
+
   }
 
 
   /*
-    Automatically switch to another
-    friendly piece.
+    AUTO SWITCH PIECE.
   */
+
   if (
     isOwnTurnPiece(
       square
@@ -4745,8 +7618,13 @@ function handleSquareInput(
 
 
     return;
+
   }
 
+
+  /*
+    Normal legal move.
+  */
 
   if (
     legalTargets.includes(
@@ -4755,15 +7633,20 @@ function handleSquareInput(
   ) {
 
     submitMove(
+
       selectedSquare,
+
       square
+
     );
+
   }
+
 }
 
 
 /* =========================================================
-   SELECT PIECE
+   SELECT
 ========================================================= */
 
 function selectSquare(
@@ -4771,18 +7654,21 @@ function selectSquare(
 ) {
 
   const piece =
+
     game.get(
       square
     );
 
 
   if (
-    !piece ||
-    piece.color !==
+    !piece
+
+    || piece.color !==
     game.turn()
   ) {
 
     return;
+
   }
 
 
@@ -4791,15 +7677,23 @@ function selectSquare(
 
 
   legalTargets =
+
     game
       .moves({
+
         square,
+
         verbose:
           true
+
       })
+
       .map(
-        (move) =>
-          move.to
+        (move) => {
+
+          return move.to;
+
+        }
       );
 
 
@@ -4812,11 +7706,12 @@ function selectSquare(
   playUiTone(
     "select"
   );
+
 }
 
 
 /* =========================================================
-   CLEAR SELECTION
+   CLEAR
 ========================================================= */
 
 function clearSelection() {
@@ -4833,6 +7728,7 @@ function clearSelection() {
 
 
   renderBoard();
+
 }
 
 
@@ -4846,7 +7742,8 @@ function submitMove(
 ) {
 
   if (
-    mode() === "online"
+    mode() ===
+    "online"
   ) {
 
     submitOnlineMove(
@@ -4860,14 +7757,14 @@ function submitMove(
       from,
       to
     );
+
   }
+
 }
 
 
 /* =========================================================
    LOCAL MOVE
-
-   HUMAN AIR REFUND IS APPLIED HERE.
 ========================================================= */
 
 function tryLocalMove(
@@ -4875,29 +7772,23 @@ function tryLocalMove(
   to
 ) {
 
-  /*
-    Capture time BEFORE move is made.
-
-    localTurnStartedAt was set when
-    this turn began.
-  */
   const moveCompletedAt =
     performance.now();
 
 
   const turnElapsedMs =
+
     Math.max(
+
       0,
 
-      moveCompletedAt -
-      localTurnStartedAt
+      moveCompletedAt
+
+      - localTurnStartedAt
+
     );
 
 
-  /*
-    Bring the clock completely up to date
-    before changing turns.
-  */
   updateLocalClock();
 
 
@@ -4908,72 +7799,77 @@ function tryLocalMove(
   try {
 
     move =
+
       game.move({
+
         from,
+
         to,
+
         promotion:
           "q"
+
       });
 
   } catch {
 
     move =
       null;
+
   }
 
 
-  if (!move) {
+  if (
+    !move
+  ) {
 
     lastClockTick =
       performance.now();
 
 
     return;
+
   }
 
 
   /*
-    ======================================
-    FAIR AI CLOCK — HUMAN REFUND
-    ======================================
+    HUMAN AIR REFUND
 
-    Only applies when:
-
-    - playing VS AI
-    - human White just moved
-
-    We refund UP TO 700 ms.
-
-    We NEVER refund more than the time
-    that actually passed during the turn.
+    AI mode only.
   */
+
   if (
-    settings.mode === "ai" &&
-    move.color === "w"
+    settings.mode ===
+    "ai"
+
+    && move.color ===
+    "w"
   ) {
 
     const refundMs =
+
       Math.min(
+
         HUMAN_AIR_REFUND_MS,
+
         turnElapsedMs
+
       );
 
 
     whiteTimeMs +=
       refundMs;
 
-
-    console.log(
-      `Air-control refund: ${(refundMs / 1000).toFixed(2)}s`
-    );
   }
 
 
   /*
-    Normal chess increment.
+    Normal increment.
   */
+
   if (
-    move.color === "w"
+    move.color ===
+    "w"
   ) {
 
     whiteTimeMs +=
@@ -4983,6 +7879,7 @@ function tryLocalMove(
 
     blackTimeMs +=
       incrementMs;
+
   }
 
 
@@ -4994,19 +7891,18 @@ function tryLocalMove(
     newTurnTime;
 
 
-  /*
-    The opponent's turn begins NOW.
-  */
   localTurnStartedAt =
     newTurnTime;
 
 
   lastMove = {
+
     from:
       move.from,
 
     to:
       move.to
+
   };
 
 
@@ -5028,7 +7924,9 @@ function tryLocalMove(
 
   renderBoard();
 
+
   renderHistory();
+
 
   updateStatus();
 
@@ -5038,16 +7936,22 @@ function tryLocalMove(
   ) {
 
     return;
+
   }
 
 
   if (
-    settings.mode === "ai" &&
-    game.turn() === "b"
+    settings.mode ===
+    "ai"
+
+    && game.turn() ===
+    "b"
   ) {
 
     scheduleAiMove();
+
   }
+
 }
 
 
@@ -5057,29 +7961,33 @@ function tryLocalMove(
 
 function getAiThinkDelay() {
 
-  const difficulty =
-    settings?.difficulty ||
-    "medium";
-
-
   const range =
+
     AI_THINK_RANGES[
-      difficulty
+
+      settings?.difficulty
+
+      || "medium"
+
     ]
 
-    ||
-
-    AI_THINK_RANGES.medium;
+    || AI_THINK_RANGES.medium;
 
 
   return Math.round(
-    range.min +
-    Math.random() *
-    (
-      range.max -
-      range.min
-    )
+
+    range.min
+
+    + Math.random()
+
+    * (
+        range.max
+
+        - range.min
+      )
+
   );
+
 }
 
 
@@ -5100,35 +8008,23 @@ function scheduleAiMove() {
     );
 
 
-  /*
-    AI clock is ALREADY RUNNING because
-    game.turn() is Black.
-
-    Therefore this delay genuinely costs
-    Nova clock time.
-  */
   const thinkDelay =
     getAiThinkDelay();
 
 
-  console.log(
-    `Nova thinking for at least ${(thinkDelay / 1000).toFixed(2)}s`
-  );
-
-
   setTimeout(
+
     () => {
 
-      /*
-        Nova may have already lost on
-        time while waiting.
-      */
-      if (!gameActive) {
+      if (
+        !gameActive
+      ) {
 
         finishAiThinking();
 
 
         return;
+
       }
 
 
@@ -5137,7 +8033,9 @@ function scheduleAiMove() {
     },
 
     thinkDelay
+
   );
+
 }
 
 
@@ -5152,32 +8050,28 @@ function finishAiThinking() {
     .add(
       "hidden"
     );
+
 }
 
 
 function makeAiMove() {
 
-  /*
-    Count everything up to this exact
-    point against Nova's clock:
-
-    - intentional delay
-    - minimax calculation from previous
-      frames/ticks
-  */
   updateLocalClock();
 
 
   if (
-    blackTimeMs <= 0
+    blackTimeMs <=
+    0
   ) {
 
     finishAiThinking();
+
 
     endLocalOnTime();
 
 
     return;
+
   }
 
 
@@ -5186,39 +8080,46 @@ function makeAiMove() {
 
 
   /*
-    AI calculation itself also consumed
-    real time.
-
-    Update once again after calculation.
+    Calculation time also
+    comes off AI clock.
   */
+
   updateLocalClock();
 
 
   if (
-    blackTimeMs <= 0
+    blackTimeMs <=
+    0
   ) {
 
     finishAiThinking();
+
 
     endLocalOnTime();
 
 
     return;
+
   }
 
 
-  if (!move) {
+  if (
+    !move
+  ) {
 
     finishAiThinking();
+
 
     checkLocalGameEnd();
 
 
     return;
+
   }
 
 
   const result =
+
     game.move({
 
       from:
@@ -5229,13 +8130,12 @@ function makeAiMove() {
 
       promotion:
         move.promotion
+
         || "q"
+
     });
 
 
-  /*
-    Normal increment for AI.
-  */
   blackTimeMs +=
     incrementMs;
 
@@ -5248,12 +8148,6 @@ function makeAiMove() {
     newTurnTime;
 
 
-  /*
-    Human's new turn begins now.
-
-    This timestamp is later used to
-    calculate the human air refund.
-  */
   localTurnStartedAt =
     newTurnTime;
 
@@ -5265,6 +8159,7 @@ function makeAiMove() {
 
     to:
       result.to
+
   };
 
 
@@ -5278,11 +8173,15 @@ function makeAiMove() {
 
   renderBoard();
 
+
   renderHistory();
+
 
   updateStatus();
 
+
   checkLocalGameEnd();
+
 }
 
 
@@ -5293,15 +8192,21 @@ function makeAiMove() {
 function chooseAiMove() {
 
   const moves =
+
     game.moves({
+
       verbose:
         true
+
     });
 
 
-  if (!moves.length) {
+  if (
+    !moves.length
+  ) {
 
     return null;
+
   }
 
 
@@ -5309,30 +8214,38 @@ function chooseAiMove() {
     settings.difficulty ===
     "easy"
 
-    &&
-
-    Math.random() <
+    && Math.random() <
     0.68
   ) {
 
     return moves[
+
       Math.floor(
-        Math.random() *
-        moves.length
+
+        Math.random()
+
+        * moves.length
+
       )
+
     ];
+
   }
 
 
   const depth = {
 
-    easy: 1,
+    easy:
+      1,
 
-    medium: 2,
+    medium:
+      2,
 
-    hard: 2,
+    hard:
+      2,
 
-    expert: 3
+    expert:
+      3
 
   }[
     settings.difficulty
@@ -5348,10 +8261,12 @@ function chooseAiMove() {
 
 
   for (
-    const move of moves
+    const move
+    of moves
   ) {
 
     const clone =
+
       new Chess(
         game.fen()
       );
@@ -5367,17 +8282,26 @@ function chooseAiMove() {
 
       promotion:
         move.promotion
+
         || "q"
+
     });
 
 
     const score =
+
       minimax(
+
         clone,
+
         depth - 1,
+
         -Infinity,
+
         Infinity,
+
         false
+
       );
 
 
@@ -5401,16 +8325,24 @@ function chooseAiMove() {
       bestMoves.push(
         move
       );
+
     }
+
   }
 
 
   return bestMoves[
+
     Math.floor(
-      Math.random() *
-      bestMoves.length
+
+      Math.random()
+
+      * bestMoves.length
+
     )
+
   ];
+
 }
 
 
@@ -5427,34 +8359,43 @@ function minimax(
 ) {
 
   if (
-    depth <= 0 ||
-    chess.isGameOver()
+    depth <= 0
+
+    || chess.isGameOver()
   ) {
 
     return evaluate(
       chess
     );
+
   }
 
 
   const moves =
+
     chess.moves({
+
       verbose:
         true
+
     });
 
 
-  if (maximizingBlack) {
+  if (
+    maximizingBlack
+  ) {
 
     let best =
       -Infinity;
 
 
     for (
-      const move of moves
+      const move
+      of moves
     ) {
 
       const child =
+
         new Chess(
           chess.fen()
         );
@@ -5470,25 +8411,37 @@ function minimax(
 
         promotion:
           move.promotion
+
           || "q"
+
       });
 
 
       best =
+
         Math.max(
+
           best,
 
           minimax(
+
             child,
+
             depth - 1,
+
             alpha,
+
             beta,
+
             false
+
           )
+
         );
 
 
       alpha =
+
         Math.max(
           alpha,
           best
@@ -5496,15 +8449,19 @@ function minimax(
 
 
       if (
-        beta <= alpha
+        beta <=
+        alpha
       ) {
 
         break;
+
       }
+
     }
 
 
     return best;
+
   }
 
 
@@ -5513,10 +8470,12 @@ function minimax(
 
 
   for (
-    const move of moves
+    const move
+    of moves
   ) {
 
     const child =
+
       new Chess(
         chess.fen()
       );
@@ -5532,25 +8491,37 @@ function minimax(
 
       promotion:
         move.promotion
+
         || "q"
+
     });
 
 
     best =
+
       Math.min(
+
         best,
 
         minimax(
+
           child,
+
           depth - 1,
+
           alpha,
+
           beta,
+
           true
+
         )
+
       );
 
 
     beta =
+
       Math.min(
         beta,
         best
@@ -5558,15 +8529,19 @@ function minimax(
 
 
     if (
-      beta <= alpha
+      beta <=
+      alpha
     ) {
 
       break;
+
     }
+
   }
 
 
   return best;
+
 }
 
 
@@ -5574,33 +8549,48 @@ function minimax(
    AI EVALUATION
 ========================================================= */
 
-function evaluate(chess) {
+function evaluate(
+  chess
+) {
 
   if (
     chess.isCheckmate()
   ) {
 
     return (
-      chess.turn() === "w"
+
+      chess.turn() ===
+      "w"
+
         ? 100000
+
         : -100000
+
     );
+
   }
 
 
   const values = {
 
-    p: 100,
+    p:
+      100,
 
-    n: 320,
+    n:
+      320,
 
-    b: 330,
+    b:
+      330,
 
-    r: 500,
+    r:
+      500,
 
-    q: 900,
+    q:
+      900,
 
-    k: 0
+    k:
+      0
+
   };
 
 
@@ -5609,33 +8599,44 @@ function evaluate(chess) {
 
 
   for (
-    const row of chess.board()
+    const row
+    of chess.board()
   ) {
 
     for (
-      const piece of row
+      const piece
+      of row
     ) {
 
-      if (!piece) {
+      if (
+        !piece
+      ) {
+
         continue;
+
       }
 
 
       score +=
-        piece.color === "b"
+
+        piece.color ===
+        "b"
 
           ? values[
-            piece.type
-          ]
+              piece.type
+            ]
 
           : -values[
-            piece.type
-          ];
+              piece.type
+            ];
+
     }
+
   }
 
 
   return score;
+
 }
 
 
@@ -5658,11 +8659,14 @@ function startClock() {
 
 
   clockTimer =
+
     setInterval(
+
       () => {
 
         if (
-          mode() === "online"
+          mode() ===
+          "online"
         ) {
 
           renderClocks();
@@ -5685,17 +8689,23 @@ function startClock() {
             ) {
 
               claimOnlineTimeout();
+
             }
+
           }
 
 
           return;
+
         }
 
 
-        if (!gameActive) {
+        if (
+          !gameActive
+        ) {
 
           return;
+
         }
 
 
@@ -5706,17 +8716,21 @@ function startClock() {
 
 
         if (
-          whiteTimeMs <= 0 ||
-          blackTimeMs <= 0
+          whiteTimeMs <= 0
+
+          || blackTimeMs <= 0
         ) {
 
           endLocalOnTime();
+
         }
 
       },
 
       100
+
     );
+
 }
 
 
@@ -5727,11 +8741,14 @@ function startClock() {
 function updateLocalClock() {
 
   if (
-    !gameActive ||
-    mode() === "online"
+    !gameActive
+
+    || mode() ===
+    "online"
   ) {
 
     return;
+
   }
 
 
@@ -5740,8 +8757,10 @@ function updateLocalClock() {
 
 
   const elapsed =
-    now -
-    lastClockTick;
+
+    now
+
+    - lastClockTick;
 
 
   lastClockTick =
@@ -5749,7 +8768,8 @@ function updateLocalClock() {
 
 
   if (
-    game.turn() === "w"
+    game.turn() ===
+    "w"
   ) {
 
     whiteTimeMs -=
@@ -5759,10 +8779,12 @@ function updateLocalClock() {
 
     blackTimeMs -=
       elapsed;
+
   }
 
 
   whiteTimeMs =
+
     Math.max(
       0,
       whiteTimeMs
@@ -5770,10 +8792,12 @@ function updateLocalClock() {
 
 
   blackTimeMs =
+
     Math.max(
       0,
       blackTimeMs
     );
+
 }
 
 
@@ -5781,48 +8805,74 @@ function updateLocalClock() {
    ONLINE CLOCK
 ========================================================= */
 
-function getOnlineClockMs(color) {
+function getOnlineClockMs(
+  color
+) {
 
   const room =
     onlineRoomState;
 
 
-  if (!room) {
+  if (
+    !room
+  ) {
 
     return 0;
+
   }
 
 
   let remaining =
+
     Number(
-      color === "w"
+
+      color ===
+      "w"
+
         ? room.whiteTimeMs
+
         : room.blackTimeMs
-    ) || 0;
+
+    )
+
+    || 0;
 
 
   if (
-    room.status === "playing" &&
-    room.turn === color &&
-    room.turnStartedAt
+    room.status ===
+    "playing"
+
+    && room.turn ===
+    color
+
+    && room.turnStartedAt
   ) {
 
     remaining -=
+
       Math.max(
+
         0,
 
-        serverNow() -
-        Number(
-          room.turnStartedAt
-        )
+        serverNow()
+
+        - Number(
+            room.turnStartedAt
+          )
+
       );
+
   }
 
 
   return Math.max(
+
     0,
+
     remaining
+
   );
+
 }
 
 
@@ -5835,27 +8885,40 @@ function formatClock(
 ) {
 
   const totalSeconds =
+
     Math.ceil(
-      milliseconds /
-      1000
+
+      milliseconds
+
+      / 1000
+
     );
 
 
   const minutes =
+
     Math.floor(
-      totalSeconds /
-      60
+
+      totalSeconds
+
+      / 60
+
     );
 
 
   const seconds =
-    totalSeconds %
-    60;
+
+    totalSeconds
+
+    % 60;
 
 
   return (
+
     `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+
   );
+
 }
 
 
@@ -5866,28 +8929,38 @@ function formatClock(
 function renderClocks() {
 
   const whiteTime =
-    mode() === "online"
 
-      ? getOnlineClockMs("w")
+    mode() ===
+    "online"
+
+      ? getOnlineClockMs(
+          "w"
+        )
 
       : whiteTimeMs;
 
 
   const blackTime =
-    mode() === "online"
 
-      ? getOnlineClockMs("b")
+    mode() ===
+    "online"
+
+      ? getOnlineClockMs(
+          "b"
+        )
 
       : blackTimeMs;
 
 
   whiteClockEl.textContent =
+
     formatClock(
       whiteTime
     );
 
 
   blackClockEl.textContent =
+
     formatClock(
       blackTime
     );
@@ -5896,41 +8969,58 @@ function renderClocks() {
   whiteClockEl
     ?.classList
     .toggle(
+
       "low-time",
 
-      whiteTime <= 10000 &&
-      gameActive
+      whiteTime <=
+      10000
+
+      && gameActive
+
     );
 
 
   blackClockEl
     ?.classList
     .toggle(
+
       "low-time",
 
-      blackTime <= 10000 &&
-      gameActive
+      blackTime <=
+      10000
+
+      && gameActive
+
     );
 
 
   whitePlayer
     ?.classList
     .toggle(
+
       "active-player",
 
-      gameActive &&
-      game.turn() === "w"
+      gameActive
+
+      && game.turn() ===
+      "w"
+
     );
 
 
   blackPlayer
     ?.classList
     .toggle(
+
       "active-player",
 
-      gameActive &&
-      game.turn() === "b"
+      gameActive
+
+      && game.turn() ===
+      "b"
+
     );
+
 }
 
 
@@ -5940,8 +9030,12 @@ function renderClocks() {
 
 function endLocalOnTime() {
 
-  if (!gameActive) {
+  if (
+    !gameActive
+  ) {
+
     return;
+
   }
 
 
@@ -5954,36 +9048,44 @@ function endLocalOnTime() {
   );
 
 
-  /*
-    If White hit zero → Black won.
-
-    If Black hit zero → White won.
-  */
   const winnerColor =
-    whiteTimeMs <= 0
+
+    whiteTimeMs <=
+    0
+
       ? "b"
+
       : "w";
 
 
   const winnerName =
-    winnerColor === "w"
+
+    winnerColor ===
+    "w"
+
       ? settings.whiteName
+
       : settings.blackName;
 
 
   gameStatus.textContent =
+
     `⏱ ${winnerName} wins on time`;
 
 
   showLocalResult(
+
     winnerColor,
+
     "time"
+
   );
 
 
   playUiTone(
     "gameover"
   );
+
 }
 
 
@@ -5991,7 +9093,9 @@ function endLocalOnTime() {
    CHECK
 ========================================================= */
 
-function isInCheck(chess) {
+function isInCheck(
+  chess
+) {
 
   if (
     typeof chess.isCheck ===
@@ -5999,6 +9103,7 @@ function isInCheck(chess) {
   ) {
 
     return chess.isCheck();
+
   }
 
 
@@ -6008,10 +9113,12 @@ function isInCheck(chess) {
   ) {
 
     return chess.inCheck();
+
   }
 
 
   return false;
+
 }
 
 
@@ -6023,19 +9130,25 @@ function updateStatus() {
 
   renderClocks();
 
+
   updateHandColor();
 
 
   if (
-    mode() === "online"
+    mode() ===
+    "online"
   ) {
 
     const room =
       onlineRoomState;
 
 
-    if (!room) {
+    if (
+      !room
+    ) {
+
       return;
+
     }
 
 
@@ -6045,10 +9158,12 @@ function updateStatus() {
     ) {
 
       gameStatus.textContent =
+
         `Room ${currentRoomCode} — waiting for opponent`;
 
 
       return;
+
     }
 
 
@@ -6058,28 +9173,38 @@ function updateStatus() {
     ) {
 
       gameStatus.textContent =
+
         describeOnlineStatus(
           room
         );
 
 
       return;
+
     }
 
 
     const side =
-      game.turn() === "w"
+
+      game.turn() ===
+      "w"
+
         ? "White"
+
         : "Black";
 
 
     const yourTurn =
+
       onlineColor ===
       game.turn();
 
 
     gameStatus.textContent =
-      isInCheck(game)
+
+      isInCheck(
+        game
+      )
 
         ? `⚠ ${side} is in check${yourTurn ? " — your turn" : ""}`
 
@@ -6091,26 +9216,39 @@ function updateStatus() {
 
 
     return;
+
   }
 
 
-  if (!gameActive) {
+  if (
+    !gameActive
+  ) {
+
     return;
+
   }
 
 
   const side =
-    game.turn() === "w"
+
+    game.turn() ===
+    "w"
+
       ? "White"
+
       : "Black";
 
 
   gameStatus.textContent =
-    isInCheck(game)
+
+    isInCheck(
+      game
+    )
 
       ? `⚠ ${side} is in check`
 
       : `${side} to move`;
+
 }
 
 
@@ -6118,22 +9256,50 @@ function updateStatus() {
    ONLINE STATUS
 ========================================================= */
 
-function describeOnlineStatus(room) {
+function describeOnlineStatus(
+  room
+) {
 
   const winnerName =
-    room.winner === "w"
+
+    room.winner ===
+    "w"
 
       ? room.players
-        ?.white
-        ?.name
-
-      : room.winner === "b"
-
-        ? room.players
-          ?.black
+          ?.white
           ?.name
 
+      : room.winner ===
+        "b"
+
+        ? room.players
+            ?.black
+            ?.name
+
         : null;
+
+
+  const myResult =
+
+    onlineColor
+
+      ? room.ratingResult
+          ?.[
+            colorKey(
+              onlineColor
+            )
+          ]
+
+      : null;
+
+
+  const ratingText =
+
+    myResult
+
+      ? ` • ${signedNumber(myResult.change)} Elo`
+
+      : "";
 
 
   if (
@@ -6142,8 +9308,11 @@ function describeOnlineStatus(room) {
   ) {
 
     return (
-      `♛ Checkmate — ${winnerName} wins`
+
+      `♛ Checkmate — ${winnerName} wins${ratingText}`
+
     );
+
   }
 
 
@@ -6153,8 +9322,11 @@ function describeOnlineStatus(room) {
   ) {
 
     return (
-      `⏱ ${winnerName} wins on time`
+
+      `⏱ ${winnerName} wins on time${ratingText}`
+
     );
+
   }
 
 
@@ -6164,8 +9336,11 @@ function describeOnlineStatus(room) {
   ) {
 
     return (
-      `${winnerName} wins by resignation`
+
+      `${winnerName} wins by resignation${ratingText}`
+
     );
+
   }
 
 
@@ -6175,8 +9350,11 @@ function describeOnlineStatus(room) {
   ) {
 
     return (
-      "½–½ Stalemate"
+
+      `½–½ Stalemate${ratingText}`
+
     );
+
   }
 
 
@@ -6186,8 +9364,11 @@ function describeOnlineStatus(room) {
   ) {
 
     return (
-      "½–½ Draw by repetition"
+
+      `½–½ Draw by repetition${ratingText}`
+
     );
+
   }
 
 
@@ -6197,12 +9378,20 @@ function describeOnlineStatus(room) {
   ) {
 
     return (
-      "½–½ Draw — insufficient material"
+
+      `½–½ Draw — insufficient material${ratingText}`
+
     );
+
   }
 
 
-  return "½–½ Draw";
+  return (
+
+    `½–½ Draw${ratingText}`
+
+  );
+
 }
 
 
@@ -6217,6 +9406,7 @@ function checkLocalGameEnd() {
   ) {
 
     return false;
+
   }
 
 
@@ -6234,13 +9424,16 @@ function checkLocalGameEnd() {
   ) {
 
     const winnerColor =
+
       otherColor(
         game.turn()
       );
 
 
     const winner =
-      winnerColor === "w"
+
+      winnerColor ===
+      "w"
 
         ? settings.whiteName
 
@@ -6248,12 +9441,16 @@ function checkLocalGameEnd() {
 
 
     gameStatus.textContent =
+
       `♛ Checkmate — ${winner} wins`;
 
 
     showLocalResult(
+
       winnerColor,
+
       "checkmate"
+
     );
 
   } else if (
@@ -6265,8 +9462,11 @@ function checkLocalGameEnd() {
 
 
     showLocalResult(
+
       null,
+
       "stalemate"
+
     );
 
   } else if (
@@ -6278,8 +9478,11 @@ function checkLocalGameEnd() {
 
 
     showLocalResult(
+
       null,
+
       "draw"
+
     );
 
   } else if (
@@ -6291,8 +9494,11 @@ function checkLocalGameEnd() {
 
 
     showLocalResult(
+
       null,
+
       "draw"
+
     );
 
   } else {
@@ -6302,9 +9508,13 @@ function checkLocalGameEnd() {
 
 
     showLocalResult(
+
       null,
+
       "draw"
+
     );
+
   }
 
 
@@ -6314,6 +9524,7 @@ function checkLocalGameEnd() {
 
 
   return true;
+
 }
 
 
@@ -6332,44 +9543,76 @@ function hideResultOverlay() {
     .add(
       "hidden"
     );
+
 }
 
 
-function reasonLabel(reason) {
+function reasonLabel(
+  reason
+) {
 
   if (
-    reason === "checkmate"
+    reason ===
+    "checkmate"
   ) {
 
     return "Checkmate";
+
   }
 
 
   if (
-    reason === "time"
+    reason ===
+    "time"
   ) {
 
     return "Win on time";
+
   }
 
 
   if (
-    reason === "resign"
+    reason ===
+    "resign"
   ) {
 
     return "Opponent resigned";
+
   }
 
 
   if (
-    reason === "stalemate"
+    reason ===
+    "stalemate"
   ) {
 
     return "Stalemate";
+
+  }
+
+
+  if (
+    reason ===
+    "repetition"
+  ) {
+
+    return "Draw by repetition";
+
+  }
+
+
+  if (
+    reason ===
+    "insufficient"
+  ) {
+
+    return "Insufficient material";
+
   }
 
 
   return "Draw";
+
 }
 
 
@@ -6385,6 +9628,7 @@ function showResultOverlay(
   ) {
 
     return;
+
   }
 
 
@@ -6392,17 +9636,23 @@ function showResultOverlay(
     signature;
 
 
-  if (resultTitle) {
+  if (
+    resultTitle
+  ) {
 
     resultTitle.textContent =
       title;
+
   }
 
 
-  if (resultSubtitle) {
+  if (
+    resultSubtitle
+  ) {
 
     resultSubtitle.textContent =
       subtitle;
+
   }
 
 
@@ -6411,8 +9661,13 @@ function showResultOverlay(
     .remove(
       "hidden"
     );
+
 }
 
+
+/* =========================================================
+   LOCAL RESULT
+========================================================= */
 
 function showLocalResult(
   winnerColor,
@@ -6420,14 +9675,17 @@ function showLocalResult(
 ) {
 
   if (
-    settings.mode === "ai"
+    settings.mode ===
+    "ai"
   ) {
 
     if (
-      winnerColor === "w"
+      winnerColor ===
+      "w"
     ) {
 
       showResultOverlay(
+
         "Yayy, you won! 🎉",
 
         reasonLabel(
@@ -6435,31 +9693,38 @@ function showLocalResult(
         ),
 
         `ai-win-${reason}`
+
       );
 
 
       return;
+
     }
 
 
     if (
-      winnerColor === "b"
+      winnerColor ===
+      "b"
     ) {
 
       showResultOverlay(
+
         "Good game! ♟️",
 
         "Nova AI wins",
 
         `ai-loss-${reason}`
+
       );
 
 
       return;
+
     }
 
 
     showResultOverlay(
+
       "Draw! 🤝",
 
       reasonLabel(
@@ -6467,17 +9732,23 @@ function showLocalResult(
       ),
 
       `ai-draw-${reason}`
+
     );
 
 
     return;
+
   }
 
 
-  if (winnerColor) {
+  if (
+    winnerColor
+  ) {
 
     const winnerName =
-      winnerColor === "w"
+
+      winnerColor ===
+      "w"
 
         ? settings.whiteName
 
@@ -6485,6 +9756,7 @@ function showLocalResult(
 
 
     showResultOverlay(
+
       `${winnerName} wins! 🎉`,
 
       reasonLabel(
@@ -6492,11 +9764,13 @@ function showLocalResult(
       ),
 
       `local-${winnerColor}-${reason}`
+
     );
 
   } else {
 
     showResultOverlay(
+
       "Draw! 🤝",
 
       reasonLabel(
@@ -6504,15 +9778,53 @@ function showLocalResult(
       ),
 
       `local-draw-${reason}`
+
     );
+
   }
+
 }
 
 
-function showOnlineResult(room) {
+/* =========================================================
+   ONLINE RESULT
+========================================================= */
+
+function showOnlineResult(
+  room
+) {
 
   const signature =
+
     `online-${currentRoomCode}-${room.endReason}-${room.winner}`;
+
+
+  const myResult =
+
+    onlineColor
+
+      ? room.ratingResult
+          ?.[
+            colorKey(
+              onlineColor
+            )
+          ]
+
+      : null;
+
+
+  const ratingLine =
+
+    myResult
+
+      ? `${myResult.old} → ${myResult.new} (${signedNumber(myResult.change)})`
+
+      : "Rating result unavailable";
+
+
+  const subtitle =
+
+    `${reasonLabel(room.endReason)} • ${ratingLine}`;
 
 
   if (
@@ -6521,44 +9833,51 @@ function showOnlineResult(room) {
   ) {
 
     showResultOverlay(
+
       "Yayy, you won! 🎉",
 
-      reasonLabel(
-        room.endReason
-      ),
+      subtitle,
 
       signature
+
     );
 
 
     return;
+
   }
 
 
-  if (!room.winner) {
+  if (
+    !room.winner
+  ) {
 
     showResultOverlay(
+
       "Draw! 🤝",
 
-      reasonLabel(
-        room.endReason
-      ),
+      subtitle,
 
       signature
+
     );
 
 
     return;
+
   }
 
 
   showResultOverlay(
+
     "Good game! ♟️",
 
-    "Your opponent won",
+    subtitle,
 
     signature
+
   );
+
 }
 
 
@@ -6571,17 +9890,23 @@ function renderHistory(
 ) {
 
   const history =
-    override ||
-    game.history();
+
+    override
+
+    || game.history();
 
 
-  if (!history.length) {
+  if (
+    !history.length
+  ) {
 
     moveHistoryEl.innerHTML =
+
       '<div class="empty-history">Moves will appear here.</div>';
 
 
     return;
+
   }
 
 
@@ -6596,6 +9921,7 @@ function renderHistory(
   ) {
 
     const row =
+
       document.createElement(
         "div"
       );
@@ -6606,6 +9932,7 @@ function renderHistory(
 
 
     const number =
+
       document.createElement(
         "span"
       );
@@ -6616,44 +9943,60 @@ function renderHistory(
 
 
     number.textContent =
+
       `${Math.floor(index / 2) + 1}.`;
 
 
     const white =
+
       document.createElement(
         "span"
       );
 
 
     white.textContent =
-      history[index] || "";
+
+      history[index]
+
+      || "";
 
 
     const black =
+
       document.createElement(
         "span"
       );
 
 
     black.textContent =
-      history[index + 1] || "";
+
+      history[index + 1]
+
+      || "";
 
 
     row.append(
+
       number,
+
       white,
+
       black
+
     );
 
 
-    moveHistoryEl.appendChild(
-      row
-    );
+    moveHistoryEl
+      .appendChild(
+        row
+      );
+
   }
 
 
   moveHistoryEl.scrollTop =
     moveHistoryEl.scrollHeight;
+
 }
 
 
@@ -6664,32 +10007,43 @@ function renderHistory(
 function fitBoardToCamera() {
 
   if (
-    !cameraStage ||
-    !boardEl
+    !cameraStage
+
+    || !boardEl
   ) {
 
     return;
+
   }
 
 
   const rect =
+
     cameraStage
       .getBoundingClientRect();
 
 
   if (
-    !rect.width ||
-    !rect.height
+    !rect.width
+
+    || !rect.height
   ) {
 
     return;
+
   }
 
 
   const size =
+
     Math.min(
-      rect.width * 0.66,
-      rect.height * 0.78
+
+      rect.width
+      * 0.66,
+
+      rect.height
+      * 0.78
+
     );
 
 
@@ -6706,10 +10060,12 @@ function fitBoardToCamera() {
 
 
   const pieceSize =
+
     (
       size / 8
-    ) *
-    0.72;
+    )
+
+    * 0.72;
 
 
   boardEl
@@ -6721,19 +10077,24 @@ function fitBoardToCamera() {
 
         square.style.fontSize =
           `${pieceSize}px`;
+
       }
     );
+
 }
 
 
 window.addEventListener(
+
   "resize",
+
   fitBoardToCamera
+
 );
 
 
 /* =========================================================
-   HOVER HELPERS
+   HOVER
 ========================================================= */
 
 function resetHover() {
@@ -6757,6 +10118,7 @@ function resetHover() {
   setCursorProgress(
     0
   );
+
 }
 
 
@@ -6777,6 +10139,7 @@ function resetHoverProgress() {
   setCursorProgress(
     0
   );
+
 }
 
 
@@ -6787,9 +10150,13 @@ function setCursorProgress(
   handCursor
     ?.style
     .setProperty(
+
       "--ghost-progress",
+
       `${Math.round(progress * 360)}deg`
+
     );
+
 }
 
 
@@ -6803,6 +10170,7 @@ function setHoveredSquare(
   ) {
 
     return;
+
   }
 
 
@@ -6820,12 +10188,17 @@ function setHoveredSquare(
         element
           .classList
           .toggle(
+
             "ghost-hover",
+
             element.dataset.square ===
             square
+
           );
+
       }
     );
+
 }
 
 
@@ -6835,13 +10208,20 @@ function setHoveredSquare(
 
 function ensureAudio() {
 
-  if (!audioContext) {
+  if (
+    !audioContext
+  ) {
 
     audioContext =
+
       new (
-        window.AudioContext ||
-        window.webkitAudioContext
+
+        window.AudioContext
+
+        || window.webkitAudioContext
+
       )();
+
   }
 
 
@@ -6851,7 +10231,9 @@ function ensureAudio() {
   ) {
 
     audioContext.resume();
+
   }
+
 }
 
 
@@ -6863,8 +10245,12 @@ function beep(
   delay = 0
 ) {
 
-  if (!soundEnabled) {
+  if (
+    !soundEnabled
+  ) {
+
     return;
+
   }
 
 
@@ -6872,16 +10258,20 @@ function beep(
 
 
   const start =
-    audioContext.currentTime +
-    delay;
+
+    audioContext.currentTime
+
+    + delay;
 
 
   const oscillator =
+
     audioContext
       .createOscillator();
 
 
   const amplifier =
+
     audioContext
       .createGain();
 
@@ -6892,22 +10282,32 @@ function beep(
 
   oscillator.frequency
     .setValueAtTime(
+
       frequency,
+
       start
+
     );
 
 
   amplifier.gain
     .setValueAtTime(
+
       gain,
+
       start
+
     );
 
 
   amplifier.gain
     .exponentialRampToValueAtTime(
+
       0.0001,
-      start + duration
+
+      start
+      + duration
+
     );
 
 
@@ -6927,95 +10327,159 @@ function beep(
 
 
   oscillator.stop(
-    start + duration
+
+    start
+    + duration
+
   );
+
 }
 
 
-function playUiTone(type) {
+function playUiTone(
+  type
+) {
 
   if (
-    type === "select"
+    type ===
+    "select"
   ) {
 
     beep(
+
       700,
+
       0.04,
+
       "sine",
+
       0.022
+
     );
+
   }
 
 
   if (
-    type === "error"
+    type ===
+    "error"
   ) {
 
     beep(
+
       180,
+
       0.05,
+
       "square",
+
       0.02
+
     );
+
   }
 
 
   if (
-    type === "gameover"
+    type ===
+    "gameover"
   ) {
 
     beep(
+
       440,
+
       0.09,
+
       "sine",
+
       0.035
+
     );
 
 
     beep(
+
       554,
+
       0.09,
+
       "sine",
+
       0.035,
+
       0.11
+
     );
 
 
     beep(
+
       659,
+
       0.18,
+
       "sine",
+
       0.04,
+
       0.22
+
     );
+
   }
+
 }
 
 
-function playMoveSound(move) {
+function playMoveSound(
+  move
+) {
 
-  if (!move) {
+  if (
+    !move
+  ) {
+
     return;
+
   }
 
 
   const base = {
-    p: 330,
-    n: 430,
-    b: 500,
-    r: 280,
-    q: 620,
-    k: 220
+
+    p:
+      330,
+
+    n:
+      430,
+
+    b:
+      500,
+
+    r:
+      280,
+
+    q:
+      620,
+
+    k:
+      220
+
   }[
     move.piece
   ] || 330;
 
 
   beep(
+
     base,
+
     0.055,
+
     "triangle",
+
     0.03
+
   );
 
 
@@ -7024,13 +10488,21 @@ function playMoveSound(move) {
   ) {
 
     beep(
+
       120,
+
       0.09,
+
       "square",
+
       0.022,
+
       0.055
+
     );
+
   }
+
 }
 
 
@@ -7040,8 +10512,12 @@ function playMoveSound(move) {
 
 async function copyRoomCode() {
 
-  if (!currentRoomCode) {
+  if (
+    !currentRoomCode
+  ) {
+
     return;
+
   }
 
 
@@ -7054,10 +10530,13 @@ async function copyRoomCode() {
       );
 
 
-    if (connectionLabel) {
+    if (
+      connectionLabel
+    ) {
 
       connectionLabel.textContent =
         "Room code copied";
+
     }
 
   } catch {
@@ -7065,21 +10544,29 @@ async function copyRoomCode() {
     console.log(
       currentRoomCode
     );
+
   }
+
 }
 
 
 copyRoomBtn
   ?.addEventListener(
+
     "click",
+
     copyRoomCode
+
   );
 
 
 copyWaitingCodeBtn
   ?.addEventListener(
+
     "click",
+
     copyRoomCode
+
   );
 
 
@@ -7089,7 +10576,9 @@ copyWaitingCodeBtn
 
 muteBtn
   ?.addEventListener(
+
     "click",
+
     () => {
 
       soundEnabled =
@@ -7097,10 +10586,15 @@ muteBtn
 
 
       muteBtn.textContent =
+
         soundEnabled
+
           ? "🔊"
+
           : "🔇";
+
     }
+
   );
 
 
@@ -7110,17 +10604,24 @@ muteBtn
 
 restartBtn
   ?.addEventListener(
+
     "click",
+
     () => {
 
       if (
-        settings &&
-        mode() !== "online"
+        settings
+
+        && mode() !==
+        "online"
       ) {
 
         initializeLocalGame();
+
       }
+
     }
+
   );
 
 
@@ -7130,39 +10631,55 @@ restartBtn
 
 resignBtn
   ?.addEventListener(
+
     "click",
+
     async () => {
 
-      if (!gameActive) {
+      if (
+        !gameActive
+      ) {
+
         return;
+
       }
 
 
+      /*
+        ONLINE RESIGN
+      */
+
       if (
-        mode() === "online"
+        mode() ===
+        "online"
       ) {
 
         if (
-          !currentRoomRef ||
-          !onlineColor
+          !currentRoomRef
+
+          || !onlineColor
         ) {
 
           return;
+
         }
 
 
         await runTransaction(
+
           currentRoomRef,
 
           (room) => {
 
             if (
-              !room ||
-              room.status !==
+              !room
+
+              || room.status !==
               "playing"
             ) {
 
               return;
+
             }
 
 
@@ -7175,6 +10692,7 @@ resignBtn
 
 
             room.winner =
+
               otherColor(
                 onlineColor
               );
@@ -7184,19 +10702,39 @@ resignBtn
               null;
 
 
+            room.ratingResult =
+
+              buildRatingResult(
+
+                room,
+
+                room.winner,
+
+                "resign"
+
+              );
+
+
             return room;
+
           },
 
           {
             applyLocally:
               false
           }
+
         );
 
 
         return;
+
       }
 
+
+      /*
+        LOCAL / AI
+      */
 
       gameActive =
         false;
@@ -7208,31 +10746,42 @@ resignBtn
 
 
       const winnerColor =
+
         otherColor(
           game.turn()
         );
 
 
       const winner =
-        winnerColor === "w"
+
+        winnerColor ===
+        "w"
+
           ? settings.whiteName
+
           : settings.blackName;
 
 
       gameStatus.textContent =
+
         `${winner} wins by resignation`;
 
 
       showLocalResult(
+
         winnerColor,
+
         "resign"
+
       );
 
 
       playUiTone(
         "gameover"
       );
+
     }
+
   );
 
 
@@ -7242,19 +10791,23 @@ resignBtn
 
 newGameBtn
   ?.addEventListener(
+
     "click",
+
     async () => {
 
       hideResultOverlay();
 
 
       if (
-        mode() === "online"
+        mode() ===
+        "online"
       ) {
 
         await leaveOnlineState(
           true
         );
+
       }
 
 
@@ -7269,25 +10822,36 @@ newGameBtn
 
       handCursor
         ?.classList
-        .add("hidden");
+        .add(
+          "hidden"
+        );
 
 
       gameScreen
         ?.classList
-        .add("hidden");
+        .add(
+          "hidden"
+        );
 
 
       setupScreen
         ?.classList
-        .remove("hidden");
+        .remove(
+          "hidden"
+        );
 
 
-      if (setupMessage) {
+      if (
+        setupMessage
+      ) {
 
         setupMessage.textContent =
           "Ghost Board ready.";
+
       }
+
     }
+
   );
 
 
@@ -7302,34 +10866,50 @@ async function leaveOnlineState(
   try {
 
     if (
-      markDisconnected &&
-      db &&
-      currentRoomCode &&
-      onlineColor
+      markDisconnected
+
+      && db
+
+      && currentRoomCode
+
+      && onlineColor
     ) {
 
       await set(
+
         ref(
+
           db,
+
           `rooms/${currentRoomCode}/players/${colorKey(onlineColor)}/connected`
+
         ),
 
         false
+
       );
+
     }
 
   } catch (error) {
 
     console.warn(
+
       "Presence error:",
+
       error
+
     );
+
   }
 
 
-  if (roomUnsubscribe) {
+  if (
+    roomUnsubscribe
+  ) {
 
     roomUnsubscribe();
+
   }
 
 
@@ -7357,19 +10937,30 @@ async function leaveOnlineState(
     false;
 
 
+  ratingApplyInFlight =
+    false;
+
+
   onlineRoomBar
     ?.classList
-    .add("hidden");
+    .add(
+      "hidden"
+    );
 
 
   waitingOverlay
     ?.classList
-    .add("hidden");
+    .add(
+      "hidden"
+    );
 
 
   restartBtn
     ?.classList
-    .remove("hidden");
+    .remove(
+      "hidden"
+    );
+
 }
 
 
@@ -7378,7 +10969,9 @@ async function leaveOnlineState(
 ========================================================= */
 
 window.addEventListener(
+
   "beforeunload",
+
   () => {
 
     cameraStream
@@ -7387,7 +10980,10 @@ window.addEventListener(
         (track) => {
 
           track.stop();
+
         }
       );
+
   }
+
 );
