@@ -1,6 +1,6 @@
-# AirChess ♞
+# GhostBoard ♞
 
-AirChess is a browser-based chess game where a 2D chessboard floats over your live camera feed and you control it with your hand.
+GhostBoard is a browser-based chess game where a 2D chessboard floats over your live camera feed and you control it with your hand.
 
 ## V1
 
