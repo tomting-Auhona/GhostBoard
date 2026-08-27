@@ -1,9 +1,23 @@
 import "./style.css";
 
-import { FilesetResolver, HandLandmarker } from "@mediapipe/tasks-vision";
-import { Chess } from "chess.js";
-import { initializeApp } from "firebase/app";
-import { getAuth, signInAnonymously } from "firebase/auth";
+import {
+  FilesetResolver,
+  HandLandmarker
+} from "@mediapipe/tasks-vision";
+
+import {
+  Chess
+} from "chess.js";
+
+import {
+  initializeApp
+} from "firebase/app";
+
+import {
+  getAuth,
+  signInAnonymously
+} from "firebase/auth";
+
 import {
   getDatabase,
   ref,
@@ -14,100 +28,185 @@ import {
   runTransaction,
   onDisconnect
 } from "firebase/database";
-import { firebaseConfig } from "./firebase-config.js";
 
-const BUILD_VERSION = "ONLINE-STABLE-HOVER-5";
+import {
+  firebaseConfig
+} from "./firebase-config.js";
 
-console.log(`Ghost Board ${BUILD_VERSION}`);
 
-document.title = "Ghost Board";
+/* =========================================================
+   GHOST BOARD
+========================================================= */
 
-const $ = (s) => document.querySelector(s);
+const BUILD_VERSION =
+  "GHOSTBOARD-UX-6";
+
+console.log(
+  `Ghost Board ${BUILD_VERSION}`
+);
+
+document.title =
+  "Ghost Board";
+
+
+const $ = (selector) =>
+  document.querySelector(selector);
 
 
 /* =========================================================
    DOM
 ========================================================= */
 
-const app = $("#app");
+const app =
+  $("#app");
 
-const setupScreen = $("#setupScreen");
-const gameScreen = $("#gameScreen");
+const setupScreen =
+  $("#setupScreen");
 
-const startGameBtn = $("#startGameBtn");
+const gameScreen =
+  $("#gameScreen");
 
-const gameModeInput = $("#gameMode");
+const startGameBtn =
+  $("#startGameBtn");
 
-const player1NameInput = $("#player1Name");
-const player2NameInput = $("#player2Name");
+const gameModeInput =
+  $("#gameMode");
 
-const player2Field = $("#player2Field");
-const difficultyField = $("#difficultyField");
-const difficultyInput = $("#difficulty");
+const player1NameInput =
+  $("#player1Name");
 
-const timeControlInput = $("#timeControl");
-const customTime = $("#customTime");
-const customMinutes = $("#customMinutes");
-const customIncrement = $("#customIncrement");
+const player2NameInput =
+  $("#player2Name");
 
-const boardThemeInput = $("#boardTheme");
-const liveTheme = $("#liveTheme");
+const player2Field =
+  $("#player2Field");
 
-const soundToggle = $("#soundToggle");
+const difficultyField =
+  $("#difficultyField");
 
-const setupMessage = $("#setupMessage");
+const difficultyInput =
+  $("#difficulty");
 
-const onlineFields = $("#onlineFields");
-const onlineAction = $("#onlineAction");
+const timeControlInput =
+  $("#timeControl");
 
-const roomCodeField = $("#roomCodeField");
-const roomCodeInput = $("#roomCodeInput");
+const customTime =
+  $("#customTime");
 
-const onlineNote = $("#onlineNote");
+const customMinutes =
+  $("#customMinutes");
 
+const customIncrement =
+  $("#customIncrement");
 
-const webcam = $("#webcam");
-const cameraStage = $("#cameraStage");
+const boardThemeInput =
+  $("#boardTheme");
 
-const boardEl = $("#board");
-const handCursor = $("#handCursor");
+const liveTheme =
+  $("#liveTheme");
 
-const gameStatus = $("#gameStatus");
+const soundToggle =
+  $("#soundToggle");
 
-const moveHistoryEl = $("#moveHistory");
-
-const whiteNameEl = $("#whiteName");
-const blackNameEl = $("#blackName");
-
-const whiteClockEl = $("#whiteClock");
-const blackClockEl = $("#blackClock");
-
-const whitePlayer = $("#whitePlayer");
-const blackPlayer = $("#blackPlayer");
-
-const aiThinking = $("#aiThinking");
-
-const muteBtn = $("#muteBtn");
-
-const restartBtn = $("#restartBtn");
-const resignBtn = $("#resignBtn");
-const newGameBtn = $("#newGameBtn");
+const setupMessage =
+  $("#setupMessage");
 
 
-const onlineRoomBar = $("#onlineRoomBar");
+const onlineFields =
+  $("#onlineFields");
 
-const roomCodeLabel = $("#roomCodeLabel");
+const onlineAction =
+  $("#onlineAction");
 
-const copyRoomBtn = $("#copyRoomBtn");
+const roomCodeField =
+  $("#roomCodeField");
 
-const connectionLabel = $("#connectionLabel");
+const roomCodeInput =
+  $("#roomCodeInput");
 
-const waitingOverlay = $("#waitingOverlay");
+const onlineNote =
+  $("#onlineNote");
 
-const waitingText = $("#waitingText");
-const waitingCode = $("#waitingCode");
 
-const copyWaitingCodeBtn = $("#copyWaitingCodeBtn");
+const webcam =
+  $("#webcam");
+
+const cameraStage =
+  $("#cameraStage");
+
+const boardEl =
+  $("#board");
+
+const handCursor =
+  $("#handCursor");
+
+
+const gameStatus =
+  $("#gameStatus");
+
+const moveHistoryEl =
+  $("#moveHistory");
+
+
+const whiteNameEl =
+  $("#whiteName");
+
+const blackNameEl =
+  $("#blackName");
+
+const whiteClockEl =
+  $("#whiteClock");
+
+const blackClockEl =
+  $("#blackClock");
+
+const whitePlayer =
+  $("#whitePlayer");
+
+const blackPlayer =
+  $("#blackPlayer");
+
+
+const aiThinking =
+  $("#aiThinking");
+
+
+const muteBtn =
+  $("#muteBtn");
+
+const restartBtn =
+  $("#restartBtn");
+
+const resignBtn =
+  $("#resignBtn");
+
+const newGameBtn =
+  $("#newGameBtn");
+
+
+const onlineRoomBar =
+  $("#onlineRoomBar");
+
+const roomCodeLabel =
+  $("#roomCodeLabel");
+
+const copyRoomBtn =
+  $("#copyRoomBtn");
+
+const connectionLabel =
+  $("#connectionLabel");
+
+const waitingOverlay =
+  $("#waitingOverlay");
+
+const waitingText =
+  $("#waitingText");
+
+const waitingCode =
+  $("#waitingCode");
+
+const copyWaitingCodeBtn =
+  $("#copyWaitingCodeBtn");
 
 
 /* =========================================================
@@ -128,7 +227,556 @@ document
 
 
 /* =========================================================
-   CHESS
+   EXTRA UI
+   CAPTURED PIECES + RESULT OVERLAY
+========================================================= */
+
+let capturedPanel =
+  null;
+
+let capturedByWhiteEl =
+  null;
+
+let capturedByBlackEl =
+  null;
+
+let resultOverlay =
+  null;
+
+let resultTitle =
+  null;
+
+let resultSubtitle =
+  null;
+
+let lastResultSignature =
+  null;
+
+
+function createExtraGameUI() {
+
+  if (
+    cameraStage
+    && !document.querySelector(
+      "#capturedPanel"
+    )
+  ) {
+
+    capturedPanel =
+      document.createElement(
+        "div"
+      );
+
+
+    capturedPanel.id =
+      "capturedPanel";
+
+
+    capturedPanel.innerHTML = `
+      <div class="captured-line">
+        <span class="captured-label">
+          White captured
+        </span>
+
+        <span
+          id="capturedByWhite"
+          class="captured-pieces"
+        >
+          —
+        </span>
+      </div>
+
+      <div class="captured-line">
+        <span class="captured-label">
+          Black captured
+        </span>
+
+        <span
+          id="capturedByBlack"
+          class="captured-pieces"
+        >
+          —
+        </span>
+      </div>
+    `;
+
+
+    cameraStage
+      .insertAdjacentElement(
+        "afterend",
+        capturedPanel
+      );
+
+
+    capturedByWhiteEl =
+      $("#capturedByWhite");
+
+
+    capturedByBlackEl =
+      $("#capturedByBlack");
+
+  } else {
+
+    capturedPanel =
+      $("#capturedPanel");
+
+
+    capturedByWhiteEl =
+      $("#capturedByWhite");
+
+
+    capturedByBlackEl =
+      $("#capturedByBlack");
+
+  }
+
+
+  if (
+    cameraStage
+    && !document.querySelector(
+      "#ghostResultOverlay"
+    )
+  ) {
+
+    resultOverlay =
+      document.createElement(
+        "div"
+      );
+
+
+    resultOverlay.id =
+      "ghostResultOverlay";
+
+
+    resultOverlay.className =
+      "ghost-result-overlay hidden";
+
+
+    resultOverlay.innerHTML = `
+
+      <div class="result-confetti">
+        ${Array.from(
+          {
+            length:
+              20
+          },
+          (_, index) => {
+
+            return `
+              <span
+                style="--i:${index}"
+              >
+                ✦
+              </span>
+            `;
+
+          }
+        ).join("")}
+      </div>
+
+
+      <div class="ghost-result-card">
+
+        <div
+          id="ghostResultTitle"
+          class="ghost-result-title"
+        >
+          Yayy, you won! 🎉
+        </div>
+
+        <div
+          id="ghostResultSubtitle"
+          class="ghost-result-subtitle"
+        >
+          Checkmate
+        </div>
+
+      </div>
+    `;
+
+
+    cameraStage.appendChild(
+      resultOverlay
+    );
+
+
+    resultTitle =
+      $("#ghostResultTitle");
+
+
+    resultSubtitle =
+      $("#ghostResultSubtitle");
+
+  } else {
+
+    resultOverlay =
+      $("#ghostResultOverlay");
+
+    resultTitle =
+      $("#ghostResultTitle");
+
+    resultSubtitle =
+      $("#ghostResultSubtitle");
+
+  }
+
+}
+
+
+createExtraGameUI();
+
+
+/* =========================================================
+   RUNTIME CSS
+========================================================= */
+
+const runtimeStyle =
+  document.createElement(
+    "style"
+  );
+
+
+runtimeStyle.textContent = `
+
+  /* ==========================================
+     Captured pieces
+  ========================================== */
+
+  #capturedPanel {
+    width: 100%;
+
+    margin-top: 10px;
+
+    padding: 10px 14px;
+
+    border:
+      1px solid
+      rgba(255,255,255,.10);
+
+    border-radius: 13px;
+
+    background:
+      rgba(12,12,18,.88);
+
+    display: grid;
+
+    gap: 6px;
+  }
+
+
+  .captured-line {
+    min-height: 28px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+  }
+
+
+  .captured-label {
+    min-width: 105px;
+
+    color:
+      rgba(255,255,255,.58);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: .08em;
+  }
+
+
+  .captured-pieces {
+    display: flex;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 2px;
+
+    color:
+      rgba(255,255,255,.86);
+
+    font-family:
+      "Segoe UI Symbol",
+      serif;
+
+    font-size: 23px;
+
+    line-height: 1;
+  }
+
+
+  .captured-piece-white {
+    color: #f6f6fa;
+
+    text-shadow:
+      0 1px 2px #000;
+  }
+
+
+  .captured-piece-black {
+    color: #737381;
+
+    text-shadow:
+      0 1px 1px
+      rgba(255,255,255,.18);
+  }
+
+
+  /* ==========================================
+     Result overlay
+  ========================================== */
+
+  #ghostResultOverlay {
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 500;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    overflow: hidden;
+
+    background:
+      rgba(5,5,10,.34);
+
+    backdrop-filter:
+      blur(3px);
+  }
+
+
+  #ghostResultOverlay.hidden {
+    display: none !important;
+  }
+
+
+  .ghost-result-card {
+    position: relative;
+
+    z-index: 5;
+
+    min-width: min(
+      80%,
+      430px
+    );
+
+    padding:
+      25px 26px;
+
+    text-align: center;
+
+    border:
+      1px solid
+      rgba(255,255,255,.22);
+
+    border-radius:
+      22px;
+
+    background:
+      rgba(15,13,24,.94);
+
+    box-shadow:
+      0 25px 80px
+      rgba(0,0,0,.65);
+
+    animation:
+      ghostResultPop
+      .58s
+      cubic-bezier(
+        .16,
+        1.3,
+        .3,
+        1
+      );
+  }
+
+
+  .ghost-result-title {
+    font-size:
+      clamp(
+        24px,
+        4vw,
+        42px
+      );
+
+    font-weight: 900;
+
+    letter-spacing:
+      -.035em;
+
+    color: white;
+
+    animation:
+      ghostTitlePulse
+      1.1s ease-in-out
+      infinite alternate;
+  }
+
+
+  .ghost-result-subtitle {
+    margin-top: 7px;
+
+    color:
+      rgba(255,255,255,.60);
+
+    font-size: 13px;
+
+    font-weight: 600;
+  }
+
+
+  .result-confetti {
+    position: absolute;
+
+    inset: 0;
+
+    overflow: hidden;
+
+    pointer-events: none;
+  }
+
+
+  .result-confetti span {
+    --column:
+      calc(
+        (
+          var(--i) + 1
+        ) * 4.76%
+      );
+
+    position: absolute;
+
+    left:
+      var(--column);
+
+    top:
+      -12%;
+
+    font-size:
+      calc(
+        11px +
+        (
+          var(--i) % 4
+        ) * 3px
+      );
+
+    opacity: .9;
+
+    animation:
+      ghostConfettiFall
+      calc(
+        1.6s +
+        (
+          var(--i) % 6
+        ) * .17s
+      )
+      linear
+      infinite;
+
+    animation-delay:
+      calc(
+        (
+          var(--i) % 8
+        ) * -.21s
+      );
+  }
+
+
+  .result-confetti span:nth-child(3n) {
+    color: #ffd454;
+  }
+
+
+  .result-confetti span:nth-child(3n + 1) {
+    color: #ba83ff;
+  }
+
+
+  .result-confetti span:nth-child(3n + 2) {
+    color: #67dcff;
+  }
+
+
+  @keyframes ghostResultPop {
+
+    from {
+      opacity: 0;
+
+      transform:
+        scale(.72)
+        translateY(18px);
+    }
+
+    to {
+      opacity: 1;
+
+      transform:
+        scale(1)
+        translateY(0);
+    }
+
+  }
+
+
+  @keyframes ghostTitlePulse {
+
+    from {
+      transform:
+        scale(1);
+    }
+
+    to {
+      transform:
+        scale(1.035);
+    }
+
+  }
+
+
+  @keyframes ghostConfettiFall {
+
+    from {
+      transform:
+        translateY(-10%)
+        rotate(0deg);
+    }
+
+    to {
+      transform:
+        translateY(700px)
+        rotate(520deg);
+    }
+
+  }
+
+
+  /* Keep overlay anchored to camera */
+  #cameraStage {
+    position: relative;
+  }
+
+`;
+
+
+document.head.appendChild(
+  runtimeStyle
+);
+
+
+/* =========================================================
+   PIECES
 ========================================================= */
 
 const FILES = [
@@ -163,78 +811,81 @@ const PIECES = {
 
 
 /* =========================================================
-   AIR MOVEMENT SETTINGS
+   AIR CONTROL
 ========================================================= */
 
 /*
-  Selecting the source piece
-  stays quick.
+  Quick source selection.
 */
 
-const SELECT_DWELL_MS = 120;
+const SELECT_DWELL_MS =
+  120;
 
 
 /*
-  Destination requires slightly
-  more intention.
-
-  0.20 seconds.
+  Destination requires a tiny
+  bit more certainty.
 */
 
-const MOVE_DWELL_MS = 200;
+const MOVE_DWELL_MS =
+  200;
 
 
 /*
-  High responsiveness.
-
-  Less lag between real finger
-  and cursor.
+  Responsive cursor.
 */
 
-const SMOOTHING = 0.88;
+const SMOOTHING =
+  0.88;
 
 
 /*
-  Initial piece selection must be
-  reasonably inside its square.
+  Prevent source-piece snapping.
 */
 
-const SELECTION_CORE_MARGIN = 0.13;
+const SELECTION_CORE_MARGIN =
+  0.11;
 
 
 /*
-  Mild destination magnetism.
+  Mild destination snapping.
 */
 
-const MAGNET_RADIUS = 0.50;
+const MAGNET_RADIUS =
+  0.50;
 
-const KING_MAGNET_RADIUS = 0.64;
+
+const KING_MAGNET_RADIUS =
+  0.66;
 
 
 /*
-  IMPORTANT:
+  Moving finger = no activation.
 
-  A hover timer is NOT allowed
-  to run while the finger is
-  moving quickly.
-
-  Value is measured as fraction
-  of one square per frame.
-
-  Example:
-  if square ≈ 50 px,
-  0.055 ≈ 2.75 px.
+  This is the d2 → d4 fix.
 */
 
-const STABLE_MOTION_FRACTION = 0.055;
+const STABLE_MOTION_FRACTION =
+  0.055;
+
+
+const REQUIRED_STABLE_FRAMES =
+  2;
 
 
 /*
-  Require multiple stable frames
-  before starting hover timer.
+  NEW:
+
+  Bottom row gets an invisible
+  selection zone slightly below
+  the board.
+
+  Makes Rank 1 / bottom rank much
+  easier to reach.
 */
 
-const REQUIRED_STABLE_FRAMES = 2;
+const BOTTOM_EDGE_ASSIST =
+  0.42;
 
 
 /* =========================================================
@@ -413,7 +1064,7 @@ let onlineMovePending =
    HELPERS
 ========================================================= */
 
-const mode = () => {
+function mode() {
 
   return (
     settings?.mode
@@ -421,10 +1072,12 @@ const mode = () => {
     || "ai"
   );
 
-};
+}
 
 
-const colorKey = (color) => {
+function colorKey(
+  color
+) {
 
   return (
     color === "w"
@@ -432,10 +1085,12 @@ const colorKey = (color) => {
       : "black"
   );
 
-};
+}
 
 
-const otherColor = (color) => {
+function otherColor(
+  color
+) {
 
   return (
     color === "w"
@@ -443,20 +1098,22 @@ const otherColor = (color) => {
       : "w"
   );
 
-};
+}
 
 
-const serverNow = () => {
+function serverNow() {
 
   return (
     Date.now()
     + serverTimeOffset
   );
 
-};
+}
 
 
-function normalizeArray(value) {
+function normalizeArray(
+  value
+) {
 
   if (
     Array.isArray(value)
@@ -501,7 +1158,7 @@ function normalizeArray(value) {
 
 
 /* =========================================================
-   FIREBASE SETUP
+   FIREBASE
 ========================================================= */
 
 function isFirebaseConfigured() {
@@ -612,7 +1269,7 @@ async function initOnlineBackend() {
 
 
 /* =========================================================
-   ROOM CODES
+   ROOM CODE
 ========================================================= */
 
 function generateRoomCode() {
@@ -621,7 +1278,7 @@ function generateRoomCode() {
     "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 
-  let result =
+  let suffix =
     "";
 
 
@@ -631,7 +1288,7 @@ function generateRoomCode() {
     index++
   ) {
 
-    result +=
+    suffix +=
       chars[
         Math.floor(
           Math.random()
@@ -643,13 +1300,15 @@ function generateRoomCode() {
 
 
   return (
-    `GHOST-${result}`
+    `GHOST-${suffix}`
   );
 
 }
 
 
-function normalizeRoomCode(code) {
+function normalizeRoomCode(
+  code
+) {
 
   return String(
     code || ""
@@ -665,7 +1324,7 @@ function normalizeRoomCode(code) {
 
 
 /* =========================================================
-   SETUP UI
+   MODE UI
 ========================================================= */
 
 function updateModeUI() {
@@ -678,7 +1337,8 @@ function updateModeUI() {
     ?.classList
     .toggle(
       "hidden",
-      selectedMode !== "ai"
+      selectedMode !==
+      "ai"
     );
 
 
@@ -686,7 +1346,8 @@ function updateModeUI() {
     ?.classList
     .toggle(
       "hidden",
-      selectedMode !== "local"
+      selectedMode !==
+      "local"
     );
 
 
@@ -694,7 +1355,8 @@ function updateModeUI() {
     ?.classList
     .toggle(
       "hidden",
-      selectedMode !== "online"
+      selectedMode !==
+      "online"
     );
 
 
@@ -708,7 +1370,8 @@ function updateModeUI() {
 
 
   if (
-    selectedMode === "ai"
+    selectedMode ===
+    "ai"
   ) {
 
     startGameBtn.textContent =
@@ -718,7 +1381,8 @@ function updateModeUI() {
 
 
   if (
-    selectedMode === "local"
+    selectedMode ===
+    "local"
   ) {
 
     startGameBtn.textContent =
@@ -728,7 +1392,8 @@ function updateModeUI() {
 
 
   if (
-    selectedMode === "online"
+    selectedMode ===
+    "online"
   ) {
 
     updateOnlineActionUI();
@@ -802,7 +1467,8 @@ timeControlInput
         ?.classList
         .toggle(
           "hidden",
-          timeControlInput.value !== "custom"
+          timeControlInput.value !==
+          "custom"
         );
 
     }
@@ -1045,7 +1711,7 @@ function collectSettings() {
 
 
 /* =========================================================
-   START GAME
+   START
 ========================================================= */
 
 startGameBtn
@@ -1062,6 +1728,9 @@ startGameBtn
 
 
       try {
+
+        hideResultOverlay();
+
 
         settings =
           collectSettings();
@@ -1316,7 +1985,7 @@ async function createLandmarker(
 
 
         minTrackingConfidence:
-          0.5
+          0.50
 
       }
 
@@ -1358,7 +2027,7 @@ async function initHandTracking() {
   } catch (error) {
 
     console.warn(
-      "GPU unavailable, using CPU.",
+      "GPU unavailable. Using CPU.",
       error
     );
 
@@ -1411,6 +2080,13 @@ function initializeLocalGame() {
 
   onlineColor =
     null;
+
+
+  lastResultSignature =
+    null;
+
+
+  hideResultOverlay();
 
 
   resetHover();
@@ -1602,7 +2278,7 @@ async function createOnlineRoom() {
     {
 
       version:
-        5,
+        6,
 
 
       status:
@@ -1876,7 +2552,7 @@ async function joinOnlineRoom(
 
     } catch {
 
-      // Ignore cleanup failure.
+      // Ignore cleanup problem.
 
     }
 
@@ -2143,7 +2819,8 @@ function syncOnlineRoom() {
     ?.classList
     .toggle(
       "my-player",
-      onlineColor === "w"
+      onlineColor ===
+      "w"
     );
 
 
@@ -2151,7 +2828,8 @@ function syncOnlineRoom() {
     ?.classList
     .toggle(
       "my-player",
-      onlineColor === "b"
+      onlineColor ===
+      "b"
     );
 
 
@@ -2211,6 +2889,9 @@ function syncOnlineRoom() {
 
     gameActive =
       false;
+
+
+    hideResultOverlay();
 
 
     waitingOverlay
@@ -2300,6 +2981,18 @@ function syncOnlineRoom() {
 
 
   startClock();
+
+
+  if (
+    room.status ===
+    "ended"
+  ) {
+
+    showOnlineResult(
+      room
+    );
+
+  }
 
 }
 
@@ -2737,7 +3430,8 @@ async function claimOnlineTimeout() {
   if (
     !currentRoomRef
     || !onlineRoomState
-    || onlineRoomState.status !== "playing"
+    || onlineRoomState.status !==
+    "playing"
   ) {
 
     return;
@@ -2859,7 +3553,7 @@ async function claimOnlineTimeout() {
 
 
 /* =========================================================
-   GAME END
+   GAME RESULT DATA
 ========================================================= */
 
 function describeGameEnd(
@@ -2950,7 +3644,7 @@ function describeGameEnd(
 
 
 /* =========================================================
-   INPUT PERMISSIONS
+   INPUT PERMISSION
 ========================================================= */
 
 function canControlTurn() {
@@ -2998,7 +3692,7 @@ function canControlTurn() {
 
 
 /* =========================================================
-   BOARD PERSPECTIVE
+   PERSPECTIVE
 ========================================================= */
 
 function boardPerspective() {
@@ -3068,7 +3762,7 @@ function rankOrder() {
 
 
 /* =========================================================
-   BOARD
+   BOARD RENDER
 ========================================================= */
 
 function renderBoard() {
@@ -3119,8 +3813,7 @@ function renderBoard() {
 
       square.classList.add(
 
-        (row + col) % 2 ===
-        0
+        (row + col) % 2 === 0
 
           ? "light"
 
@@ -3243,9 +3936,197 @@ function renderBoard() {
   }
 
 
+  renderCapturedPieces();
+
+
   requestAnimationFrame(
     fitBoardToCamera
   );
+
+}
+
+
+/* =========================================================
+   CAPTURED PIECES
+========================================================= */
+
+function renderCapturedPieces() {
+
+  if (
+    !capturedByWhiteEl
+    || !capturedByBlackEl
+  ) {
+
+    return;
+
+  }
+
+
+  const capturedByWhite =
+    [];
+
+
+  const capturedByBlack =
+    [];
+
+
+  let history;
+
+
+  try {
+
+    history =
+      game.history({
+        verbose:
+          true
+      });
+
+  } catch {
+
+    history =
+      [];
+
+  }
+
+
+  for (
+    const move
+    of history
+  ) {
+
+    if (
+      !move.captured
+    ) {
+
+      continue;
+
+    }
+
+
+    if (
+      move.color ===
+      "w"
+    ) {
+
+      capturedByWhite.push(
+        move.captured
+      );
+
+    } else {
+
+      capturedByBlack.push(
+        move.captured
+      );
+
+    }
+
+  }
+
+
+  const order = {
+
+    q:
+      1,
+
+    r:
+      2,
+
+    b:
+      3,
+
+    n:
+      4,
+
+    p:
+      5
+
+  };
+
+
+  capturedByWhite.sort(
+    (a, b) => {
+
+      return (
+        order[a]
+        - order[b]
+      );
+
+    }
+  );
+
+
+  capturedByBlack.sort(
+    (a, b) => {
+
+      return (
+        order[a]
+        - order[b]
+      );
+
+    }
+  );
+
+
+  if (
+    capturedByWhite.length ===
+    0
+  ) {
+
+    capturedByWhiteEl.textContent =
+      "—";
+
+  } else {
+
+    capturedByWhiteEl.innerHTML =
+
+      capturedByWhite
+        .map(
+          (piece) => {
+
+            return `
+              <span
+                class="captured-piece-black"
+              >
+                ${PIECES[`b${piece}`]}
+              </span>
+            `;
+
+          }
+        )
+        .join("");
+
+  }
+
+
+  if (
+    capturedByBlack.length ===
+    0
+  ) {
+
+    capturedByBlackEl.textContent =
+      "—";
+
+  } else {
+
+    capturedByBlackEl.innerHTML =
+
+      capturedByBlack
+        .map(
+          (piece) => {
+
+            return `
+              <span
+                class="captured-piece-white"
+              >
+                ${PIECES[`w${piece}`]}
+              </span>
+            `;
+
+          }
+        )
+        .join("");
+
+  }
 
 }
 
@@ -3346,9 +4227,7 @@ function handTrackingLoop() {
 
 
 /* =========================================================
-   PROCESS HAND
-
-   THIS IS THE MAIN MOVEMENT FIX
+   HAND PROCESSING
 ========================================================= */
 
 function processHand(
@@ -3424,12 +4303,9 @@ function processHand(
     * stageRect.height;
 
 
-  /*
-    Responsive smoothing.
-  */
-
   if (
-    smoothX === null
+    smoothX ===
+    null
   ) {
 
     smoothX =
@@ -3496,12 +4372,6 @@ function processHand(
   );
 
 
-  /*
-    Determine how much the finger moved
-    compared with the previous camera
-    frame.
-  */
-
   const boardRect =
 
     boardEl
@@ -3524,8 +4394,12 @@ function processHand(
 
 
   if (
-    previousPointerX !== null
-    && previousPointerY !== null
+    previousPointerX !==
+    null
+
+    && previousPointerY !==
+    null
+
     && squareSize > 0
   ) {
 
@@ -3569,6 +4443,7 @@ function processHand(
 
   if (
     lastActivatedSquare
+
     && square !==
     lastActivatedSquare
   ) {
@@ -3609,21 +4484,9 @@ function processHand(
 
 
   /*
-    ==============================================
-    IMPORTANT FLY-OVER PROTECTION
-    ==============================================
+    Finger is travelling.
 
-    If your hand is moving through d3
-    toward d4, motionFraction is high.
-
-    Therefore:
-
-    - timer is reset
-    - d3 cannot activate
-    - ring stays at 0
-
-    Only once your finger settles on
-    d4 can the timer start.
+    DO NOT start timer.
   */
 
   if (
@@ -3653,10 +4516,6 @@ function processHand(
   }
 
 
-  /*
-    Arrived on a new square.
-  */
-
   if (
     currentHoverSquare !==
     square
@@ -3684,10 +4543,6 @@ function processHand(
   }
 
 
-  /*
-    Count stable frames.
-  */
-
   stableFrames +=
     1;
 
@@ -3706,12 +4561,6 @@ function processHand(
 
   }
 
-
-  /*
-    Finger is actually settled now.
-
-    Start timer.
-  */
 
   if (
     !hoverStartTime
@@ -3754,7 +4603,8 @@ function processHand(
 
 
   if (
-    progress >= 1
+    progress >=
+    1
   ) {
 
     handleSquareInput(
@@ -3827,7 +4677,9 @@ function updateHandColor() {
 
   cameraStage.dataset.handColor =
 
-    mode() === "online"
+    mode() ===
+    "online"
+
     && onlineColor
 
       ? onlineColor
@@ -3838,7 +4690,7 @@ function updateHandColor() {
 
 
 /* =========================================================
-   CURSOR -> SQUARE
+   POINT -> SQUARE
 ========================================================= */
 
 function squareFromPoint(
@@ -3850,21 +4702,6 @@ function squareFromPoint(
 
     boardEl
       .getBoundingClientRect();
-
-
-  if (
-    clientX < rect.left
-
-    || clientX > rect.right
-
-    || clientY < rect.top
-
-    || clientY > rect.bottom
-  ) {
-
-    return null;
-
-  }
 
 
   const files =
@@ -3883,12 +4720,72 @@ function squareFromPoint(
     rect.height / 8;
 
 
+  /*
+    NEW BOTTOM-RANK ASSIST.
+
+    You can point slightly underneath
+    the visible board and Ghost Board
+    will still map it to the bottom rank.
+
+    This is especially useful for
+    pieces on Rank 1.
+  */
+
+  const extraBottom =
+
+    !selectedSquare
+
+      ? squareHeight
+        * BOTTOM_EDGE_ASSIST
+
+      : 0;
+
+
+  if (
+    clientX <
+    rect.left
+
+    || clientX >
+    rect.right
+
+    || clientY <
+    rect.top
+
+    || clientY >
+    rect.bottom
+    + extraBottom
+  ) {
+
+    return null;
+
+  }
+
+
+  const clampedClientY =
+
+    Math.min(
+
+      rect.bottom
+      - 0.5,
+
+      Math.max(
+        rect.top,
+        clientY
+      )
+
+    );
+
+
   const boardX =
-    clientX - rect.left;
+
+    clientX
+    - rect.left;
 
 
   const boardY =
-    clientY - rect.top;
+
+    clampedClientY
+    - rect.top;
 
 
   const col =
@@ -3937,9 +4834,9 @@ function squareFromPoint(
 
 
   /*
-    SELECTING SOURCE PIECE
+    SOURCE SELECTION
 
-    No magnetism at all.
+    No magnetism.
   */
 
   if (
@@ -3954,11 +4851,29 @@ function squareFromPoint(
 
     if (
       !piece
+
       || piece.color !==
       game.turn()
     ) {
 
       return null;
+
+    }
+
+
+    /*
+      If pointer is actually below board,
+      do not require central margin.
+
+      This makes bottom pieces much easier.
+    */
+
+    if (
+      clientY >
+      rect.bottom
+    ) {
+
+      return rawSquare;
 
     }
 
@@ -4006,11 +4921,7 @@ function squareFromPoint(
 
 
   /*
-    If the finger is genuinely inside
-    a legal square, use that exact square.
-
-    This means when you actually reach d4,
-    d4 wins over any magnetic target.
+    Exact legal square first.
   */
 
   if (
@@ -4025,7 +4936,7 @@ function squareFromPoint(
 
 
   /*
-    Mild magnetic help for destinations.
+    Mild move magnetism.
   */
 
   let nearestSquare =
@@ -4072,7 +4983,8 @@ function squareFromPoint(
     const centerX =
 
       (
-        targetCol + 0.5
+        targetCol
+        + 0.5
       )
 
       * squareWidth;
@@ -4081,7 +4993,8 @@ function squareFromPoint(
     const centerY =
 
       (
-        targetRow + 0.5
+        targetRow
+        + 0.5
       )
 
       * squareHeight;
@@ -4118,7 +5031,8 @@ function squareFromPoint(
     const limit =
 
       targetPiece
-        ?.type === "k"
+        ?.type ===
+      "k"
 
         ? KING_MAGNET_RADIUS
 
@@ -4194,17 +5108,16 @@ function getMagneticTargets() {
     );
 
 
-  /*
-    Add rook as castling target.
-  */
-
   if (
     selectedPiece
-      ?.type === "k"
+      ?.type ===
+    "k"
   ) {
 
     if (
-      selectedSquare === "e1"
+      selectedSquare ===
+      "e1"
+
       && legalTargets.includes(
         "g1"
       )
@@ -4218,7 +5131,9 @@ function getMagneticTargets() {
 
 
     if (
-      selectedSquare === "e1"
+      selectedSquare ===
+      "e1"
+
       && legalTargets.includes(
         "c1"
       )
@@ -4232,7 +5147,9 @@ function getMagneticTargets() {
 
 
     if (
-      selectedSquare === "e8"
+      selectedSquare ===
+      "e8"
+
       && legalTargets.includes(
         "g8"
       )
@@ -4246,7 +5163,9 @@ function getMagneticTargets() {
 
 
     if (
-      selectedSquare === "e8"
+      selectedSquare ===
+      "e8"
+
       && legalTargets.includes(
         "c8"
       )
@@ -4311,14 +5230,12 @@ function getCastlingMove(
     null;
 
 
-  /*
-    King -> rook.
-  */
-
   if (
-    first?.type === "k"
+    first?.type ===
+    "k"
 
-    && second?.type === "r"
+    && second?.type ===
+    "r"
 
     && first.color ===
     second.color
@@ -4338,14 +5255,12 @@ function getCastlingMove(
   }
 
 
-  /*
-    Rook -> king.
-  */
-
   else if (
-    first?.type === "r"
+    first?.type ===
+    "r"
 
-    && second?.type === "k"
+    && second?.type ===
+    "k"
 
     && first.color ===
     second.color
@@ -4364,10 +5279,6 @@ function getCastlingMove(
 
   }
 
-
-  /*
-    King -> normal destination.
-  */
 
   else if (
     first?.type ===
@@ -4474,11 +5385,14 @@ function getCastlingMove(
 
 
   if (
-    color === "w"
+    color ===
+    "w"
 
-    && kingSquare === "e1"
+    && kingSquare ===
+    "e1"
 
-    && rookSquare === "h1"
+    && rookSquare ===
+    "h1"
 
     && legalKingMoves.includes(
       "g1"
@@ -4497,11 +5411,14 @@ function getCastlingMove(
 
 
   if (
-    color === "w"
+    color ===
+    "w"
 
-    && kingSquare === "e1"
+    && kingSquare ===
+    "e1"
 
-    && rookSquare === "a1"
+    && rookSquare ===
+    "a1"
 
     && legalKingMoves.includes(
       "c1"
@@ -4520,11 +5437,14 @@ function getCastlingMove(
 
 
   if (
-    color === "b"
+    color ===
+    "b"
 
-    && kingSquare === "e8"
+    && kingSquare ===
+    "e8"
 
-    && rookSquare === "h8"
+    && rookSquare ===
+    "h8"
 
     && legalKingMoves.includes(
       "g8"
@@ -4543,11 +5463,14 @@ function getCastlingMove(
 
 
   if (
-    color === "b"
+    color ===
+    "b"
 
-    && kingSquare === "e8"
+    && kingSquare ===
+    "e8"
 
-    && rookSquare === "a8"
+    && rookSquare ===
+    "a8"
 
     && legalKingMoves.includes(
       "c8"
@@ -4571,7 +5494,7 @@ function getCastlingMove(
 
 
 /* =========================================================
-   ACTIONABLE SQUARE
+   ACTIONABLE
 ========================================================= */
 
 function isActionableSquare(
@@ -4736,10 +5659,6 @@ function handleSquareInput(
   }
 
 
-  /*
-    Mouse fallback.
-  */
-
   const clickedPiece =
     game.get(
       square
@@ -4763,7 +5682,7 @@ function handleSquareInput(
 
 
 /* =========================================================
-   SELECT PIECE
+   SELECT
 ========================================================= */
 
 function selectSquare(
@@ -4778,6 +5697,7 @@ function selectSquare(
 
   if (
     !piece
+
     || piece.color !==
     game.turn()
   ) {
@@ -5199,27 +6119,23 @@ function chooseAiMove() {
   }
 
 
-  const depth =
+  const depth = {
 
-    {
+    easy:
+      1,
 
-      easy:
-        1,
+    medium:
+      2,
 
-      medium:
-        2,
+    hard:
+      2,
 
-      hard:
-        2,
+    expert:
+      3
 
-      expert:
-        3
-
-    }[
-      settings.difficulty
-    ]
-
-    || 2;
+  }[
+    settings.difficulty
+  ] || 2;
 
 
   let bestScore =
@@ -5338,7 +6254,6 @@ function minimax(
 
 
   const moves =
-
     chess.moves({
       verbose:
         true
@@ -5777,7 +6692,8 @@ function getOnlineClockMs(
 
     Number(
 
-      color === "w"
+      color ===
+      "w"
 
         ? room.whiteTimeMs
 
@@ -5824,7 +6740,7 @@ function getOnlineClockMs(
 
 
 /* =========================================================
-   CLOCK FORMAT
+   FORMAT CLOCK
 ========================================================= */
 
 function formatClock(
@@ -5864,7 +6780,8 @@ function renderClocks() {
 
   const whiteTime =
 
-    mode() === "online"
+    mode() ===
+    "online"
 
       ? getOnlineClockMs(
         "w"
@@ -5875,7 +6792,8 @@ function renderClocks() {
 
   const blackTime =
 
-    mode() === "online"
+    mode() ===
+    "online"
 
       ? getOnlineClockMs(
         "b"
@@ -5955,7 +6873,7 @@ function renderClocks() {
 
 
 /* =========================================================
-   TIMEOUT
+   LOCAL TIMEOUT
 ========================================================= */
 
 function endLocalOnTime() {
@@ -5978,18 +6896,38 @@ function endLocalOnTime() {
   );
 
 
-  const winner =
+  const winnerColor =
 
-    whiteTimeMs <= 0
+    whiteTimeMs <=
+    0
 
-      ? settings.blackName
+      ? "b"
 
-      : settings.whiteName;
+      : "w";
+
+
+  const winnerName =
+
+    winnerColor ===
+    "w"
+
+      ? settings.whiteName
+
+      : settings.blackName;
 
 
   gameStatus.textContent =
 
-    `⏱ ${winner} wins on time`;
+    `⏱ ${winnerName} wins on time`;
+
+
+  showLocalResult(
+
+    winnerColor,
+
+    "time"
+
+  );
 
 
   playUiTone(
@@ -6163,7 +7101,7 @@ function updateStatus() {
 
 
 /* =========================================================
-   ONLINE STATUS
+   ONLINE STATUS TEXT
 ========================================================= */
 
 function describeOnlineStatus(
@@ -6269,7 +7207,7 @@ function describeOnlineStatus(
 
 
 /* =========================================================
-   LOCAL END
+   LOCAL GAME END
 ========================================================= */
 
 function checkLocalGameEnd() {
@@ -6296,19 +7234,31 @@ function checkLocalGameEnd() {
     game.isCheckmate()
   ) {
 
+    const winnerColor =
+      otherColor(
+        game.turn()
+      );
+
+
     const winner =
 
-      game.turn() ===
+      winnerColor ===
       "w"
 
-        ? settings.blackName
+        ? settings.whiteName
 
-        : settings.whiteName;
+        : settings.blackName;
 
 
     gameStatus.textContent =
 
       `♛ Checkmate — ${winner} wins`;
+
+
+    showLocalResult(
+      winnerColor,
+      "checkmate"
+    );
 
   } else if (
     game.isStalemate()
@@ -6317,12 +7267,24 @@ function checkLocalGameEnd() {
     gameStatus.textContent =
       "½–½ Stalemate";
 
+
+    showLocalResult(
+      null,
+      "stalemate"
+    );
+
   } else if (
     game.isThreefoldRepetition()
   ) {
 
     gameStatus.textContent =
       "½–½ Draw by repetition";
+
+
+    showLocalResult(
+      null,
+      "draw"
+    );
 
   } else if (
     game.isInsufficientMaterial()
@@ -6331,10 +7293,22 @@ function checkLocalGameEnd() {
     gameStatus.textContent =
       "½–½ Draw — insufficient material";
 
+
+    showLocalResult(
+      null,
+      "draw"
+    );
+
   } else {
 
     gameStatus.textContent =
       "½–½ Draw";
+
+
+    showLocalResult(
+      null,
+      "draw"
+    );
 
   }
 
@@ -6345,6 +7319,316 @@ function checkLocalGameEnd() {
 
 
   return true;
+
+}
+
+
+/* =========================================================
+   RESULT OVERLAY
+========================================================= */
+
+function hideResultOverlay() {
+
+  lastResultSignature =
+    null;
+
+
+  resultOverlay
+    ?.classList
+    .add(
+      "hidden"
+    );
+
+}
+
+
+function reasonLabel(
+  reason
+) {
+
+  if (
+    reason ===
+    "checkmate"
+  ) {
+
+    return "Checkmate";
+
+  }
+
+
+  if (
+    reason ===
+    "time"
+  ) {
+
+    return "Win on time";
+
+  }
+
+
+  if (
+    reason ===
+    "resign"
+  ) {
+
+    return "Opponent resigned";
+
+  }
+
+
+  if (
+    reason ===
+    "stalemate"
+  ) {
+
+    return "Stalemate";
+
+  }
+
+
+  return "Draw";
+
+}
+
+
+function showResultOverlay(
+  title,
+  subtitle,
+  signature
+) {
+
+  if (
+    lastResultSignature ===
+    signature
+  ) {
+
+    return;
+
+  }
+
+
+  lastResultSignature =
+    signature;
+
+
+  if (
+    resultTitle
+  ) {
+
+    resultTitle.textContent =
+      title;
+
+  }
+
+
+  if (
+    resultSubtitle
+  ) {
+
+    resultSubtitle.textContent =
+      subtitle;
+
+  }
+
+
+  resultOverlay
+    ?.classList
+    .remove(
+      "hidden"
+    );
+
+}
+
+
+function showLocalResult(
+  winnerColor,
+  reason
+) {
+
+  /*
+    VS AI:
+    player is White.
+  */
+
+  if (
+    settings.mode ===
+    "ai"
+  ) {
+
+    if (
+      winnerColor ===
+      "w"
+    ) {
+
+      showResultOverlay(
+
+        "Yayy, you won! 🎉",
+
+        reasonLabel(
+          reason
+        ),
+
+        `ai-win-${reason}`
+
+      );
+
+
+      return;
+
+    }
+
+
+    if (
+      winnerColor ===
+      "b"
+    ) {
+
+      showResultOverlay(
+
+        "Good game! ♟️",
+
+        "Nova AI wins",
+
+        `ai-loss-${reason}`
+
+      );
+
+
+      return;
+
+    }
+
+
+    showResultOverlay(
+
+      "Draw! 🤝",
+
+      reasonLabel(
+        reason
+      ),
+
+      `ai-draw-${reason}`
+
+    );
+
+
+    return;
+
+  }
+
+
+  /*
+    Local two player.
+  */
+
+  if (
+    winnerColor
+  ) {
+
+    const winnerName =
+
+      winnerColor ===
+      "w"
+
+        ? settings.whiteName
+
+        : settings.blackName;
+
+
+    showResultOverlay(
+
+      `${winnerName} wins! 🎉`,
+
+      reasonLabel(
+        reason
+      ),
+
+      `local-${winnerColor}-${reason}`
+
+    );
+
+  } else {
+
+    showResultOverlay(
+
+      "Draw! 🤝",
+
+      reasonLabel(
+        reason
+      ),
+
+      `local-draw-${reason}`
+
+    );
+
+  }
+
+}
+
+
+function showOnlineResult(
+  room
+) {
+
+  const signature =
+
+    `online-${currentRoomCode}-${room.endReason}-${room.winner}`;
+
+
+  if (
+    room.winner ===
+    onlineColor
+  ) {
+
+    showResultOverlay(
+
+      "Yayy, you won! 🎉",
+
+      reasonLabel(
+        room.endReason
+      ),
+
+      signature
+
+    );
+
+
+    return;
+
+  }
+
+
+  if (
+    !room.winner
+  ) {
+
+    showResultOverlay(
+
+      "Draw! 🤝",
+
+      reasonLabel(
+        room.endReason
+      ),
+
+      signature
+
+    );
+
+
+    return;
+
+  }
+
+
+  showResultOverlay(
+
+    "Good game! ♟️",
+
+    "Your opponent won",
+
+    signature
+
+  );
 
 }
 
@@ -6491,13 +7775,25 @@ function fitBoardToCamera() {
   }
 
 
+  /*
+    IMPORTANT RANK-1 FIX.
+
+    Old board reached too close to
+    bottom of camera.
+
+    New board is slightly smaller,
+    giving your hand more room.
+  */
+
   const size =
 
     Math.min(
 
-      rect.width * 0.70,
+      rect.width
+      * 0.66,
 
-      rect.height * 0.86
+      rect.height
+      * 0.78
 
     );
 
@@ -6508,6 +7804,14 @@ function fitBoardToCamera() {
 
   boardEl.style.height =
     `${size}px`;
+
+
+  /*
+    Move board upward slightly.
+  */
+
+  boardEl.style.top =
+    "47.5%";
 
 
   const pieceSize =
@@ -6542,7 +7846,7 @@ window.addEventListener(
 
 
 /* =========================================================
-   HOVER RESET
+   HOVER
 ========================================================= */
 
 function resetHover() {
@@ -6856,33 +8160,29 @@ function playMoveSound(
   }
 
 
-  const base =
+  const base = {
 
-    {
+    p:
+      330,
 
-      p:
-        330,
+    n:
+      430,
 
-      n:
-        430,
+    b:
+      500,
 
-      b:
-        500,
+    r:
+      280,
 
-      r:
-        280,
+    q:
+      620,
 
-      q:
-        620,
+    k:
+      220
 
-      k:
-        220
-
-    }[
-      move.piece
-    ]
-
-    || 330;
+  }[
+    move.piece
+  ] || 330;
 
 
   beep(
@@ -7004,6 +8304,7 @@ restartBtn
 
       if (
         settings
+
         && mode() !==
         "online"
       ) {
@@ -7057,7 +8358,8 @@ resignBtn
 
             if (
               !room
-              || room.status !== "playing"
+              || room.status !==
+              "playing"
             ) {
 
               return;
@@ -7109,19 +8411,31 @@ resignBtn
       );
 
 
+      const winnerColor =
+        otherColor(
+          game.turn()
+        );
+
+
       const winner =
 
-        game.turn() ===
+        winnerColor ===
         "w"
 
-          ? settings.blackName
+          ? settings.whiteName
 
-          : settings.whiteName;
+          : settings.blackName;
 
 
       gameStatus.textContent =
 
         `${winner} wins by resignation`;
+
+
+      showLocalResult(
+        winnerColor,
+        "resign"
+      );
 
 
       playUiTone(
@@ -7140,6 +8454,9 @@ newGameBtn
   ?.addEventListener(
     "click",
     async () => {
+
+      hideResultOverlay();
+
 
       if (
         mode() ===
